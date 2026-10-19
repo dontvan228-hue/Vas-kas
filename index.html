@@ -955,7 +955,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v20`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v21`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1175,6 +1175,24 @@ function renderCloud(){const e=$('#cloudBox');if(!e)return;const m=clMsg?`<p cla
 setInterval(async()=>{if(!CL||!CL.ready||!me||!db.users[me]||clBusy)return;try{const d=JSON.stringify(clData()),h=d.length+':'+hashS(d);if(h!==CL.last){clBusy=true;await clPush();clBusy=false}}catch(e){clBusy=false}},20000);
 const _r20=render;render=function(){_r20();renderCloud()};
 renderCloud();
+</script>
+
+<script>
+/* ===== v21: сканер штрихкодов для Safari/iPhone (библиотека ZXing) ===== */
+let zxReader=null;
+function zxLoad(){return new Promise((ok,no)=>{if(window.ZXing)return ok();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';s.onload=()=>window.ZXing?ok():no();s.onerror=no;document.head.appendChild(s)})}
+scan=async function(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return toast('Камера недоступна. Откройте приложение в Safari или Chrome по обычной ссылке, а не внутри другого приложения');
+  toast('Запускаю камеру…');
+  try{await zxLoad()}catch(e){return toast('Не удалось загрузить сканер. Проверьте интернет или введите цифры штрихкода в поиск')}
+  try{
+    const H=new Map(),F=ZXing.BarcodeFormat;H.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128]);H.set(ZXing.DecodeHintType.TRY_HARDER,true);
+    zxReader=new ZXing.BrowserMultiFormatReader(H,300);
+    const v=$('#cV');v.hidden=false;$('#cStop').hidden=false;v.setAttribute('playsinline','');v.muted=true;
+    await zxReader.decodeFromConstraints({video:{facingMode:{ideal:'environment'}}},v,(res,err)=>{
+      if(res){const code=res.getText();stopScan();$('#cQ').value=code;navigator.vibrate&&navigator.vibrate(30);cSearch()}});
+  }catch(e){stopScan();toast(e&&e.name==='NotAllowedError'?'Нет доступа к камере. Разрешите её в настройках Safari для этого сайта':'Не удалось запустить камеру')}};
+const _stop21=stopScan;stopScan=function(){try{zxReader&&zxReader.reset()}catch(e){}zxReader=null;_stop21()};
 </script>
 </body>
 </html>
