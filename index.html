@@ -327,6 +327,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
     <button class="btn ghost" onclick="logout()">Выйти</button>
     <button class="btn ghost" style="color:var(--warn)" onclick="delAcc()">Удалить аккаунт и данные</button>
   </div>
+  <div class="card"><h2>Облако: вход и синхронизация</h2><div id="cloudBox"></div></div>
   <div class="card"><h2>Оформление</h2><label>Цветовая тема</label><div class="sw" id="swBox"></div><label>Фон</label><div id="bgBox"></div><label>Звуки</label><div id="sndBox"></div><button class="btn ghost" onclick="startQuiz()">Пройти анкету заново</button></div>
   <div class="card"><h2>Уведомления</h2><div id="ntBox"></div></div>
   <div class="card"><h2>Почта и отчёты</h2><label>Ваша почта</label><input id="mlTo" type="email" placeholder="name@gmail.com"><button class="btn" onclick="mailReport()">Отправить отчёт на почту</button><button class="btn ghost" onclick="copyReport()">Скопировать отчёт</button><p class="m" style="margin-top:10px;font-size:11px">Отчёт откроется в вашем почтовом приложении, останется нажать «Отправить». Данные никуда не уходят сами.</p></div>
@@ -954,7 +955,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v19`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v20`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1121,6 +1122,59 @@ function rcSave(){const n=$('#rcN').value.trim();if(!n)return toast('Введи�
   myList().push({n:'Рецепт: '+n,k:s.k*k,p:s.p*k,f:s.f*k,c:s.c*k,fi:s.fi*k,g:Math.round(w/sv)});save();RCI=[];['rcN','rcW'].forEach(i=>$('#'+i).value='');$('#rcS').value=1;rcShow();renderMy();toast('Рецепт сохранён. Он в поиске, порция уже подставлена')}
 const _r19=render;render=function(){_r19();renderBzu();renderMy();rcShow()};
 if(typeof me!=='undefined'&&me&&db.users[me]&&U().p)try{render()}catch(e){}
+</script>
+
+<script>
+/* ===== v20: облако (Supabase): вход по почте и синхронизация ===== */
+const SB={url:'https://abmdtuqcbzrlzyecczkc.supabase.co',key:'sb_publishable_zzvAo21uKGmIhEH1jhvgBA_L3rVk8sC'};
+let CL=null;try{CL=JSON.parse(localStorage.getItem('flow_cloud')||'null')}catch(e){}
+const clSave=()=>{try{localStorage.setItem('flow_cloud',JSON.stringify(CL))}catch(e){}};
+const clErr=e=>{const s=String((e&&e.message)||e||'');
+  if(/Invalid login/i.test(s))return 'Неверная почта или пароль';
+  if(/already registered|already been registered/i.test(s))return 'Эта почта уже зарегистрирована. Нажмите «Войти»';
+  if(/Password should be|at least/i.test(s))return 'Пароль слишком короткий: нужно минимум 6 символов';
+  if(/Email not confirmed/i.test(s))return 'Подтвердите почту: откройте письмо от Supabase и нажмите ссылку';
+  if(/rate limit/i.test(s))return 'Слишком много попыток. Подождите несколько минут';
+  if(/Failed to fetch|NetworkError|Load failed/i.test(s))return 'Нет связи с облаком. Проверьте интернет';
+  return 'Ошибка облака: '+s.slice(0,120)};
+async function sbReq(path,o={},auth){const h=Object.assign({apikey:SB.key,'Content-Type':'application/json'},o.headers||{});
+  if(auth){await clFresh();h.Authorization='Bearer '+CL.access_token}
+  const r=await fetch(SB.url+path,{method:o.method||'GET',headers:h,body:o.body});const tx=await r.text();let j=null;try{j=tx?JSON.parse(tx):null}catch(e){}
+  if(!r.ok)throw new Error((j&&(j.msg||j.message||j.error_description||j.error))||('HTTP '+r.status));return j}
+function clSet(s){CL=Object.assign(CL||{},{access_token:s.access_token,refresh_token:s.refresh_token,expires_at:s.expires_at||Math.floor(Date.now()/1000)+(s.expires_in||3600),user:s.user||CL.user});clSave()}
+async function clFresh(){if(!CL||!CL.access_token)throw new Error('Нужно войти');
+  if(Date.now()/1000>CL.expires_at-60){const s=await sbReq('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:CL.refresh_token})});clSet(s)}}
+const clData=()=>{const u=JSON.parse(JSON.stringify(U()));delete u.salt;delete u.hash;return u};
+async function clPull(){const r=await sbReq('/rest/v1/user_data?select=data,updated_at',{},true);return r&&r[0]||null}
+async function clPush(){const d=clData(),body=JSON.stringify({user_id:CL.user.id,data:d,updated_at:new Date().toISOString()});
+  if(body.length>6e6)throw new Error('Данных слишком много для облака (больше 6 МБ)');
+  await sbReq('/rest/v1/user_data?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body},true);CL.last=JSON.stringify(d).length+':'+hashS(JSON.stringify(d));clSave()}
+const hashS=s=>{let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return h};
+let clMsg='',clBusy=false;
+const clUI=(m)=>{clMsg=m||'';renderCloud()};
+async function clAuth(kind){const em=$('#clE').value.trim(),pw=$('#clP').value;if(!/^\S+@\S+\.\S+$/.test(em))return clUI('Введите почту');if(pw.length<6)return clUI('Пароль: минимум 6 символов');
+  clBusy=true;clUI('Подождите…');
+  try{let s;
+    if(kind==='up'){s=await sbReq('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:em,password:pw})});
+      if(!s.access_token){clBusy=false;return clUI('Почти готово: мы отправили письмо на '+em+'. Откройте его, подтвердите почту и вернитесь сюда, чтобы нажать «Войти».')}}
+    else s=await sbReq('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:em,password:pw})});
+    CL={user:{id:s.user.id,email:s.user.email||em}};clSet(s);CL.ready=false;
+    const c=await clPull();CL.has=!!c;
+    if(!c){await clPush();CL.ready=true;clSave();clBusy=false;return clUI('Готово: данные сохранены в облаке')}
+    clSave();clBusy=false;clUI('Нашли данные в облаке. Выберите, что сделать.')}
+  catch(e){clBusy=false;clUI(clErr(e))}}
+async function clUse(kind){clBusy=true;clUI('Подождите…');
+  try{if(kind==='pull'){const c=await clPull();if(!c)throw new Error('В облаке пока нет данных');
+      const u=U(),keep={salt:u.salt,hash:u.hash};Object.keys(u).forEach(k=>delete u[k]);Object.assign(u,c.data,keep);save();CL.last=null;render();clMsg='Данные загружены из облака'}
+    else{await clPush();clMsg='Данные отправлены в облако'}
+    CL.ready=true;CL.has=true;clSave()}catch(e){clMsg=clErr(e)}clBusy=false;renderCloud()}
+function clOut(){CL=null;try{localStorage.removeItem('flow_cloud')}catch(e){}clUI('Вы вышли из облака. Данные на этом устройстве остались.')}
+function renderCloud(){const e=$('#cloudBox');if(!e)return;const m=clMsg?`<p class="m" style="margin:10px 0 0">${esc(clMsg)}</p>`:'';
+  if(!CL||!CL.user){e.innerHTML=`<p class="m">Войдите по почте, и прогресс сохранится в облаке. Откроете приложение на другом телефоне, и всё будет на месте.</p><label>Почта</label><input id="clE" type="email" autocomplete="email"><label>Пароль</label><input id="clP" type="password" autocomplete="current-password" placeholder="минимум 6 символов"><div class="row" style="margin-top:12px"><button class="btn" ${clBusy?'disabled':''} onclick="clAuth('in')">Войти</button><button class="btn ghost" ${clBusy?'disabled':''} onclick="clAuth('up')">Создать аккаунт</button></div>${m}`;return}
+  e.innerHTML=`<p class="m">Вы вошли как <b>${esc(CL.user.email)}</b></p>`+(CL.ready?`<p class="m" style="margin-top:6px">Автосинхронизация включена. Изменения уходят в облако сами.</p><button class="btn" ${clBusy?'disabled':''} onclick="clUse('push')">Синхронизировать сейчас</button>`:`<p class="m" style="margin-top:6px">Выберите, какие данные главные. Это нужно сделать один раз на этом устройстве.</p>${CL.has?`<button class="btn" ${clBusy?'disabled':''} onclick="clUse('pull')">Загрузить данные из облака сюда</button>`:''}<button class="btn ghost" ${clBusy?'disabled':''} onclick="clUse('push')">Отправить данные этого телефона в облако</button>`)+`<button class="btn ghost" onclick="clOut()">Выйти из облака</button>${m}`}
+setInterval(async()=>{if(!CL||!CL.ready||!me||!db.users[me]||clBusy)return;try{const d=JSON.stringify(clData()),h=d.length+':'+hashS(d);if(h!==CL.last){clBusy=true;await clPush();clBusy=false}}catch(e){clBusy=false}},20000);
+const _r20=render;render=function(){_r20();renderCloud()};
+renderCloud();
 </script>
 </body>
 </html>
