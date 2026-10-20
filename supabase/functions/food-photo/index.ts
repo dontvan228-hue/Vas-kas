@@ -3,7 +3,7 @@
 // Фото нигде не сохраняется: оно живёт только в памяти на время запроса.
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-region',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
@@ -91,13 +91,14 @@ Deno.serve(async (req) => {
   try {
     g = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
       method: 'POST',
+      signal: AbortSignal.timeout(40000),
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
       body: JSON.stringify({
         contents: [{ parts: [{ text: PROMPT }, { inline_data: { mime_type: 'image/jpeg', data: img } }] }],
         generationConfig: { responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.2 },
       }),
     });
-  } catch { return json({ error: 'upstream' }, 502); }
+  } catch (e) { return json({ error: 'upstream', detail: String(e).slice(0, 120) }, 502); }
   if (!g.ok) { let d = ''; try { d = (await g.text()).slice(0, 160); } catch { /* */ } return json({ error: g.status === 429 ? 'busy' : 'upstream', status: g.status, detail: d }, 502); }
 
   let out;

@@ -963,7 +963,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v25`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v26`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1214,12 +1214,12 @@ async function photoGo(inp){const f=inp.files&&inp.files[0];if(!f)return;
   openPop('Смотрю, что на фото…','<div class="brw" style="margin:20px auto">🍽</div><p class="m" style="text-align:center">Обычно 5–10 секунд. Фото не сохраняется: оно отправляется на анализ и сразу удаляется.</p>');
   let img;try{img=await phResize(f)}catch(e){return openPop('Не получилось','<p class="m">Не удалось открыть фото. Выберите другое.</p>')}
   try{await clFresh();
-    const r=await fetch(SB.url+'/functions/v1/food-photo',{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+CL.access_token,'Content-Type':'application/json'},body:JSON.stringify({image:img.data})});
+    const r=await fetch(SB.url+'/functions/v1/food-photo',{method:'POST',signal:AbortSignal.timeout(60000),headers:{apikey:SB.key,Authorization:'Bearer '+CL.access_token,'Content-Type':'application/json','x-region':'eu-central-1'},body:JSON.stringify({image:img.data})});
     let j=null;try{j=await r.json()}catch(e){}
     if(!r.ok)return openPop('Не получилось',`<p class="m">${esc(phErr(j&&j.error,j))}</p><p class="m" style="opacity:.6;font-size:12px">Код: ${esc(String(r.status)+' '+((j&&j.error)||'')+' '+((j&&j.status)||'')+' '+((j&&j.detail)||'')).slice(0,200)}</p>`);
     PH=(j.items||[]).map(x=>({n:x.name,g0:Math.max(1,x.grams),g:Math.max(1,x.grams),k:x.kcal,p:x.protein,f:x.fat,c:x.carbs,on:true,conf:x.confidence}));
     phLeft=j.left;phThumb=img.thumb;const h=new Date().getHours();phMeal=h<11?'Завтрак':h<16?'Обед':h<21?'Ужин':'Перекус';phShow()}
-  catch(e){openPop('Не получилось',`<p class="m">${esc(phErr('net'))}</p>`)}}
+  catch(e){openPop('Не получилось',`<p class="m">${esc(phErr('net'))}</p><p class="m" style="opacity:.6;font-size:12px">Код: ${esc(String(e&&e.name||'')+' '+String(e&&e.message||'')).slice(0,160)}</p>`)}}
 let phLeft=null,phThumb='';
 const phK=(x,v)=>v*x.g/x.g0;
 function phTotals(){return PH.filter(x=>x.on).reduce((a,x)=>({k:a.k+phK(x,x.k),p:a.p+phK(x,x.p),f:a.f+phK(x,x.f),c:a.c+phK(x,x.c)}),{k:0,p:0,f:0,c:0})}
