@@ -72,7 +72,7 @@ async function getUser(token) {
   return u && u.id ? u : null;
 }
 
-async function useQuota(userId) {
+async function useQuota(userId, commit) {
   const day = new Date().toISOString().slice(0, 10);
   const H = {
     apikey: SERVICE,
@@ -86,6 +86,7 @@ async function useQuota(userId) {
   const rows = q.ok ? await q.json() : [];
   const used = (rows[0] && rows[0].n) || 0;
   if (used >= DAILY_LIMIT) return { ok: false, used };
+  if (!commit) return { ok: true, used };
   await fetch(SB_URL + '/rest/v1/photo_usage?on_conflict=user_id,day', {
     method: 'POST',
     headers: { ...H, Prefer: 'resolution=merge-duplicates,return=minimal' },
@@ -221,11 +222,12 @@ async function handle(req) {
   img = img.replace(/^data:image\/\w+;base64,/, '');
   if (!img || img.length > MAX_BYTES) return json({ error: 'bad_image' }, 400);
 
-  const quota = await useQuota(user.id);
+  let quota = await useQuota(user.id, false);
   if (!quota.ok) return json({ error: 'limit', limit: DAILY_LIMIT }, 429);
 
   const res = OR_KEY ? await askOpenRouter(img) : await askGemini(img);
   if (res.err) return res.err;
+  quota = await useQuota(user.id, true);
   const out = res.out || {};
 
   const list = Array.isArray(out.items) ? out.items.slice(0, 12) : [];
