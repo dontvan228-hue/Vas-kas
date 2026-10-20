@@ -641,7 +641,7 @@ function closeSheet(){$('#bk').classList.remove('on');$('#sheet').classList.remo
 function drawMeals(){$('#shMeals').innerHTML=['Завтрак','Обед','Ужин','Перекус'].map(m=>`<span class="chip2 ${m===shM?'on':''}" onclick="shM='${m}';drawMeals()">${m}</span>`).join('')}
 function stepG(d){const v=Math.max(5,(+$('#shG').value||0)+d);$('#shG').value=v;$('#shR').value=Math.min(500,v);shUpd()}
 function shUpd(){const r=RES[shI],f=(+$('#shG').value||0)/100;$('#shM').innerHTML=`<div>Ккал<b>${Math.round(r.k*f)}</b></div><div>Чист. угл.<b>${n1(Math.max(0,r.c-r.fi)*f)}</b></div><div>Белки<b>${n1(r.p*f)}</b></div><div>Жиры<b>${n1(r.f*f)}</b></div>`}
-function commitSheet(){const r=RES[shI],g=+$('#shG').value;if(!(g>0))return toast('Укажите граммы');const f=g/100,k=v=>n1(v*f);closeSheet();addMacroFood({n:`${r.n}, ${g} г`,k:Math.round(r.k*f),c:k(r.c),fi:k(r.fi),p:k(r.p),f:k(r.f),m:shM});burst&&burst(innerWidth/2,innerHeight*.6,12)}
+function commitSheet(){const r=RES[shI],g=+$('#shG').value;if(!r)return closeSheet();if(!(g>0))return toast('Укажите граммы');const f=g/100,k=v=>n1(v*f);closeSheet();addMacroFood({n:`${r.n}, ${g} г`,k:Math.round(r.k*f),c:k(r.c),fi:k(r.fi),p:k(r.p),f:k(r.f),m:shM});burst&&burst(innerWidth/2,innerHeight*.6,12)}
 const _am=addMacroFood;addMacroFood=function(o){o.m=o.m||'Перекус';_am(o)};
 const _go=go;go=function(id,b){_go(id,b);if(id==='carb'&&!RES.length)liveSearch()};
 
@@ -962,7 +962,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v32`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v33`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1101,7 +1101,7 @@ liveSearch=function(){RES=srch($('#cQ').value);if(!/^\d{8,}$/.test($('#cQ').valu
 showRes=function(){$('#cRes').innerHTML=resHtml()};
 function homeSearch(){const q=$('#fN').value;if(!q.trim()){$('#fRes').innerHTML='';return}RES=srch(q);$('#fRes').innerHTML=resHtml()}
 openSheet=function(i){shI=i;const h=new Date().getHours();shM=h<11?'Завтрак':h<16?'Обед':h<21?'Ужин':'Перекус';const r=RES[i],g=r.g||100;$('#shT').textContent=r.n;$('#shG').value=g;$('#shR').value=Math.min(500,g);drawMeals();shUpd();$('#bk').classList.add('on');$('#sheet').classList.add('on');navigator.vibrate&&navigator.vibrate(10)};
-shUpd=function(){const r=RES[shI],f=(+$('#shG').value||0)/100;$('#shM').innerHTML=`<div>Ккал<b>${Math.round(r.k*f)}</b></div><div>Белки<b>${n1(r.p*f)}</b></div><div>Жиры<b>${n1(r.f*f)}</b></div><div>Углеводы<b>${n1(r.c*f)}</b></div>`};
+shUpd=function(){const r=RES[shI];if(!r)return;const f=(+$('#shG').value||0)/100;$('#shM').innerHTML=`<div>Ккал<b>${Math.round(r.k*f)}</b></div><div>Белки<b>${n1(r.p*f)}</b></div><div>Жиры<b>${n1(r.f*f)}</b></div><div>Углеводы<b>${n1(r.c*f)}</b></div>`};
 const _commit0=commitSheet;commitSheet=function(){_commit0();const a=$('#fN');if(a){a.value='';$('#fRes').innerHTML=''}};
 addFood=function(){const k=+$('#fK').value,n=$('#fN').value.trim();if(!(k>0))return toast('Выберите продукт из списка или впишите ккал');
   addMacroFood({n:n||'Блюдо',k:Math.round(k)});$('#fK').value='';$('#fN').value='';$('#fRes').innerHTML=''};

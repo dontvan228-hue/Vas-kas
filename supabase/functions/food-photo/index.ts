@@ -214,6 +214,10 @@ async function askGemini(img, prompt) {
     } catch (e) {
       d = '';
     }
+    if (g.status === 400 || g.status === 403) {
+      const nd = 'Нет рабочего ключа: добавьте секрет OPENROUTER_API_KEY';
+      return { err: json({ error: 'not_configured', detail: nd }, 500) };
+    }
     const code = g.status === 429 ? 'busy' : 'upstream';
     return { err: json({ error: code, status: g.status, detail: d }, 502) };
   }
