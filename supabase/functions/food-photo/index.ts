@@ -15,7 +15,7 @@ const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY');
 const OR_KEY = Deno.env.get('OPENROUTER_API_KEY');
 const OR_MODELS = (
   Deno.env.get('OPENROUTER_MODEL') ||
-  'openrouter/free,google/gemini-2.0-flash-001'
+  'openrouter/free'
 ).split(',').map((x) => x.trim()).filter(Boolean);
 const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-latest';
 const DAILY_LIMIT = parseInt(Deno.env.get('DAILY_LIMIT') || '5', 10);
