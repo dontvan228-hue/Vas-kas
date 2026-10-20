@@ -287,7 +287,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
   <div class="qa"><button onclick="quickAdd()">Добавить еду</button><button onclick="setWater(day().water+1)">Вода +1</button><button onclick="go('carb',document.querySelector('nav button:nth-child(2)'));setTimeout(()=>$('#fastBox').scrollIntoView({behavior:'smooth'}),120)">Голодание</button></div>
   <div class="card"><h2>Добавить еду</h2>
     <input id="fN" placeholder="Найти: гречка, борщ, банан…" oninput="homeSearch()" autocomplete="off">
-    <datalist id="fl"></datalist><div id="fRes"></div>
+    <button class="btn ghost" onclick="photoPick()" style="margin-top:10px">📸 Определить калории по фото</button><input type="file" id="phIn" accept="image/*" hidden onchange="photoGo(this)"><datalist id="fl"></datalist><div id="fRes"></div>
     <div class="row"><div><label>Или своё блюдо: всего ккал</label><input id="fK" type="number" inputmode="numeric" placeholder="например, 350"></div><button class="btn sm" onclick="addFood()">＋</button></div>
     <p class="m" style="margin-top:8px;font-size:11px">Выберите продукт, укажите вес — приложение посчитает калории, белки, жиры и углеводы. Ещё продукты, штрихкод и свои рецепты — на вкладке «Углеводы».</p>
   </div>
@@ -339,7 +339,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
 <p class="m" style="margin-top:8px">Чистые углеводы = углеводы − клетчатка (− сахарные спирты, если вписали их как клетчатку).</p></div>
 <div class="card"><h2>Поиск продукта и штрихкод</h2><div class="row"><div><input id="cQ" placeholder="Яйцо, авокадо, сыр… или штрихкод" oninput="liveSearch()" onkeydown="if(event.key==='Enter')cSearch()"></div><button class="btn sm" onclick="cSearch()">🔎</button><button class="btn sm" onclick="scan()">📷</button></div>
 <video id="cV" playsinline muted hidden style="width:100%;border-radius:12px;margin-top:10px"></video><button class="btn ghost" id="cStop" hidden onclick="stopScan()">Закрыть камеру</button>
-<div id="cRes"></div>
+<button class="btn ghost" onclick="photoPick()" style="margin-top:10px">📸 Определить калории по фото</button><div id="cRes"></div>
 <p class="m" style="margin-top:8px;font-size:11px">База: Open Food Facts (открытая, бесплатная). Нужен интернет. Данные добавлены сообществом, проверяйте этикетку.</p></div>
 <div class="card"><h2>Своя еда с макросами</h2><input id="xN" placeholder="Название"><div class="row"><div><label>Ккал</label><input id="xK" type="number" inputmode="decimal"></div><div><label>Углеводы, г</label><input id="xC" type="number" inputmode="decimal"></div></div><div class="row"><div><label>Клетчатка, г</label><input id="xFi" type="number" inputmode="decimal"></div><div><label>Белки, г</label><input id="xP" type="number" inputmode="decimal"></div><div><label>Жиры, г</label><input id="xF" type="number" inputmode="decimal"></div></div><button class="btn" onclick="addCustom()">Добавить в сегодня</button></div>
 <div class="card"><h2>Мои продукты</h2><p class="m">Внесите продукт с упаковки один раз (значения на 100 г), и он будет в поиске.</p>
@@ -955,7 +955,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v21`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v22`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1193,6 +1193,33 @@ scan=async function(){
       if(res){const code=res.getText();stopScan();$('#cQ').value=code;navigator.vibrate&&navigator.vibrate(30);cSearch()}});
   }catch(e){stopScan();toast(e&&e.name==='NotAllowedError'?'Нет доступа к камере. Разрешите её в настройках Safari для этого сайта':'Не удалось запустить камеру')}};
 const _stop21=stopScan;stopScan=function(){try{zxReader&&zxReader.reset()}catch(e){}zxReader=null;_stop21()};
+</script>
+
+<script>
+/* ===== v22: калории по фото еды (Supabase + Gemini). Фото нигде не сохраняется ===== */
+let PH=[],phMeal='Обед';
+function photoPick(){if(!CL||!CL.user){openPop('Нужен вход в облако','<p class="m">Распознавание работает через защищённый сервер, поэтому нужно войти по почте. Это один раз: откройте «Профиль» и блок «Облако».</p><button class="btn" onclick="closeSheet();go(\'me\',document.querySelector(\'nav button:nth-child(5)\'))">Открыть профиль</button>');return}
+  const i=$('#phIn');i.value='';i.click()}
+function phResize(file){return new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(file);im.onload=()=>{const s=Math.min(1,1024/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);ok({data:c.toDataURL('image/jpeg',.82),thumb:(()=>{const t=document.createElement('canvas'),k=160/Math.max(c.width,c.height);t.width=Math.round(c.width*k);t.height=Math.round(c.height*k);t.getContext('2d').drawImage(c,0,0,t.width,t.height);return t.toDataURL('image/jpeg',.6)})()})};im.onerror=()=>{URL.revokeObjectURL(u);no(new Error('image'))};im.src=u})}
+const phErr=(c,x)=>c==='limit'?`Лимит фото на сегодня исчерпан${x&&x.limit?` (${x.limit} в день)`:''}. Завтра счётчик обнулится. Продукты можно добавить через поиск.`:c==='auth'?'Сессия входа истекла. Войдите в облако заново в «Профиле».':c==='busy'?'Нейросеть сейчас занята. Попробуйте через минуту.':c==='bad_image'?'Фото не подошло. Снимите ещё раз или выберите другое.':c==='not_configured'?'Сервер распознавания ещё не настроен.':c==='net'?'Нет связи. Проверьте интернет.':'Не удалось распознать фото. Попробуйте ещё раз.';
+async function photoGo(inp){const f=inp.files&&inp.files[0];if(!f)return;
+  openPop('Смотрю, что на фото…','<div class="brw" style="margin:20px auto">🍽</div><p class="m" style="text-align:center">Обычно 5–10 секунд. Фото не сохраняется: оно отправляется на анализ и сразу удаляется.</p>');
+  let img;try{img=await phResize(f)}catch(e){return openPop('Не получилось','<p class="m">Не удалось открыть фото. Выберите другое.</p>')}
+  try{await clFresh();
+    const r=await fetch(SB.url+'/functions/v1/food-photo',{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+CL.access_token,'Content-Type':'application/json'},body:JSON.stringify({image:img.data})});
+    let j=null;try{j=await r.json()}catch(e){}
+    if(!r.ok)return openPop('Не получилось',`<p class="m">${esc(phErr(j&&j.error,j))}</p>`);
+    PH=(j.items||[]).map(x=>({n:x.name,g0:Math.max(1,x.grams),g:Math.max(1,x.grams),k:x.kcal,p:x.protein,f:x.fat,c:x.carbs,on:true,conf:x.confidence}));
+    phLeft=j.left;phThumb=img.thumb;const h=new Date().getHours();phMeal=h<11?'Завтрак':h<16?'Обед':h<21?'Ужин':'Перекус';phShow()}
+  catch(e){openPop('Не получилось',`<p class="m">${esc(phErr('net'))}</p>`)}}
+let phLeft=null,phThumb='';
+const phK=(x,v)=>v*x.g/x.g0;
+function phTotals(){return PH.filter(x=>x.on).reduce((a,x)=>({k:a.k+phK(x,x.k),p:a.p+phK(x,x.p),f:a.f+phK(x,x.f),c:a.c+phK(x,x.c)}),{k:0,p:0,f:0,c:0})}
+function phShow(){if(!PH.length)return openPop('Еду не нашла','<p class="m">На фото не видно еды. Снимите тарелку сверху при хорошем свете.</p>');
+  const rows=PH.map((x,i)=>`<div class="item" style="align-items:flex-start;gap:8px"><input type="checkbox" class="tg" ${x.on?'checked':''} onchange="PH[${i}].on=this.checked;phShow()" style="flex:none;margin-top:4px"><span style="flex:1;min-width:0">${esc(x.n)}<br><small style="color:var(--mut)">${Math.round(phK(x,x.k))} ккал · Б ${n1(phK(x,x.p))} · Ж ${n1(phK(x,x.f))} · У ${n1(phK(x,x.c))}</small></span><span style="flex:none;width:86px"><input type="number" inputmode="numeric" value="${x.g}" onchange="PH[${i}].g=Math.max(1,+this.value||1);phShow()" style="padding:8px"><small style="color:var(--mut)">грамм</small></span></div>`).join('');
+  const T=phTotals(),meals=['Завтрак','Обед','Ужин','Перекус'].map(m=>`<span class="chip2 ${m===phMeal?'on':''}" onclick="phMeal='${m}';phShow()">${m}</span>`).join('');
+  openPop('Вот что вижу на фото',(phThumb?`<img src="${phThumb}" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:12px;float:right;margin:0 0 8px 10px">`:'')+`<p class="m">Это оценка нейросети. Проверьте названия и поправьте граммы, если знаете точный вес.</p>${rows}<div class="stats" style="margin:12px 0"><div>Ккал<b>${Math.round(T.k)}</b></div><div>Белки<b>${n1(T.p)}</b></div><div>Жиры<b>${n1(T.f)}</b></div><div>Углеводы<b>${n1(T.c)}</b></div></div><div>${meals}</div><button class="btn" onclick="phAdd()">Добавить в дневник</button>`+(phLeft!=null?`<p class="m" style="font-size:11px;margin-top:8px">Осталось фото на сегодня: ${phLeft}</p>`:''))}
+function phAdd(){const sel=PH.filter(x=>x.on);if(!sel.length)return toast('Отметьте хотя бы один продукт');closeSheet();sel.forEach(x=>addMacroFood({n:`${x.n}, ${x.g} г (по фото)`,k:Math.round(phK(x,x.k)),c:n1(phK(x,x.c)),fi:0,p:n1(phK(x,x.p)),f:n1(phK(x,x.f)),m:phMeal}));PH=[]}
 </script>
 </body>
 </html>
