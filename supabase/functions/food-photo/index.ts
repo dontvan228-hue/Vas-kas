@@ -11,6 +11,8 @@ const json = (o, status = 200) => new Response(JSON.stringify(o), { status, head
 const SB_URL = Deno.env.get('SUPABASE_URL');
 const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY');
+const OR_KEY = Deno.env.get('OPENROUTER_API_KEY');
+const OR_MODEL = Deno.env.get('OPENROUTER_MODEL') || 'google/gemini-2.0-flash-001';
 const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-latest';
 const DAILY_LIMIT = parseInt(Deno.env.get('DAILY_LIMIT') || '5', 10);
 const MAX_BYTES = 1_500_000; // размер base64-строки
@@ -73,7 +75,7 @@ async function useQuota(userId) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
-  if (!GEMINI_KEY || !SERVICE || !SB_URL) return json({ error: 'not_configured' }, 500);
+  if ((!GEMINI_KEY && !OR_KEY) || !SERVICE || !SB_URL) return json({ error: 'not_configured' }, 500);
 
   const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
   const user = token ? await getUser(token) : null;
@@ -87,25 +89,50 @@ Deno.serve(async (req) => {
   const quota = await useQuota(user.id);
   if (!quota.ok) return json({ error: 'limit', limit: DAILY_LIMIT }, 429);
 
-  let g;
-  try {
-    g = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
-      method: 'POST',
-      signal: AbortSignal.timeout(40000),
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: PROMPT }, { inline_data: { mime_type: 'image/jpeg', data: img } }] }],
-        generationConfig: { responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.2 },
-      }),
-    });
-  } catch (e) { return json({ error: 'upstream', detail: String(e).slice(0, 120) }, 502); }
-  if (!g.ok) { let d = ''; try { d = (await g.text()).slice(0, 160); } catch { /* */ } return json({ error: g.status === 429 ? 'busy' : 'upstream', status: g.status, detail: d }, 502); }
-
   let out;
-  try {
-    const j = await g.json();
-    out = JSON.parse(j.candidates[0].content.parts[0].text);
-  } catch { return json({ error: 'parse', detail: 'no_text' }, 502); }
+  if (OR_KEY) {
+    // OpenRouter (ключ в секретах OPENROUTER_API_KEY), модель в OPENROUTER_MODEL
+    const sys = PROMPT + '\nФормат ответа: {"items":[{"name":"","grams":0,"kcal":0,"protein":0,"fat":0,"carbs":0,"confidence":0.7}],"note":""}';
+    let g;
+    try {
+      g = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        signal: AbortSignal.timeout(45000),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OR_KEY}`, 'X-Title': 'VASSKASS FLOW' },
+        body: JSON.stringify({
+          model: OR_MODEL,
+          temperature: 0.2,
+          messages: [{ role: 'user', content: [{ type: 'text', text: sys }, { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${img}` } }] }],
+        }),
+      });
+    } catch (e) { return json({ error: 'upstream', detail: 'or:' + String(e).slice(0, 110) }, 502); }
+    if (!g.ok) { let d = ''; try { d = (await g.text()).slice(0, 160); } catch { /* */ } return json({ error: g.status === 429 ? 'busy' : 'upstream', status: g.status, detail: d }, 502); }
+    try {
+      const j = await g.json();
+      let s = String(j.choices[0].message.content || '');
+      s = s.replace(/```json|```/g, '');
+      const a = s.indexOf('{'), b = s.lastIndexOf('}');
+      out = JSON.parse(s.slice(a, b + 1));
+    } catch { return json({ error: 'parse', detail: 'or_no_json' }, 502); }
+  } else {
+    let g;
+    try {
+      g = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+        method: 'POST',
+        signal: AbortSignal.timeout(40000),
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: PROMPT }, { inline_data: { mime_type: 'image/jpeg', data: img } }] }],
+          generationConfig: { responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.2 },
+        }),
+      });
+    } catch (e) { return json({ error: 'upstream', detail: String(e).slice(0, 120) }, 502); }
+    if (!g.ok) { let d = ''; try { d = (await g.text()).slice(0, 160); } catch { /* */ } return json({ error: g.status === 429 ? 'busy' : 'upstream', status: g.status, detail: d }, 502); }
+    try {
+      const j = await g.json();
+      out = JSON.parse(j.candidates[0].content.parts[0].text);
+    } catch { return json({ error: 'parse', detail: 'no_text' }, 502); }
+  }
 
   const items = (Array.isArray(out.items) ? out.items : []).slice(0, 12).map((x) => ({
     name: String(x.name || 'Блюдо').slice(0, 60),
