@@ -962,7 +962,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v31`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v32`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1264,7 +1264,7 @@ cSearch=async function(){const q=$('#cQ').value.trim();
   const r=await bcLookup(q);
   if(r.p){RES=[toRes(r.p)];showRes();if(!(RES[0].k>0))$('#cRes').insertAdjacentHTML('beforeend','<p class="m" style="font-size:12px">В базе нет калорий для этого товара. Посмотрите на упаковке и добавьте как свой продукт.</p>');return}
   RES=[];PB=q;
-  $('#cRes').innerHTML=r.net===0&&r.p===null&&false?'':`<p class="m" style="margin-top:10px">Штрихкод ${esc(q)} не найден в базе. Такое бывает с российскими товарами. Впишите калории с упаковки один раз, и приложение запомнит этот штрихкод.</p><button class="btn" onclick="bcAdd()">Добавить этот товар</button>`};
+  $('#cRes').innerHTML=r.net===0&&r.p===null&&false?'':`<p class="m" style="margin-top:10px">Штрихкод ${esc(q)} не найден в базе. Такое бывает с российскими товарами. Сфотографируйте упаковку, и приложение само прочитает название и калории.</p><button class="btn" onclick="lbPick()">📷 Сфотографировать упаковку</button><button class="btn ghost" style="margin-top:8px" onclick="bcAdd()">Ввести вручную</button>`};
 function bcAdd(){const e=$('#mpN');if(!e)return;e.scrollIntoView({block:'center',behavior:'smooth'});e.focus();toast('Впишите название и калории на 100 г с упаковки')}
 const _saveMy=saveMy;saveMy=function(){const had=myList().length,pb=PB;_saveMy();if(myList().length>had&&pb){myList()[myList().length-1].b=pb;PB='';save();toast('Продукт сохранён. Штрихкод запомнен')}};
 
@@ -1278,6 +1278,22 @@ const _cs4=cSearch;cSearch=async function(){const q=$('#cQ').value.trim();
   await _cs4();
   if(q&&!/^\d/.test(q)){const a=await shFind(q);if(a.length){RES=RES.concat(a.filter(x=>!RES.some(l=>l.n===x.n)));showRes()}}};
 const _saveMy2=saveMy;saveMy=function(){const had=myList().length,pb=PB;_saveMy2();if(myList().length>had&&pb){const m=myList()[myList().length-1];shPut(m).then(ok=>ok&&toast('Спасибо! Товар добавлен в общую базу'))}};
+
+/* v32: фото упаковки -> название и КБЖУ на 100 г, без ручного ввода */
+function lbPick(){if(!CL||!CL.user)return photoPick();let i=$('#lbIn');if(!i){i=document.createElement('input');i.type='file';i.accept='image/*';i.id='lbIn';i.hidden=true;i.onchange=()=>lbGo(i);document.body.appendChild(i)}i.value='';i.click()}
+async function lbGo(inp){const f=inp.files&&inp.files[0];if(!f)return;
+  openPop('Читаю упаковку…','<div class="brw" style="margin:20px auto">🏷</div><p class="m" style="text-align:center">Обычно 5–10 секунд. Фото не сохраняется.</p>');
+  let img;try{img=await phResize(f)}catch(e){return openPop('Не получилось','<p class="m">Не удалось открыть фото.</p>')}
+  try{await clFresh();const r=await fetch(SB.url+'/functions/v1/food-photo',{method:'POST',signal:AbortSignal.timeout(60000),headers:{apikey:SB.key,Authorization:'Bearer '+CL.access_token,'Content-Type':'application/json'},body:JSON.stringify({image:img.data,mode:'label'})});
+    let j=null;try{j=await r.json()}catch(e){}
+    if(!r.ok)return openPop('Не получилось',`<p class="m">${esc(phErr(j&&j.error,j))}</p>`);
+    const x=(j.items||[])[0];if(!x)return openPop('Не вижу упаковку','<p class="m">Снимите этикетку ближе и при хорошем свете, чтобы было видно название.</p>');
+    lbShow(x)}catch(e){openPop('Не получилось',`<p class="m">${esc(phErr('net'))}</p>`)}}
+function lbShow(x){openPop('Проверьте и сохраните',`<p class="m">Так прочитано с упаковки, на 100 г. Поправьте, если что-то не так.</p><label>Название</label><input id="lbN" value="${esc(x.name)}"><div class="row"><div><label>Ккал</label><input id="lbK" type="number" inputmode="decimal" value="${Math.round(x.kcal)}"></div><div><label>Белки</label><input id="lbP" type="number" inputmode="decimal" value="${n1(x.protein)}"></div></div><div class="row"><div><label>Жиры</label><input id="lbF" type="number" inputmode="decimal" value="${n1(x.fat)}"></div><div><label>Углеводы</label><input id="lbC" type="number" inputmode="decimal" value="${n1(x.carbs)}"></div></div><button class="btn" onclick="lbSave()">Сохранить в базу</button>`)}
+function lbSave(){const n=$('#lbN').value.trim(),k=+$('#lbK').value;if(!n||!(k>=0))return toast('Проверьте название и ккал');
+  const m={n,k,p:+$('#lbP').value||0,f:+$('#lbF').value||0,c:+$('#lbC').value||0,fi:0};if(PB)m.b=PB;myList().push(m);save();renderMy();closeSheet();
+  const q=PB;PB='';if(m.b)shPut(m).then(ok=>ok&&toast('Спасибо! Товар добавлен в общую базу'));
+  RES=[{n:m.n,k:m.k,c:m.c,fi:0,p:m.p,f:m.f}];showRes()}
 let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY},{passive:true});
 document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
 

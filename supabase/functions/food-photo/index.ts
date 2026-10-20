@@ -32,6 +32,18 @@ const PROMPT = [
   '"fat":0,"carbs":0,"confidence":0.7}],"note":""}',
 ].join('\n');
 
+const PROMPT_LABEL = [
+  'На фото упаковка продукта (этикетка, банка, бутылка, коробка).',
+  'Прочитай название, бренд и пищевую ценность на 100 г (или на 100 мл).',
+  'Если таблицы не видно, оцени по названию и типу продукта.',
+  'Верни ровно один элемент в items: grams равно 100,',
+  'kcal, protein, fat, carbs на 100 г. Название по-русски.',
+  'Если это не продукт, верни пустой items.',
+  'Ответ: только JSON такого вида:',
+  '{"items":[{"name":"","grams":100,"kcal":0,"protein":0,',
+  '"fat":0,"carbs":0,"confidence":0.7}],"note":""}',
+].join('\n');
+
 const SCHEMA = {
   type: 'OBJECT',
   properties: {
@@ -95,7 +107,7 @@ async function useQuota(userId, commit) {
   return { ok: true, used: used + 1 };
 }
 
-async function askOpenRouter(img) {
+async function askOpenRouter(img, prompt) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: 'Bearer ' + OR_KEY,
@@ -108,7 +120,7 @@ async function askOpenRouter(img) {
       {
         role: 'user',
         content: [
-          { type: 'text', text: PROMPT },
+          { type: 'text', text: prompt },
           {
             type: 'image_url',
             image_url: { url: 'data:image/jpeg;base64,' + img },
@@ -150,7 +162,7 @@ async function askOpenRouter(img) {
   }
 }
 
-async function askGemini(img) {
+async function askGemini(img, prompt) {
   const url =
     'https://generativelanguage.googleapis.com/v1beta/models/' + MODEL +
     ':generateContent';
@@ -158,7 +170,7 @@ async function askGemini(img) {
     contents: [
       {
         parts: [
-          { text: PROMPT },
+          { text: prompt },
           { inline_data: { mime_type: 'image/jpeg', data: img } },
         ],
       },
@@ -225,7 +237,10 @@ async function handle(req) {
   let quota = await useQuota(user.id, false);
   if (!quota.ok) return json({ error: 'limit', limit: DAILY_LIMIT }, 429);
 
-  const res = OR_KEY ? await askOpenRouter(img) : await askGemini(img);
+  const prompt = body.mode === 'label' ? PROMPT_LABEL : PROMPT;
+  const res = OR_KEY
+    ? await askOpenRouter(img, prompt)
+    : await askGemini(img, prompt);
   if (res.err) return res.err;
   quota = await useQuota(user.id, true);
   const out = res.out || {};
