@@ -69,7 +69,7 @@ async function useQuota(userId) {
   return { ok: true, used: used + 1 };
 }
 
-Deno.serve(async (req) => {
+async function handle(req) {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
   if ((!GEMINI_KEY && !OR_KEY) || !SERVICE || !SB_URL) return json({ error: 'not_configured' }, 500);
@@ -140,4 +140,12 @@ Deno.serve(async (req) => {
     confidence: clamp(x.confidence ?? 0.6, 0, 1),
   }));
   return json({ items, note: String(out.note || '').slice(0, 200), left: DAILY_LIMIT - quota.used });
+}
+
+Deno.serve(async (req) => {
+  try {
+    return await handle(req);
+  } catch (e) {
+    return json({ error: 'crash', detail: String((e && e.stack) || e).slice(0, 220) }, 500);
+  }
 });
