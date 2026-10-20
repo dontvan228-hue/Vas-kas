@@ -962,7 +962,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v22`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v23`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1162,7 +1162,7 @@ const clUI=(m)=>{clMsg=m||'';renderCloud()};
 async function clAuth(kind){const em=$('#clE').value.trim(),pw=$('#clP').value;if(!/^\S+@\S+\.\S+$/.test(em))return clUI('Введите почту');if(pw.length<6)return clUI('Пароль: минимум 6 символов');
   clBusy=true;clUI('Подождите…');
   try{let s;
-    if(kind==='up'){s=await sbReq('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:em,password:pw})});
+    if(kind==='up'){s=await sbReq('/auth/v1/signup?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:JSON.stringify({email:em,password:pw})});
       if(!s.access_token){clBusy=false;return clUI('Почти готово: мы отправили письмо на '+em+'. Откройте его, подтвердите почту и вернитесь сюда, чтобы нажать «Войти».')}}
     else s=await sbReq('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:em,password:pw})});
     CL={user:{id:s.user.id,email:s.user.email||em}};clSet(s);CL.ready=false;
@@ -1230,6 +1230,19 @@ function phAdd(){const sel=PH.filter(x=>x.on);if(!sel.length)return toast('От�
 </script>
 <script>
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js').then(r=>{r.update&&r.update()}).catch(()=>{})}catch(e){}})}
+</script>
+<script>
+/* v23: после подтверждения почты Supabase возвращает на сайт со входом в адресе. Входим автоматически. */
+async function clFromHash(){const h=new URLSearchParams(location.hash.replace(/^#/,''));const at=h.get('access_token');
+  if(!at){const er=h.get('error_description');if(er){history.replaceState(null,'',location.pathname+location.search);clMsg='Ссылка из письма не сработала или устарела. Войдите по почте и паролю ещё раз.';renderCloud()}return}
+  history.replaceState(null,'',location.pathname+location.search);
+  try{const u=await fetch(SB.url+'/auth/v1/user',{headers:{apikey:SB.key,Authorization:'Bearer '+at}}).then(r=>r.json());if(!u.id)throw new Error('user');
+    CL={user:{id:u.id,email:u.email}};clSet({access_token:at,refresh_token:h.get('refresh_token'),expires_in:+h.get('expires_in')||3600,user:CL.user});CL.ready=false;
+    if(me&&db.users[me]){const c=await clPull();CL.has=!!c;if(!c){await clPush();CL.ready=true}clMsg=c?'Почта подтверждена. Выберите, что сделать с данными.':'Почта подтверждена. Данные сохранены в облаке.'}
+    else clMsg='Почта подтверждена. Войдите в приложение, и данные подключатся к облаку.';
+    clSave();renderCloud();toast('Почта подтверждена, вы вошли в облако')}
+  catch(e){clMsg='Не удалось завершить вход. Попробуйте войти по почте и паролю.';renderCloud()}}
+setTimeout(clFromHash,300);
 </script>
 </body>
 </html>
