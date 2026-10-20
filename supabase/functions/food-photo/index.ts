@@ -1,6 +1,3 @@
-// Supabase Edge Function: food-photo
-// Принимает фото еды, проверяет вход, считает лимит, спрашивает Gemini, возвращает JSON.
-// Фото нигде не сохраняется: оно живёт только в памяти на время запроса.
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-region',
@@ -15,7 +12,7 @@ const OR_KEY = Deno.env.get('OPENROUTER_API_KEY');
 const OR_MODEL = Deno.env.get('OPENROUTER_MODEL') || 'google/gemini-2.0-flash-001';
 const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-latest';
 const DAILY_LIMIT = parseInt(Deno.env.get('DAILY_LIMIT') || '5', 10);
-const MAX_BYTES = 1_500_000; // размер base64-строки
+const MAX_BYTES = 1_500_000;
 
 const PROMPT = `Ты опытный нутрициолог. На фото еда. Определи каждый отдельный продукт или блюдо на тарелке.
 Для каждого оцени вес порции в граммах (готовое блюдо, как на фото) и посчитай для этой порции калории, белки, жиры и углеводы.
