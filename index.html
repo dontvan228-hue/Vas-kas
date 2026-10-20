@@ -962,7 +962,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v29`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v30`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1247,6 +1247,26 @@ async function clFromHash(){const h=new URLSearchParams(location.hash.replace(/^
     clSave();renderCloud();toast('Почта подтверждена, вы вошли в облако')}
   catch(e){clMsg='Не удалось завершить вход. Попробуйте войти по почте и паролю.';renderCloud()}}
 setTimeout(clFromHash,300);
+
+/* v30: надёжный поиск по штрихкоду + сохранение своих штрихкодов */
+let PB='';
+toRes=function(x){const n=x.nutriments||{};let k=+n['energy-kcal_100g'];if(!(k>=0)||n['energy-kcal_100g']===undefined){const kj=+n['energy-kj_100g']||+n.energy_100g||0;k=kj/4.184}
+  return {n:(x.product_name||x.product_name_ru||'Без названия')+(x.brands?` (${String(x.brands).split(',')[0]})`:''),k:k||0,c:+n.carbohydrates_100g||0,fi:+n.fiber_100g||0,p:+n.proteins_100g||0,f:+n.fat_100g||0}};
+async function bcLookup(q){const vs=[...new Set([q,q.length===12?'0'+q:q,q.length===13&&q[0]==='0'?q.slice(1):q])];let net=0;
+  for(const c of vs)for(const h of ['https://world.openfoodfacts.org','https://ru.openfoodfacts.org']){try{const r=await (await fetch(`${h}/api/v2/product/${c}.json?fields=product_name,product_name_ru,nutriments,brands`)).json();net=1;if(r.status===1&&r.product)return {p:r.product}}catch(e){}}
+  return {p:null,net}}
+const _cs3=cSearch;
+cSearch=async function(){const q=$('#cQ').value.trim();
+  if(!/^\d{8,14}$/.test(q))return _cs3();
+  const mine=(myList().find(m=>m.b===q));
+  if(mine){RES=[{n:mine.n,k:mine.k,c:mine.c||0,fi:mine.fi||0,p:mine.p||0,f:mine.f||0}];showRes();return}
+  $('#cRes').innerHTML='<p class="m" style="margin-top:10px">Ищу по штрихкоду…</p>';
+  const r=await bcLookup(q);
+  if(r.p){RES=[toRes(r.p)];showRes();if(!(RES[0].k>0))$('#cRes').insertAdjacentHTML('beforeend','<p class="m" style="font-size:12px">В базе нет калорий для этого товара. Посмотрите на упаковке и добавьте как свой продукт.</p>');return}
+  RES=[];PB=q;
+  $('#cRes').innerHTML=r.net===0&&r.p===null&&false?'':`<p class="m" style="margin-top:10px">Штрихкод ${esc(q)} не найден в базе. Такое бывает с российскими товарами. Впишите калории с упаковки один раз, и приложение запомнит этот штрихкод.</p><button class="btn" onclick="bcAdd()">Добавить этот товар</button>`};
+function bcAdd(){const e=$('#mpN');if(!e)return;e.scrollIntoView({block:'center',behavior:'smooth'});e.focus();toast('Впишите название и калории на 100 г с упаковки')}
+const _saveMy=saveMy;saveMy=function(){const had=myList().length,pb=PB;_saveMy();if(myList().length>had&&pb){myList()[myList().length-1].b=pb;PB='';save();toast('Продукт сохранён. Штрихкод запомнен')}};
 let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY},{passive:true});
 document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
 
