@@ -962,7 +962,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v39`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v40`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1309,6 +1309,40 @@ const _os5=openSheet;openSheet=function(i){_os5(i);const r=RES[i];if(r&&r.por){s
 function shG_set(g){$('#shG').value=g;$('#shR').value=Math.min(500,g);shUpd()}
 function drawPor(r){let e=$('#shP');if(!e){e=document.createElement('div');e.id='shP';e.style.cssText='margin:6px 0;display:flex;gap:6px;flex-wrap:wrap';$('#shR').insertAdjacentElement('afterend',e)}
   e.innerHTML=r&&r.por?[[.5,'½ порции'],[1,'1 порция'],[1.5,'1,5'],[2,'2 порции'],[3,'3 порции']].map(([m,l])=>`<span class="chip2" onclick="shG_set(${Math.round(r.por*m)})">${l} · ${Math.round(r.por*m)} г</span>`).join(''):''}
+
+/* v40: вход и регистрация сразу работают с облаком: те же почта и пароль, анкета не повторяется */
+const clRace=(p,ms)=>Promise.race([p,new Promise((_,no)=>setTimeout(()=>no(new Error('timeout')),ms))]);
+async function cloudTry(mail,pw){try{const s=await clRace(sbReq('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:mail,password:pw})}),9000);
+  CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=false;const c=await clRace(clPull(),9000);return {c}}catch(e){return null}}
+async function cloudSignup(mail,pw){try{const s=await clRace(sbReq('/auth/v1/signup?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:JSON.stringify({email:mail,password:pw})}),9000);
+  if(s&&s.access_token){CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=true;clSave();return true}}catch(e){}return false}
+doAuth=async function(){
+  const mail=$('#aMail').value.trim().toLowerCase(),pw=$('#aPass').value,err=$('#aErr'),btn=$('#aBtn');
+  if(!/^\S+@\S+\.\S+$/.test(mail))return err.textContent='Введите корректную почту';
+  if(pw.length<6)return err.textContent='Пароль должен быть не короче 6 символов';
+  if(btn.disabled)return;btn.disabled=true;err.textContent='Входим…';
+  try{
+    const lu=db.users[mail],localOk=!!(lu&&lu.hash===await hash(pw,lu.salt));
+    const cr=await cloudTry(mail,pw);
+    if(cr){
+      const c=cr.c;
+      if(c&&c.data&&c.data.p&&!(localOk&&lu.p)){
+        const salt=lu?lu.salt:Math.random().toString(36).slice(2),h=await hash(pw,salt);
+        db.users[mail]=Object.assign({},c.data,{salt,hash:h});CL.ready=true;CL.has=true;CL.last=null;clSave();
+        me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();toast('С возвращением! Данные из облака на месте');return}
+      if(!db.users[mail]){const salt=Math.random().toString(36).slice(2);db.users[mail]={name:$('#aName').value.trim()||'Друг',salt,hash:await hash(pw,salt),p:null,days:{},weights:[],adapt:null}}
+      else if(!localOk){const salt=db.users[mail].salt;db.users[mail].hash=await hash(pw,salt)}
+      CL.ready=!(c&&c.data&&c.data.p);CL.has=!!c;clSave();
+      me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();return}
+    if(mode==='reg'&&!db.users[mail]){
+      const salt=Math.random().toString(36).slice(2);
+      db.users[mail]={name:$('#aName').value.trim()||'Друг',salt,hash:await hash(pw,salt),p:null,days:{},weights:[],adapt:null};
+      me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();cloudSignup(mail,pw);return}
+    if(mode==='reg'&&localOk){me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();return}
+    if(mode==='reg')return err.textContent='Эта почта уже зарегистрирована. Войдите или проверьте пароль';
+    if(!localOk)return err.textContent='Неверная почта или пароль';
+    me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter()
+  }finally{btn.disabled=false}};
 let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY},{passive:true});
 document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
 
