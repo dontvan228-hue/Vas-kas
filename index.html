@@ -345,7 +345,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
 <div class="card"><h2>Макросы и чистые углеводы</h2><div id="mBars"></div></div><div class="card"><h2>Избранное</h2><div id="favList"></div></div><div class="card"><h2>Дневник по приёмам пищи</h2><div id="mealList"></div></div><div class="card">
 <label>Режим (лимит чистых углеводов в день)</label><select id="mNet" onchange="MG().net=+this.value;save();renderCarb()"><option value="20">Кето — 20 г</option><option value="30">Строгий лоу-карб — 30 г</option><option value="50">Лоу-карб — 50 г</option><option value="100">Умеренный — 100 г</option></select>
 <p class="m" style="margin-top:8px">Чистые углеводы = углеводы − клетчатка (− сахарные спирты, если вписали их как клетчатку).</p></div>
-<div class="card"><h2>Поиск продукта и штрихкод</h2><div class="row"><div><input id="cQ" placeholder="Яйцо, авокадо, сыр… или штрихкод" oninput="liveSearch()" onkeydown="if(event.key==='Enter')cSearch()"></div><button class="btn sm" onclick="cSearch()">🔎</button><button class="btn sm" onclick="scan()">📷</button></div>
+<div class="card"><h2>Поиск продукта и штрихкод</h2><div class="row"><div><input id="cQ" placeholder="Яйцо, авокадо, сыр… или штрихкод" oninput="liveSearch()" onkeydown="if(event.key==='Enter')cSearch()"></div><button class="btn sm" onclick="cSearch()">🔎</button><button class="btn sm" onclick="scan()" style="white-space:nowrap">▮▯▮ Штрихкод</button></div>
 <video id="cV" playsinline muted hidden style="width:100%;border-radius:12px;margin-top:10px"></video><button class="btn ghost" id="cStop" hidden onclick="stopScan()">Закрыть камеру</button>
 <button class="btn ghost" onclick="photoPick()" style="margin-top:10px">📸 Определить калории по фото</button><div id="cRes"></div>
 <p class="m" style="margin-top:8px;font-size:11px">База: Open Food Facts (открытая, бесплатная). Нужен интернет. Данные добавлены сообществом, проверяйте этикетку.</p></div>
@@ -963,7 +963,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v26`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v27`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1191,7 +1191,7 @@ let zxReader=null;
 function zxLoad(){return new Promise((ok,no)=>{if(window.ZXing)return ok();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';s.onload=()=>window.ZXing?ok():no();s.onerror=no;document.head.appendChild(s)})}
 scan=async function(){
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return toast('Камера недоступна. Откройте приложение в Safari или Chrome по обычной ссылке, а не внутри другого приложения');
-  toast('Запускаю камеру…');
+  toast('Наведите камеру на штрихкод упаковки');
   try{await zxLoad()}catch(e){return toast('Не удалось загрузить сканер. Проверьте интернет или введите цифры штрихкода в поиск')}
   try{
     const H=new Map(),F=ZXing.BarcodeFormat;H.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128]);H.set(ZXing.DecodeHintType.TRY_HARDER,true);
