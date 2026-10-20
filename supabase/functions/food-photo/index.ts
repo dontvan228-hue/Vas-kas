@@ -91,7 +91,6 @@ Deno.serve(async (req) => {
 
   let out;
   if (OR_KEY) {
-    // OpenRouter (ключ в секретах OPENROUTER_API_KEY), модель в OPENROUTER_MODEL
     const sys = PROMPT + '\nФормат ответа: {"items":[{"name":"","grams":0,"kcal":0,"protein":0,"fat":0,"carbs":0,"confidence":0.7}],"note":""}';
     let g;
     try {
