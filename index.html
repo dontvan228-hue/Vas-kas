@@ -15,7 +15,7 @@
 <style>
 :root{--bg:#3a0418;--bg2:#5a0a28;--card:rgba(255,255,255,.07);--line:rgba(var(--acc),.22);--lime:#c6e3a0;--txt:#fbf3ef;--mut:rgba(251,243,239,.68);--warn:#ff9a85;--r:18px}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-html,body{min-height:100%}
+html,body{min-height:100%;overscroll-behavior:none;overflow-x:hidden;max-width:100vw;touch-action:pan-y}
 body{background:radial-gradient(120% 80% at 50% 0,var(--bg2),var(--bg));color:var(--txt);padding-bottom:env(safe-area-inset-bottom)}
 [hidden]{display:none!important}
 button,input,select{font-size:15px;color:inherit}
@@ -334,6 +334,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
     <button class="btn ghost" onclick="logout()">Выйти</button>
     <button class="btn ghost" style="color:var(--warn)" onclick="delAcc()">Удалить аккаунт и данные</button>
   </div>
+  <div class="card"><h2>Напоминания</h2><div id="ntBox"></div></div>
   <div class="card"><h2>Облако: вход и синхронизация</h2><div id="cloudBox"></div></div>
   <div class="card"><h2>Оформление</h2><label>Цветовая тема</label><div class="sw" id="swBox"></div><label>Фон</label><div id="bgBox"></div><label>Звуки</label><div id="sndBox"></div><button class="btn ghost" onclick="startQuiz()">Пройти анкету заново</button></div>
   <div class="card"><h2>Уведомления</h2><div id="ntBox"></div></div>
@@ -962,7 +963,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v23`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v24`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1243,6 +1244,29 @@ async function clFromHash(){const h=new URLSearchParams(location.hash.replace(/^
     clSave();renderCloud();toast('Почта подтверждена, вы вошли в облако')}
   catch(e){clMsg='Не удалось завершить вход. Попробуйте войти по почте и паролю.';renderCloud()}}
 setTimeout(clFromHash,300);
+/* Напоминания: показываются, пока приложение открыто или свёрнуто (без сервера iPhone не будит закрытое приложение) */
+const NTX={get(){try{return JSON.parse(localStorage.getItem('flow_nt')||'{}')}catch(e){return{}}},set(o){try{localStorage.setItem('flow_nt',JSON.stringify(o))}catch(e){}}};
+const NTX_DEF=[['eat1','Завтрак','09:00','Время позавтракать и записать еду'],['eat2','Обед','13:30','Время обеда: запишите, что съели'],['eat3','Ужин','19:00','Время ужина: не забудьте записать'],['w','Взвешивание','08:00','Запишите вес на сегодня']];
+async function ntShow(t,b){try{const r=await navigator.serviceWorker.ready;await r.showNotification(t,{body:b,icon:'icon-192.png',badge:'icon-192.png',tag:t})}catch(e){try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(_){}}}
+function ntTick(){const o=NTX.get();if(!o.on||!('Notification' in window)||Notification.permission!=='granted')return;const n=new Date(),hm=('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2),d=n.toISOString().slice(0,10);o.sent=o.sent||{};let ch=0;
+  NTX_DEF.forEach(([k,nm,def,txt])=>{const t=(o.t&&o.t[k])||def;if(o.off&&o.off[k])return;if(hm>=t&&o.sent[k]!==d){o.sent[k]=d;ch=1;if(hm<=addMin(t,90))ntShow('VASSKASS • FLOW',txt)}});if(ch)NTX.set(o)}
+function addMin(t,m){let[h,mi]=t.split(':').map(Number);let x=h*60+mi+m;x=Math.min(x,1439);return('0'+Math.floor(x/60)).slice(-2)+':'+('0'+x%60).slice(-2)}
+function renderNt(){const e=document.getElementById('ntBox');if(!e)return;const o=NTX.get();const ok='Notification' in window;
+  if(!ok){e.innerHTML='<p class="m">Уведомления доступны, когда приложение добавлено на главный экран (Поделиться → На экран «Домой») и открыто оттуда.</p>';return}
+  const g=Notification.permission==='granted'&&o.on;
+  e.innerHTML='<p class="m" style="margin:0 0 10px">Напоминания приходят, пока приложение открыто или свёрнуто. Когда оно полностью закрыто, телефон их не покажет.</p>'+
+   '<button class="btn" id="ntOn">'+(g?'Выключить напоминания':'Включить напоминания')+'</button>'+
+   (g?NTX_DEF.map(([k,nm,def])=>'<div style="display:flex;align-items:center;gap:10px;margin-top:10px"><label style="flex:1"><input type="checkbox" data-nk="'+k+'" '+((o.off&&o.off[k])?'':'checked')+'> '+nm+'</label><input type="time" data-nt="'+k+'" value="'+((o.t&&o.t[k])||def)+'"></div>').join('')+'<button class="btn" id="ntTest" style="margin-top:12px">Проверить уведомление</button>':'');
+  document.getElementById('ntOn').onclick=async()=>{const o=NTX.get();if(g){o.on=false;NTX.set(o);renderNt();return}let p=Notification.permission;if(p!=='granted')p=await Notification.requestPermission();if(p==='granted'){o.on=true;NTX.set(o);ntShow('VASSKASS • FLOW','Напоминания включены');ntTick()}else toast('Разрешите уведомления в настройках телефона');renderNt()};
+  e.querySelectorAll('[data-nt]').forEach(i=>i.onchange=()=>{const o=NTX.get();o.t=o.t||{};o.t[i.dataset.nt]=i.value;o.sent={};NTX.set(o)});
+  e.querySelectorAll('[data-nk]').forEach(i=>i.onchange=()=>{const o=NTX.get();o.off=o.off||{};o.off[i.dataset.nk]=!i.checked;NTX.set(o)});
+  const tb=document.getElementById('ntTest');if(tb)tb.onclick=()=>ntShow('VASSKASS • FLOW','Так будут выглядеть напоминания')}
+setInterval(ntTick,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)ntTick()});
+setTimeout(()=>{renderNt();ntTick()},500);
+{const _r=render;render=function(){const x=_r.apply(this,arguments);try{renderNt()}catch(e){}return x}}
+let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
+
 </script>
 </body>
 </html>
