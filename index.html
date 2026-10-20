@@ -290,6 +290,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
   <div class="tiles" id="tiles"></div>
   <div id="nudge"></div>
   <div class="qa"><button onclick="whatToEat()">✨ Что съесть?</button><button onclick="sos()">🫧 Тяга — SOS</button></div>
+  <div class="qa" style="margin-top:8px"><button onclick="buyNear()" style="grid-column:1/-1">🛒 Что купить в магазине рядом</button></div>
   <div class="card"><h2>Неделя</h2><div class="wk" id="wk"></div></div>
   <div class="qa"><button onclick="quickAdd()">Добавить еду</button><button onclick="setWater(day().water+1)">Вода +1</button><button onclick="go('carb',document.querySelector('nav button:nth-child(2)'));setTimeout(()=>$('#fastBox').scrollIntoView({behavior:'smooth'}),120)">Голодание</button></div>
   <div class="card"><h2>Добавить еду</h2>
@@ -962,7 +963,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v40`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v41`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1343,6 +1344,28 @@ doAuth=async function(){
     if(!localOk)return err.textContent='Неверная почта или пароль';
     me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter()
   }finally{btn.disabled=false}};
+
+/* v41: что купить рядом: готовая еда из магазина под остаток калорий + ближайшие магазины (OpenStreetMap) */
+let BY=[];
+const BY_KEYS=['Творог','Йогурт','Кефир','Сырок','Яйц','Ветчина','Сыр ','Сыр','Банан','Яблоко','Груша','Хлеб','Лаваш','Чебупицца','Пирожок','Блинчики','Пицца','Тунец','Шаурма','Сэндвич','Бутерброд','Сосиски','Горбуша','Ряженка','Молоко','Орех','Хумус','Салат','Греческий','Оливье','Йогурт греческий','Мандарин','Апельсин','Курица','Грудка'];
+function buyList(remK,remP){const seen=new Set();return FDB.filter(x=>x[6]&&x[1]>30&&BY_KEYS.some(k=>x[0].includes(k))&&!/сух|сыр(ая|ое|ой)/i.test(x[0])).map(x=>{const k=x[1]*x[6]/100,p=x[4]*x[6]/100;return{x,g:x[6],k,p,sc:p/Math.max(k,1)}}).filter(r=>r.k<=Math.max(remK,60)).sort((a,b)=>(remP>0?b.sc-a.sc:a.k-b.k)).filter(r=>{if(seen.has(r.x[0]))return false;seen.add(r.x[0]);return true}).slice(0,9)}
+function buyNear(){const p=plan(),d=day(),m=macros(d),remK=p.b-eaten(d),remP=Math.max(0,Math.round(1.2*lastW())-m.p);
+  if(remK<80)return openPop('План на сегодня выполнен','<p class="m">Калории на сегодня набраны. Если хочется есть: вода, чай, огурец или листовой салат.</p>');
+  BY=buyList(remK,remP);
+  openPop('Что купить в магазине',`<p class="m">Осталось ${remK} ккал, белка ещё ${remP} г. Это готовое, что есть почти в любом магазине, не нужно готовить. Нажмите, чтобы записать в дневник после покупки.</p>`+(BY.length?BY.map((r,i)=>`<div class="res" onclick="addBY(${i})"><span>${esc(r.x[0])}, ${r.g} г<br><small>${Math.round(r.k)} ккал · Б ${n1(r.p)}</small></span><i>+</i></div>`).join(''):'<p class="m">Под остаток ничего не подошло. Возьмите овощи или кефир.</p>')+'<button class="btn" style="margin-top:12px" onclick="shopsNear()">📍 Найти магазины рядом</button><div id="shopsBox"></div>')}
+function addBY(i){const r=BY[i],x=r.x,f=r.g/100,h=new Date().getHours();closeSheet();addMacroFood({n:`${x[0]}, ${r.g} г`,k:Math.round(r.k),c:n1(x[2]*f),fi:n1((x[3]||0)*f),p:n1(x[4]*f),f:n1(x[5]*f),m:h<11?'Завтрак':h<16?'Обед':h<21?'Ужин':'Перекус'})}
+function shopsNear(){const b=$('#shopsBox');if(!navigator.geolocation){b.innerHTML='<p class="m">Геолокация недоступна в этом браузере.</p>';return}
+  b.innerHTML='<p class="m">Определяю место…</p>';
+  navigator.geolocation.getCurrentPosition(async pos=>{const la=pos.coords.latitude,lo=pos.coords.longitude;
+    const ym=`https://yandex.ru/maps/?ll=${lo},${la}&z=16&text=${encodeURIComponent('продукты магазин')}`;
+    b.innerHTML='<p class="m">Ищу магазины…</p>';
+    try{const q=`[out:json][timeout:12];(node(around:1500,${la},${lo})[shop~"supermarket|convenience|bakery|greengrocer|butcher|deli"];way(around:1500,${la},${lo})[shop~"supermarket|convenience|bakery|greengrocer|butcher|deli"];);out center 40;`;
+      const r=await clRace(fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}}).then(x=>x.json()),14000);
+      const dist=(a,c,e,f)=>{const R=6371e3,t=Math.PI/180,u=(e-a)*t,v=(f-c)*t,h=Math.sin(u/2)**2+Math.cos(a*t)*Math.cos(e*t)*Math.sin(v/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+      const L=(r.elements||[]).map(e=>{const y=e.lat??(e.center&&e.center.lat),x=e.lon??(e.center&&e.center.lon);return{n:(e.tags&&(e.tags.name||e.tags['name:ru']))||'Магазин',d:Math.round(dist(la,lo,y,x)),y,x}}).filter(e=>e.y!=null).sort((a,b)=>a.d-b.d).slice(0,8);
+      b.innerHTML=(L.length?L.map(e=>`<div class="item"><span>${esc(e.n)}<br><small style="color:var(--mut)">${e.d} м</small></span><a href="https://yandex.ru/maps/?pt=${e.x},${e.y}&z=18&l=map" target="_blank" rel="noopener" style="color:var(--lime)">Карта</a></div>`).join(''):'<p class="m">Рядом ничего не нашла в открытой карте.</p>')+`<a class="btn ghost" style="display:block;text-align:center;margin-top:10px" href="${ym}" target="_blank" rel="noopener">Открыть магазины в Яндекс.Картах</a>`}
+    catch(e){b.innerHTML=`<p class="m">Список не загрузился. Откройте карту:</p><a class="btn" style="display:block;text-align:center" href="${ym}" target="_blank" rel="noopener">Магазины рядом в Яндекс.Картах</a>`}},
+    ()=>{b.innerHTML='<p class="m">Нет доступа к местоположению. Разрешите его в настройках Safari для сайта или откройте карту вручную.</p><a class="btn" style="display:block;text-align:center" href="https://yandex.ru/maps/?text=продукты%20магазин" target="_blank" rel="noopener">Магазины в Яндекс.Картах</a>'},{timeout:12000,maximumAge:120000})}
 let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY},{passive:true});
 document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
 
