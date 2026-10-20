@@ -962,7 +962,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v30`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v31`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1267,6 +1267,17 @@ cSearch=async function(){const q=$('#cQ').value.trim();
   $('#cRes').innerHTML=r.net===0&&r.p===null&&false?'':`<p class="m" style="margin-top:10px">Штрихкод ${esc(q)} не найден в базе. Такое бывает с российскими товарами. Впишите калории с упаковки один раз, и приложение запомнит этот штрихкод.</p><button class="btn" onclick="bcAdd()">Добавить этот товар</button>`};
 function bcAdd(){const e=$('#mpN');if(!e)return;e.scrollIntoView({block:'center',behavior:'smooth'});e.focus();toast('Впишите название и калории на 100 г с упаковки')}
 const _saveMy=saveMy;saveMy=function(){const had=myList().length,pb=PB;_saveMy();if(myList().length>had&&pb){myList()[myList().length-1].b=pb;PB='';save();toast('Продукт сохранён. Штрихкод запомнен')}};
+
+/* v31: общая база товаров (штрихкод -> продукт), её пополняют все пользователи */
+const shRow=x=>({n:x.name,k:+x.kcal||0,c:+x.carbs||0,fi:+x.fiber||0,p:+x.protein||0,f:+x.fat||0});
+async function shGet(q){try{const r=await sbReq('/rest/v1/shared_products?select=*&barcode=eq.'+q);return r&&r[0]?shRow(r[0]):null}catch(e){return null}}
+async function shFind(q){try{const r=await sbReq('/rest/v1/shared_products?select=*&limit=8&name=ilike.'+encodeURIComponent('*'+q.replace(/[*%,()]/g,' ').trim()+'*'));return (r||[]).map(shRow)}catch(e){return[]}}
+async function shPut(m){if(!CL||!CL.user)return false;try{await sbReq('/rest/v1/shared_products',{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=minimal'},body:JSON.stringify({barcode:m.b,name:m.n,kcal:m.k,protein:m.p||0,fat:m.f||0,carbs:m.c||0,fiber:m.fi||0})},true);return true}catch(e){return false}}
+const _cs4=cSearch;cSearch=async function(){const q=$('#cQ').value.trim();
+  if(/^\d{8,14}$/.test(q)&&!myList().find(m=>m.b===q)){const s=await shGet(q);if(s){RES=[s];showRes();return}}
+  await _cs4();
+  if(q&&!/^\d/.test(q)){const a=await shFind(q);if(a.length){RES=RES.concat(a.filter(x=>!RES.some(l=>l.n===x.n)));showRes()}}};
+const _saveMy2=saveMy;saveMy=function(){const had=myList().length,pb=PB;_saveMy2();if(myList().length>had&&pb){const m=myList()[myList().length-1];shPut(m).then(ok=>ok&&toast('Спасибо! Товар добавлен в общую базу'))}};
 let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY},{passive:true});
 document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
 
