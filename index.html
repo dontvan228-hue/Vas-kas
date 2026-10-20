@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VASSKASS • FLOW</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FLOW">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#3a0418">
 <script>try{var t=localStorage.getItem("flow_theme")||"wine";document.documentElement.dataset.theme=t;document.documentElement.dataset.mode=({cream:1,mint:1})[t]?"light":"dark";document.documentElement.dataset.bg=localStorage.getItem("flow_bg")||"aurora"}catch(e){}</script>
 <style>
 :root{--bg:#3a0418;--bg2:#5a0a28;--card:rgba(255,255,255,.07);--line:rgba(var(--acc),.22);--lime:#c6e3a0;--txt:#fbf3ef;--mut:rgba(251,243,239,.68);--warn:#ff9a85;--r:18px}
@@ -1220,6 +1227,9 @@ function phShow(){if(!PH.length)return openPop('Еду не нашла','<p clas
   const T=phTotals(),meals=['Завтрак','Обед','Ужин','Перекус'].map(m=>`<span class="chip2 ${m===phMeal?'on':''}" onclick="phMeal='${m}';phShow()">${m}</span>`).join('');
   openPop('Вот что вижу на фото',(phThumb?`<img src="${phThumb}" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:12px;float:right;margin:0 0 8px 10px">`:'')+`<p class="m">Это оценка нейросети. Проверьте названия и поправьте граммы, если знаете точный вес.</p>${rows}<div class="stats" style="margin:12px 0"><div>Ккал<b>${Math.round(T.k)}</b></div><div>Белки<b>${n1(T.p)}</b></div><div>Жиры<b>${n1(T.f)}</b></div><div>Углеводы<b>${n1(T.c)}</b></div></div><div>${meals}</div><button class="btn" onclick="phAdd()">Добавить в дневник</button>`+(phLeft!=null?`<p class="m" style="font-size:11px;margin-top:8px">Осталось фото на сегодня: ${phLeft}</p>`:''))}
 function phAdd(){const sel=PH.filter(x=>x.on);if(!sel.length)return toast('Отметьте хотя бы один продукт');closeSheet();sel.forEach(x=>addMacroFood({n:`${x.n}, ${x.g} г (по фото)`,k:Math.round(phK(x,x.k)),c:n1(phK(x,x.c)),fi:0,p:n1(phK(x,x.p)),f:n1(phK(x,x.f)),m:phMeal}));PH=[]}
+</script>
+<script>
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js').then(r=>{r.update&&r.update()}).catch(()=>{})}catch(e){}})}
 </script>
 </body>
 </html>
