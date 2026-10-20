@@ -11,7 +11,7 @@ const json = (o, status = 200) => new Response(JSON.stringify(o), { status, head
 const SB_URL = Deno.env.get('SUPABASE_URL');
 const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY');
-const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
+const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-latest';
 const DAILY_LIMIT = parseInt(Deno.env.get('DAILY_LIMIT') || '5', 10);
 const MAX_BYTES = 1_500_000; // размер base64-строки
 
@@ -98,13 +98,13 @@ Deno.serve(async (req) => {
       }),
     });
   } catch { return json({ error: 'upstream' }, 502); }
-  if (!g.ok) return json({ error: g.status === 429 ? 'busy' : 'upstream', status: g.status }, 502);
+  if (!g.ok) { let d = ''; try { d = (await g.text()).slice(0, 160); } catch { /* */ } return json({ error: g.status === 429 ? 'busy' : 'upstream', status: g.status, detail: d }, 502); }
 
   let out;
   try {
     const j = await g.json();
     out = JSON.parse(j.candidates[0].content.parts[0].text);
-  } catch { return json({ error: 'parse' }, 502); }
+  } catch { return json({ error: 'parse', detail: 'no_text' }, 502); }
 
   const items = (Array.isArray(out.items) ? out.items : []).slice(0, 12).map((x) => ({
     name: String(x.name || 'Блюдо').slice(0, 60),
