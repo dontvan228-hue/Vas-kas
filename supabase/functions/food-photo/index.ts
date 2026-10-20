@@ -13,8 +13,10 @@ const SB_URL = Deno.env.get('SUPABASE_URL');
 const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY');
 const OR_KEY = Deno.env.get('OPENROUTER_API_KEY');
-const OR_MODEL =
-  Deno.env.get('OPENROUTER_MODEL') || 'google/gemini-2.0-flash-001';
+const OR_MODELS = (
+  Deno.env.get('OPENROUTER_MODEL') ||
+  'openrouter/free,google/gemini-2.0-flash-001'
+).split(',').map((x) => x.trim()).filter(Boolean);
 const MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-flash-latest';
 const DAILY_LIMIT = parseInt(Deno.env.get('DAILY_LIMIT') || '5', 10);
 const MAX_BYTES = 1500000;
@@ -107,14 +109,14 @@ async function useQuota(userId, commit) {
   return { ok: true, used: used + 1 };
 }
 
-async function askOpenRouter(img, prompt) {
+async function askOpenRouterModel(img, prompt, model) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: 'Bearer ' + OR_KEY,
     'X-Title': 'VASSKASS FLOW',
   };
   const body = {
-    model: OR_MODEL,
+    model: model,
     temperature: 0.2,
     messages: [
       {
@@ -160,6 +162,16 @@ async function askOpenRouter(img, prompt) {
   } catch (e) {
     return { err: json({ error: 'parse', detail: 'or_no_json' }, 502) };
   }
+}
+
+async function askOpenRouter(img, prompt) {
+  let last = null;
+  for (const m of OR_MODELS) {
+    const r = await askOpenRouterModel(img, prompt, m);
+    if (r.out) return r;
+    last = r;
+  }
+  return last;
 }
 
 async function askGemini(img, prompt) {
