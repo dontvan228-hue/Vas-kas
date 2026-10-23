@@ -32,7 +32,7 @@
 <meta name="apple-mobile-web-app-title" content="FLOW">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#3a0418">
-<script>try{var t=localStorage.getItem("flow_theme")||"wine";document.documentElement.dataset.theme=t;document.documentElement.dataset.mode=({cream:1,mint:1,calm:1,y2k:1,pearl:1})[t]?"light":"dark";document.documentElement.dataset.ui=localStorage.getItem("flow_ui")||"";document.documentElement.dataset.bg=localStorage.getItem("flow_bg")||"aurora"}catch(e){}</script>
+<script>try{var t=localStorage.getItem("flow_theme")||"wine";document.documentElement.dataset.theme=t;document.documentElement.dataset.mode=({cream:1,mint:1,calm:1,y2k:1,pearl:1,snow:1})[t]?"light":"dark";document.documentElement.dataset.ui=localStorage.getItem("flow_ui")||"";document.documentElement.dataset.bg=localStorage.getItem("flow_bg")||"aurora"}catch(e){}</script>
 <style>
 :root{--bg:#3a0418;--bg2:#5a0a28;--card:rgba(255,255,255,.07);--line:rgba(var(--acc),.22);--lime:#c6e3a0;--txt:#fbf3ef;--mut:rgba(251,243,239,.68);--warn:#ff9a85;--r:18px}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
@@ -796,7 +796,7 @@ renderTheme();
 
 /* ===== v6: chibi, quests, shop, workouts, planner, trend ===== */
 TH.push(['leaf','Лес','#2f5b44','#c9dca3'],['cream','Крем и шалфей','#f4efe4','#7a8a64'],['mint','Мята и персик','#cdeee3','#ffd8c4']);
-const LIGHT={cream:1,mint:1};
+const LIGHT={cream:1,mint:1,snow:1};
 const _st=setTheme;setTheme=function(id){document.documentElement.dataset.mode=LIGHT[id]?'light':'dark';_st(id)};
 const toToday=()=>go('today',document.querySelector('nav button:nth-child(1)'));
 /* gentle streak: one missed day does not reset it */
@@ -819,7 +819,7 @@ const CB=()=>{const u=U();return u.cb||(u.cb={name:'Чиби',skin:'#f6d3b8',hai
 function awakeH(t0){let h=0,t=t0,n=Date.now();while(t<n){const hr=new Date(t).getHours();if(hr>=7&&hr<23)h+=.25;t+=9e5}return h}
 const cbVal=(o,r)=>Math.max(0,Math.min(100,o.v-awakeH(o.t)*r)),cbSat=()=>cbVal(CB().sat,9),cbWat=()=>cbVal(CB().wat,6);
 const cbFeed=a=>{CB().sat={v:Math.min(100,cbSat()+a),t:Date.now()}},cbDrink=a=>{CB().wat={v:Math.min(100,cbWat()+a),t:Date.now()}};
-function prog(){const u=U(),a=u.p.w0,t=u.p.t;return a<=t? .5:Math.max(0,Math.min(1,(a-lastW())/(a-t)))}
+function prog(){const u=U(),a=u.p.w0||u.p.w||lastW(),t=u.p.t;return !(a>t)?.5:Math.max(0,Math.min(1,(a-lastW())/(a-t)))}
 let CBA={m:'happy',until:0,say:''};
 function cbMood(){const h=new Date().getHours();if(CBA.until>Date.now())return CBA.m;if(cbSat()<25)return'hungry';if(cbWat()<25)return'thirsty';if(h>=23||h<6)return'sleepy';return'happy'}
 function cbSay(){const m=cbMood();if(CBA.until>Date.now()&&CBA.say)return CBA.say;return m==='hungry'?'🍽 Хочу есть':m==='thirsty'?'💧 Хочу пить':m==='sleepy'?'😴 Zzz':(cbSat()>70&&cbWat()>70?'💚 Всё отлично':'')}
@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v66`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v67`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1567,7 +1567,7 @@ function openHealth(tab){const u=U();if(tab)hlTab=tab;else if(!isF(u))hlTab='die
   if(h.st==='cyc'){const c=cycInfo(u);b+=`<label>Первый день последних месячных</label><input type="date" value="${h.last||''}" max="${today()}" onchange="hlSet('last',this.value)"><div class="row"><div><label>Длина цикла (дней)</label><input type="number" inputmode="numeric" value="${h.len||28}" min="21" max="40" onchange="hlSet('len',this.value)"></div><div><label>Месячные (дней)</label><input type="number" inputmode="numeric" value="${h.per||5}" min="2" max="9" onchange="hlSet('per',this.value)"></div></div><button class="btn ghost" onclick="hlSet('last','${today()}')">Месячные начались сегодня</button>`;
    if(c){const t=CYT[c.cl];b+=`<div class="hld"><b>День ${c.n}: ${t[0]}</b><p class="m">${t[1]}</p><p class="m">До следующих месячных примерно ${c.next} дн. Даты ориентировочные, цикл может смещаться.</p></div>`}
    else b+='<p class="m">Введите дату, и появятся советы по дням.</p>'}
-  if(h.st==='preg'){const w=pregWeek(u),ex=lifeExtra(u);b+=`<label>Предполагаемая дата родов</label><input type="date" value="${h.due||''}" onchange="hlSet('due',this.value)">`;
+  if(h.st==='preg'){const w=pregWeek(u),ex=lifeExtra(u);b+=`<label>Предполагаемая дата родов</label><input type="date" value="${h.due||''}" onchange="hlSet('due',this.value)">`+dueBox();
    if(w)b+=`<div class="hld"><b>Неделя ${w} · ${w<14?'1':w<28?'2':'3'} триместр</b><p class="m">Размер малыша примерно как ${babyOf(w)}.</p><p class="m">${PREG_OK}</p><p class="m" style="color:var(--warn)">${PREG_NO}</p><p class="m">Похудение отключено. ${ex?`К норме добавлено ${ex} ккал (ориентир для этого срока).`:'В первом триместре добавка калорий обычно не нужна.'} Точную норму и вес назначает врач.</p><div class="chips"><span class="chip2 ${h.noex?'on':''}" onclick="hlSet('noex',${!h.noex})">Без добавки калорий</span></div></div>`}
   if(h.st==='feed')b+=`<div class="hld"><b>Кормление грудью</b><p class="m">Организму нужно больше энергии и воды. К норме добавлено 330 ккал, похудение отключено. Ешь регулярно, пей воду по жажде, добавь белок и кальций. Резко не худей: молока может стать меньше. Алкоголь и энергетики исключи или согласуй с врачом.</p><div class="chips"><span class="chip2 ${h.noex?'on':''}" onclick="hlSet('noex',${!h.noex})">Без добавки калорий</span></div></div>`;
   if(h.st==='men')b+=`<div class="hld"><b>Менопауза и перименопауза</b><p class="m">${MENO}</p></div>`;
@@ -1880,7 +1880,8 @@ document.head.insertAdjacentHTML('beforeend','<style>'+
 /* v58: режимы оформления (карусель как в референсе), перламутр, неон, режим для бабушек, анимации */
 LIGHT.pearl=1;
 const MODES=[
- {id:'modern',n:'Современный',c:'Бордо и лайм, героиня рядом',th:'wine',ui:'',bg:'aurora',a:'#6a0b2e',b:'#3a0418',ac:'#c6e3a0',tx:'#f4ead8'},
+ {id:'modern',n:'Стандартный',c:'Привычный вид: бордо и лайм, героиня рядом',th:'wine',ui:'',bg:'aurora',a:'#6a0b2e',b:'#3a0418',ac:'#c6e3a0',tx:'#f4ead8'},
+ {id:'snow',n:'Современный',c:'Светлый и чистый, как в лучших приложениях',th:'snow',ui:'',bg:'flat',a:'#ffffff',b:'#e6e9f5',ac:'#4f46e5',tx:'#1b1d2b'},
  {id:'granny',n:'Для бабушек',c:'Крупно и просто: еда, вода, давление',th:'calm',ui:'granny',bg:'flat',a:'#fbf7ee',b:'#e4d9c2',ac:'#5f7a49',tx:'#2f281d'},
  {id:'preg',n:'Для беременных',c:'Нежный перламутр, неделя и малыш',th:'pearl',ui:'preg',bg:'aurora',a:'#f3e9ff',b:'#ffd9ec',ac:'#8b5cf6',tx:'#2e2a52'},
  {id:'glam',n:'Гламур',c:'Розовое золото и глянец',th:'glam',ui:'',bg:'aurora',a:'#4a2433',b:'#1d0a12',ac:'#f0b9a1',tx:'#fbeee8'},
@@ -2072,7 +2073,7 @@ function modeCards(){const r=document.documentElement.dataset.ui||'',t=document.
  /* ---- беременные ---- */
  if(r==='preg'){const h=HL(u),w=h.due?pregWeek(u):0,left=h.due?dd0(u):0;
   let hero;
-  if(!w){hero=`<h2 style="text-align:center">Беременность</h2><p class="m" style="text-align:center">Укажи предполагаемую дату родов, и здесь появятся неделя, малыш и советы.</p><input type="date" id="pgDue" onchange="pgSetDue(this.value)"><p class="m" style="text-align:center;font-size:12px;margin-top:8px">Дату можно взять из заключения врача. Её можно изменить в «Здоровье».</p>`}
+  if(!w){hero=`<h2 style="text-align:center">Беременность</h2><p class="m" style="text-align:center">Укажи предполагаемую дату родов, и здесь появятся неделя, малыш и советы.</p><input type="date" id="pgDue" onchange="pgSetDue(this.value)">${dueBox()}<p class="m" style="text-align:center;font-size:12px;margin-top:8px">Дату можно взять из заключения врача. Её можно изменить в «Здоровье».</p>`}
   else{const p=Math.min(1,w/40),C=2*Math.PI*105,tri=w<14?'1 триместр':w<28?'2 триместр':'3 триместр';
    hero=`<div class="pgr"><svg viewBox="0 0 250 250"><circle cx="125" cy="125" r="105" class="pb"/><circle cx="125" cy="125" r="105" class="pf" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-p)).toFixed(1)}"/></svg><div class="pgc"><small>${tri}</small><b>${w}</b><span>неделя</span><em>размер малыша как ${babyOf(w)}</em></div></div><p class="pgl">${left>0?`До родов примерно ${left} дн.`:'Срок родов наступил, скоро встреча!'}</p>`}
   put('pgHero',hero);
@@ -2102,14 +2103,14 @@ document.head.insertAdjacentHTML('beforeend','<style>'+
 /* ====== Y2K: HUD / бенто ====== */
 'html[data-ui=y2k] body{font-family:ui-monospace,"SF Mono",Menlo,monospace}html[data-ui=y2k] .greet{font-family:ui-monospace,Menlo,monospace;font-size:15px;text-transform:uppercase;letter-spacing:.14em;color:#ff4d8d;margin-bottom:10px}'+
 'html[data-ui=y2k] #t-today.on{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}html[data-ui=y2k] #t-today>*{grid-column:1/-1;margin-bottom:0}html[data-ui=y2k] #ringCard{order:1}html[data-ui=y2k] #y2Lv{order:2}html[data-ui=y2k] #greet{order:0}html[data-ui=y2k] #hlCard{order:6}html[data-ui=y2k] #cbHero{order:3;grid-column:1/-1}html[data-ui=y2k] #tiles{order:4;grid-column:1/-1}html[data-ui=y2k] #t-today>*:not(#greet):not(#y2Lv):not(#cbHero):not(#tiles):not(#hlCard):not(#ringCard){order:7}'+
-'html[data-ui=y2k] .ringbox{width:auto;height:auto;margin:0}html[data-ui=y2k] .ringbox svg{display:none}html[data-ui=y2k] .ringbox .c{position:static;align-items:flex-start}html[data-ui=y2k] #rN{font-size:76px;line-height:1;font-family:ui-monospace,Menlo,monospace;color:#fff;text-shadow:0 0 18px #ff4d8d,0 0 40px rgba(255,77,141,.6)}html[data-ui=y2k] #rL{text-transform:uppercase;letter-spacing:.2em;font-size:11px}'+
+'html[data-ui=y2k] #ringCard .ringbox{width:auto;height:auto;margin:0}html[data-ui=y2k] #ringCard .ringbox svg{display:none}html[data-ui=y2k] #ringCard .ringbox .c{position:static;align-items:flex-start}html[data-ui=y2k] #rN{font-size:76px;line-height:1;font-family:ui-monospace,Menlo,monospace;color:#fff;text-shadow:0 0 18px #ff4d8d,0 0 40px rgba(255,77,141,.6)}html[data-ui=y2k] #rL{text-transform:uppercase;letter-spacing:.2em;font-size:11px}'+
 '.y2b{height:10px;border-radius:5px;background:rgba(255,255,255,.08);margin-top:12px;width:100%;overflow:hidden;box-shadow:inset 0 0 8px rgba(0,0,0,.5)}.y2b i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#ff4d8d);box-shadow:0 0 14px #ff4d8d;transition:width .8s cubic-bezier(.2,.8,.2,1)}'+
 'html[data-ui=y2k] .card{border-radius:6px!important;border-width:1px!important;position:relative}html[data-ui=y2k] .card::before,html[data-ui=y2k] .card::after{content:"";position:absolute;width:14px;height:14px;border:2px solid #ff4d8d;pointer-events:none}html[data-ui=y2k] .card::before{left:-1px;top:-1px;border-right:0;border-bottom:0}html[data-ui=y2k] .card::after{right:-1px;bottom:-1px;border-left:0;border-top:0}'+
 '.y2h{display:flex;align-items:center;gap:10px}.y2h span{font-size:11px;letter-spacing:.2em;color:#ff4d8d}.y2h b{font-size:40px;color:#fff;text-shadow:0 0 14px #8b5cf6}.y2x{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.y2x i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#ff4d8d);box-shadow:0 0 12px #ff4d8d}.y2h small{font-size:11px;opacity:.8}.y2bd{display:flex;gap:8px;margin-top:12px}.y2bd span{flex:1;border:1px solid rgba(139,92,246,.6);border-radius:4px;padding:8px 4px;text-align:center;font-size:13px;box-shadow:0 0 10px rgba(139,92,246,.3) inset}.y2bd i{display:block;font-style:normal;font-size:20px}'+
 'html[data-ui=y2k] nav{left:22px;right:22px;border-radius:40px;border:1.5px solid #ff4d8d;box-shadow:0 0 24px rgba(255,77,141,.5),inset 0 0 14px rgba(255,77,141,.2);background:rgba(13,4,20,.85)}html[data-ui=y2k] nav button em{display:none}html[data-ui=y2k] nav button.on em{display:block;color:#ff4d8d;text-transform:uppercase;letter-spacing:.14em;font-size:9px}html[data-ui=y2k] nav svg{width:26px;height:26px}'+
 /* ====== БЕРЕМЕННЫЕ: мягкая, круглая ====== */
 'html[data-ui=preg] body{font-family:ui-rounded,"SF Pro Rounded","Avenir Next Rounded",system-ui,sans-serif}html[data-ui=preg] .greet{font-family:ui-rounded,Georgia,serif;text-align:center;font-size:22px}html[data-ui=preg] #t-today.on{display:flex;flex-direction:column}html[data-ui=preg] #greet{order:0}html[data-ui=preg] #pgHero{order:1}html[data-ui=preg] #pgTip{order:2}html[data-ui=preg] #pgKick{order:3}html[data-ui=preg] #hlCard{order:4}html[data-ui=preg] #ringCard{order:5}html[data-ui=preg] #t-today>*:not(#greet):not(#pgHero):not(#pgTip):not(#pgKick):not(#hlCard):not(#ringCard){order:6}'+
-'html[data-ui=preg] #ringCard .ringbox svg{display:none}html[data-ui=preg] .ringbox{width:auto;height:auto;margin:0}html[data-ui=preg] .ringbox .c{position:static}html[data-ui=preg] #rN{font-size:44px}'+
+'html[data-ui=preg] #ringCard .ringbox svg{display:none}html[data-ui=preg] #ringCard .ringbox{width:auto;height:auto;margin:0}html[data-ui=preg] #ringCard .ringbox .c{position:static}html[data-ui=preg] #rN{font-size:44px}'+
 '.pgr{position:relative;width:250px;height:250px;margin:6px auto}.pgr svg{width:250px;height:250px;transform:rotate(-90deg)}.pgr circle{fill:none;stroke-width:16;stroke-linecap:round}.pgr .pb{stroke:rgba(139,92,246,.15)}.pgr .pf{stroke:url(#pgg);stroke:#a67cf5;transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 8px rgba(166,124,245,.5))}.pgc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}.pgc small{font-size:12px;opacity:.7}.pgc b{font-size:72px;line-height:1;color:#7c4ddb}.pgc span{font-size:15px}.pgc em{font-style:normal;font-size:13px;margin-top:6px;opacity:.8}.pgl{text-align:center;font-size:15px;margin:0}.pgp{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pgp span{padding:8px 14px;border-radius:20px;background:rgba(139,92,246,.14);font-size:13px}'+
 'html[data-ui=preg] .card{border-radius:36px!important;padding:22px!important}html[data-ui=preg] nav{border-radius:36px;left:18px;right:18px}html[data-ui=preg] nav button em{font-size:11px}'+
 /* ====== ГЛАМУР: журнал ====== */
@@ -2120,9 +2121,29 @@ document.head.insertAdjacentHTML('beforeend','<style>'+
 'html[data-ui=glam] nav{left:0;right:0;bottom:0;border-radius:0;border:0;border-top:1px solid rgba(var(--acc),.5);background:rgba(var(--bgd),.95)}html[data-ui=glam] nav svg{display:none}html[data-ui=glam] nav button em{font-size:11px;text-transform:uppercase;letter-spacing:.24em;font-style:normal}html[data-ui=glam] nav .on{border-bottom:2px solid var(--lime)}html[data-ui=glam] nav .fab{margin:0;width:auto;height:auto;border-radius:0;background:none;box-shadow:none;font-size:26px;color:var(--lime)!important}'+
 '.glr{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(var(--acc),.18);font-size:16px}.glr input{width:20px;height:20px;accent-color:var(--lime)}'+
 /* ====== БАБУШКИ: огромное и простое ====== */
-'html[data-ui=granny] nav button:nth-child(2),html[data-ui=granny] nav button:nth-child(4){display:none}html[data-ui=granny] nav button em{font-size:15px;font-weight:700}html[data-ui=granny] nav svg{width:32px;height:32px}html[data-ui=granny] #rN{font-size:84px}html[data-ui=granny] .ringbox{width:auto;height:auto;margin:0}html[data-ui=granny] .ringbox svg{display:none}html[data-ui=granny] .ringbox .c{position:static}html[data-ui=granny] .y2b{height:16px;background:rgba(0,0,0,.1)}html[data-ui=granny] .y2b i{background:var(--lime);box-shadow:none}html[data-ui=granny] .stats{display:none}html[data-ui=granny] #planNote{display:none}html[data-ui=granny] .greet{font-size:32px;font-weight:700}html[data-ui=granny] body{font-weight:500}html[data-ui=granny] .card{border:2px solid rgba(var(--acc),.55)}'+
+'html[data-ui=granny] nav button:nth-child(2),html[data-ui=granny] nav button:nth-child(4){display:none}html[data-ui=granny] nav button em{font-size:15px;font-weight:700}html[data-ui=granny] nav svg{width:32px;height:32px}html[data-ui=granny] #rN{font-size:84px}html[data-ui=granny] #ringCard .ringbox{width:auto;height:auto;margin:0}html[data-ui=granny] #ringCard .ringbox svg{display:none}html[data-ui=granny] #ringCard .ringbox .c{position:static}html[data-ui=granny] .y2b{height:16px;background:rgba(0,0,0,.1)}html[data-ui=granny] .y2b i{background:var(--lime);box-shadow:none}html[data-ui=granny] .stats{display:none}html[data-ui=granny] #planNote{display:none}html[data-ui=granny] .greet{font-size:32px;font-weight:700}html[data-ui=granny] body{font-weight:500}html[data-ui=granny] .card{border:2px solid rgba(var(--acc),.55)}'+
 'html[data-ui=granny] .cbtop .nm b{font-size:15px}html[data-ui=preg] .row label{font-size:10px;letter-spacing:0}'+
 '</style>');
+
+document.head.insertAdjacentHTML('beforeend','<style>'+
+'html[data-theme=snow]{--bg:#eef0f7;--bg2:#ffffff;--g1:#ffffff;--g2:#eef0f7;--g3:#e1e5f2;--lime:#4f46e5;--on:#ffffff;--acc:79,70,229;--bgd:238,240,247;--a1:#7c75f2;--a2:#4338ca;--acc2:255,122,110;--txt:#1b1d2b;--mut:rgba(27,29,43,.62);--warn:#d9480f;--card:#fff;--line:rgba(27,29,43,.09)}'+
+'html[data-theme=snow] body{background:linear-gradient(180deg,#f7f8fc,#eceff8)!important;background-attachment:fixed}'+
+'html[data-theme=snow] .card{background:#fff;border:1px solid rgba(27,29,43,.07);border-radius:22px;box-shadow:0 1px 2px rgba(27,29,43,.05),0 10px 30px rgba(60,70,130,.09)}'+
+'html[data-theme=snow] .btn{background:linear-gradient(135deg,#6a63f5,#4338ca);color:#fff;border-radius:16px;box-shadow:0 8px 20px rgba(79,70,229,.3)}html[data-theme=snow] .btn.ghost{background:#fff;color:#4338ca;border:1px solid rgba(79,70,229,.3);box-shadow:none}'+
+'html[data-theme=snow] h2,html[data-theme=snow] h3{letter-spacing:0}html[data-theme=snow] body,html[data-theme=snow] .serif{font-family:-apple-system,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif}'+
+'html[data-theme=snow] input,html[data-theme=snow] select,html[data-theme=snow] textarea{background:#f3f4fa;border:1px solid rgba(27,29,43,.1);color:#1b1d2b}'+
+'html[data-theme=snow] nav{background:rgba(255,255,255,.88);backdrop-filter:blur(16px);border:1px solid rgba(27,29,43,.07);box-shadow:0 10px 30px rgba(60,70,130,.16)}'+
+'html[data-theme=snow] .chip2{background:#fff;border:1px solid rgba(27,29,43,.12);color:#1b1d2b}html[data-theme=snow] .chip2.on{background:#4f46e5;border-color:#4f46e5;color:#fff}'+
+'</style>');
+
+/* v67: калькулятор даты родов по последним месячным (правило Негеле) */
+function dueBox(){const h=HL(U());return `<details class="dcb"><summary><b>🧮 Врач не назвал срок? Посчитай сама</b></summary><div class="dcin"><p class="m">Дата родов считается так: первый день последних месячных + 280 дней (40 недель). Если цикл длиннее или короче 28 дней, срок сдвигается. Это ориентир. Точнее срок определяет УЗИ, и доверять нужно дате врача.</p><label>Первый день последних месячных</label><input type="date" id="dcL" value="${h.last||''}" max="${today()}"><label>Обычная длина цикла (дней)</label><input type="number" id="dcN" inputmode="numeric" min="21" max="40" value="${h.len||28}"><button class="btn" style="margin-top:10px" onclick="dueGo()">Рассчитать дату родов</button><p class="m" id="dcR" style="margin-top:10px"></p></div></details>`}
+function dueGo(){const l=$('#dcL').value,n=Math.max(21,Math.min(40,+$('#dcN').value||28));const r=$('#dcR');if(!l){r.textContent='Выбери дату первых месячных.';return}
+ const due=addD(l,280+(n-28)),w=Math.floor(dDiff(l,today())/7);if(dDiff(l,today())<0||w>42){r.textContent='Эта дата не подходит: проверь, что месячные были не позже сегодняшнего дня и не больше 10 месяцев назад.';return}
+ const u=U(),h=HL(u);h.last=l;h.len=n;h.due=due;h.st='preg';save();r.innerHTML='Предполагаемая дата родов: <b>'+due.split('-').reverse().join('.')+'</b>. Сейчас примерно '+Math.max(1,Math.min(42,40-Math.ceil(dDiff(today(),due)/7)))+' неделя. Дата сохранена.';toast('Дата родов сохранена');setTimeout(()=>{try{openHealth&&hlSheetOpen()?openHealth(hlTab):0}catch(e){}render()},1400)}
+const hlSheetOpen=()=>{const e=document.getElementById('hlSheet');return !!(e&&e.classList.contains('on'))};
+
+document.head.insertAdjacentHTML('beforeend','<style>details.dcb{border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:12px 0;text-align:left}details.dcb summary{cursor:pointer;list-style:none;display:block}details.dcb summary::-webkit-details-marker{display:none}details.dcb summary:after{content:"▾";float:right;opacity:.6}details.dcb[open] summary:after{content:"▴"}.dcin{padding-top:8px}.dcin .btn{width:100%}</style>');
 </script>
 </body>
 </html>
