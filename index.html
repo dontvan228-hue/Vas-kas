@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v52`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v53`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1551,7 +1551,7 @@ function hlSummary(u){const h=HL(u),st=h.st;
  return 'Настрой раздел: цикл, беременность, кормление или менопауза.'}
 function renderHealthCard(){const u=U();if(!u||!u.p)return;const t=$('#t-today'),g=$('#greet');if(!t||!g)return;
  let c=$('#hlCard');if(!c){g.insertAdjacentHTML('afterend','<div class="card" id="hlCard"></div>');c=$('#hlCard')}
- c.innerHTML=`<p class="m" style="font-size:15px;color:var(--txt);margin-bottom:8px">💗 ${esc(affToday(u))}</p><div class="hlrow"><span class="m">${esc(hlSummary(u))}</span><button class="btn ghost" style="margin:0;width:auto;padding:10px 16px" onclick="openHealth()">${isF(u)?'Моё здоровье':'Диеты'}</button></div>`}
+ c.innerHTML=`<p class="m" style="font-size:15px;color:var(--txt);margin-bottom:8px">💗 ${esc(affToday(u))}</p><div class="hlrow"><span class="m">${esc(hlSummary(u))}</span><button class="btn ghost" style="margin:0;width:auto;padding:10px 16px" onclick="openHealth('my')">Моё здоровье</button></div>`}
 const _r50=render;render=function(){_r50();try{renderHealthCard()}catch(e){}};
 function hlSet(k,v){const u=U(),h=HL(u);h[k]=v;save();openHealth(hlTab);render()}
 let hlTab='me';
@@ -1740,6 +1740,32 @@ clMergeInto=function(u,r){let ch=_mg52(u,r);if(!r||typeof r!=='object')return ch
  if(!u.hl&&r.hl){u.hl=r.hl;ch++}if(u.diet===undefined&&r.diet){u.diet=r.diet;ch++}
  return ch};
 document.head.insertAdjacentHTML('beforeend','<style>.dtl{margin:8px 0}.dtr{display:flex;gap:10px;align-items:flex-start;margin:6px 0;font-size:14px}.dtr input{width:20px;height:20px;margin-top:2px;flex:none}.cyd{border-top:1px solid var(--line);padding:8px 0}.cyb{display:flex;gap:6px;margin:6px 0}.cyb button{flex:1;padding:8px 2px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--txt);font-size:12px}.cyb button.on{background:var(--lime);color:#000;border-color:var(--lime)}.cyd.on b{color:var(--lime)}.hlx2{float:right;background:none;border:0;color:var(--txt);opacity:.6;font-size:15px}.ms-ok{color:#7ddc9a}.ms-mid{color:#f0c060}.ms-hi{color:#ff8a80}.hltabs button{font-size:12px;padding:9px 2px}</style>');
+/* v53: вкладка «Здоровье»: этап и несколько состояний одновременно */
+function hlCond(k){const u=U(),h=HL(u);h.cond=h.cond||[];const j=h.cond.indexOf(k);j<0?h.cond.push(k):h.cond.splice(j,1);save();render();openHealth('my')}
+function hlStage(v){const u=U(),h=HL(u);h.st=v;save();render();openHealth('my')}
+function illItem(d,open){const li=a=>a.map(x=>`<li>${x}</li>`).join('');
+ const go=d.k==='dia'?`<button class="btn ghost" style="margin-top:6px" onclick="openHealth('meas')">🩸 Записать сахар</button>`:(['heart','edema','kid'].includes(d.k)?`<button class="btn ghost" style="margin-top:6px" onclick="openHealth('meas')">❤️ Записать давление</button>`:'');
+ return `<details class="hld" ${open?'open':''}><summary><b>${d.e} ${d.n}</b></summary><p class="m" style="margin-top:8px"><u>Можно соблюдать:</u></p><ul class="m">${li(d.do)}</ul><p class="m"><u>Лучше ограничить:</u></p><ul class="m">${li(d.lim)}</ul><p class="m" style="color:var(--warn)"><u>Срочно к врачу или в скорую, если:</u></p><ul class="m" style="color:var(--warn)">${li(d.red)}</ul><p class="m">🩺 ${d.dr}</p>${go}</details>`}
+function myView(){const u=U(),h=HL(u),f=isF(u),cs=h.cond||[];
+ const st=(v,l)=>`<span class="chip2 ${h.st===v?'on':''}" onclick="hlStage('${v}')">${l}</span>`;
+ const sel=ILL.filter(d=>cs.includes(d.k));
+ return `<h3>Моё здоровье</h3><p class="m">Ты не одна. Отметь всё, что тебя касается: можно несколько пунктов сразу, например цикл и диабет. Советы подстроятся.</p>`
+ +(f?`<p class="m" style="margin-top:10px"><b>Этап жизни</b> (выбери один)</p><div class="chips">${st('cyc','Цикл')}${st('preg','Беременность')}${st('feed','Кормлю')}${st('men','Менопауза')}${st('none','Не показывать')}</div><button class="btn ghost" onclick="openHealth('me')">Настроить цикл и отметить дни</button>`:'')
+ +`<p class="m" style="margin-top:12px"><b>Мои состояния</b> (можно несколько)</p><div class="chips">${ILL.map(d=>`<span class="chip2 ${cs.includes(d.k)?'on':''}" onclick="hlCond('${d.k}')">${d.e} ${d.n.split(' (')[0]}</span>`).join('')}</div>`
+ +(sel.length?`<h3 style="font-size:18px;margin-top:14px">Мои советы</h3>`+sel.map(d=>illItem(d,sel.length===1)).join(''):'<p class="m">Если ничего не отмечено, смотри общий справочник ниже.</p>')
+ +`<details class="hld" style="margin-top:14px"><summary><b>📚 Справочник по всем болезням</b></summary>${ILL.filter(d=>!cs.includes(d.k)).map(d=>illItem(d,false)).join('')}</details>`
+ +`<p class="m" style="margin-top:14px;opacity:.85">${ILL_NOTE} В России скорая: 103 или 112. В любом случае обратись к врачу.</p>`}
+ill51Tabs=function(){const u=U(),f=isF(u),t=hlTab==='ill'?'my':hlTab,b=(k,l)=>`<button class="${t===k?'on':''}" onclick="openHealth('${k}')">${l}</button>`;
+ return `<div class="hltabs">${b('my','Здоровье')}${f?b('me','Цикл'):''}${b('diets','Диеты')}${b('meas','Показатели')}</div>`};
+const _oh53=openHealth;
+openHealth=function(tab){if(tab==='ill')tab='my';
+ if(tab==='my'){hlTab='my';_oh53('diets');hlTab='my';$('#hlBody').innerHTML=ill51Tabs()+myView();return}
+ _oh53(tab)};
+const _hsum53=hlSummary;
+hlSummary=function(u){const h=HL(u),c=(h.cond||[]).map(k=>(ILL.find(d=>d.k===k)||{}).n).filter(Boolean).map(n=>n.split(' (')[0].toLowerCase());
+ let s=_hsum53(u);if(c.length)s+=' Учитываю: '+c.join(', ')+'.';return s};
+document.addEventListener('click',e=>{});
+const _mg53=clMergeInto;clMergeInto=function(u,r){let ch=_mg53(u,r);if(r&&r.hl&&r.hl.cond&&u.hl){u.hl.cond=u.hl.cond||[];r.hl.cond.forEach(k=>{if(!u.hl.cond.includes(k)){u.hl.cond.push(k);ch++}})}return ch};
 </script>
 </body>
 </html>
