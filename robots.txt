@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://dontvan228-hue.github.io/Vas-kas/sitemap.xml
