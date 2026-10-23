@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v63`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v64`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -2035,6 +2035,29 @@ function qcDet(){const k=qcSel,C=CHARS[k],d=document.getElementById('qcDet');if(
 function qcOk(){const k=qcSel;if(!k)return;const nm=($('#qcName').value||'').trim()||CHARS[k].name;const c=CB();c.her=k;c.name=nm;c.made=1;chPre(k);HERDEF.face=chFace(k);save();qaChar=true;hap();snd('ok');qRender();window.scrollTo(0,0)}
 document.head.insertAdjacentHTML('beforeend','<style>.qcg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}.qcc{border:2px solid var(--line);background:transparent;border-radius:22px;padding:10px 6px 12px;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .2s,border-color .2s,background .2s}.qcc b{font-size:16px}.qcc.on{border-color:var(--lime);background:rgba(var(--acc),.14);transform:scale(1.03)}.qci{width:84px;height:84px;border-radius:50%;overflow:hidden;background:rgba(var(--acc),.15);display:block}.qci img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}'+
 '.qcd{display:flex;gap:12px;align-items:flex-end;margin-top:6px;animation:tabin .4s both}.qcp{width:110px;height:200px;object-fit:contain;object-position:bottom}.qcb{position:relative;overflow:hidden;margin-top:10px}.qcb i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.35)}.qcb.wait{opacity:.6}.qcb.wait i{animation:qcf 1.1s linear forwards}@keyframes qcf{to{width:100%}}.qcb span{position:relative}</style>');
+/* v64: режим «Тест» / «Использую» для владельца */
+const OWNER_H='5972549046c4ff1142252c9270f549101a7275a4ab287d2781a83cc71bf88b0b';
+async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+let OWNER=false;
+const TESTKEY='flow_test_snap';
+const isTest=()=>{try{return localStorage.getItem(TESTKEY)!==null}catch(e){return false}};
+function testOn(){if(isTest())return;try{localStorage.setItem(TESTKEY,localStorage.getItem(K)||'')}catch(e){toast('Не удалось включить тест');return}toast('Тест включён: данные не сохранятся');testUi()}
+function testOff(){const snap=localStorage.getItem(TESTKEY);if(snap===null)return;try{if(snap)localStorage.setItem(K,snap);localStorage.removeItem(TESTKEY)}catch(e){}location.reload()}
+/* в тесте ничего не уходит в облако и не приходит из него */
+const _cp64=clPush;clPush=async function(){if(isTest())return;return _cp64.apply(this,arguments)};
+const _cl64=clPull;clPull=async function(){if(isTest())return null;return _cl64.apply(this,arguments)};
+const _rf64=clRefresh46;clRefresh46=async function(){if(isTest())return;return _rf64.apply(this,arguments)};
+function testUi(){
+ let bn=document.getElementById('tstBar');
+ if(isTest()){if(!bn){document.body.insertAdjacentHTML('beforeend','<div id="tstBar"><span>🧪 ТЕСТ: данные не сохраняются</span><button onclick="testOff()">Выйти и вернуть как было</button></div>')}}
+ else if(bn)bn.remove();
+ const me=document.getElementById('t-me');let bx=document.getElementById('testBox');
+ if(!OWNER){if(bx)bx.remove();return}
+ if(me&&!bx){me.insertAdjacentHTML('afterbegin','<div class="card" id="testBox"></div>');bx=document.getElementById('testBox')}
+ if(bx)bx.innerHTML=`<h2>Режим работы</h2><div class="chips"><span class="chip2 ${isTest()?'on':''}" onclick="testOn()">🧪 Тест</span><span class="chip2 ${!isTest()?'on':''}" onclick="testOff()">✅ Использую</span></div><p class="m" style="font-size:12px;margin-top:8px">${isTest()?'Сейчас всё, что ты вводишь, не сохраняется и не уходит в облако. Нажми «Использую», и всё вернётся как было до теста.':'Обычная работа: данные сохраняются и синхронизируются. Включи «Тест», чтобы проверять приложение без следов.'}</p>`}
+const _r64=render;render=function(){_r64();try{(async()=>{OWNER=typeof me==='string'&&me&&(await sha256(me.trim().toLowerCase()))===OWNER_H;testUi()})()}catch(e){}};
+if(isTest())document.addEventListener('DOMContentLoaded',testUi);
+document.head.insertAdjacentHTML('beforeend','<style>#tstBar{position:fixed;left:0;right:0;top:0;z-index:300;background:#e8870c;color:#1c1100;font-size:13px;font-weight:700;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:calc(6px + env(safe-area-inset-top)) 12px 6px}#tstBar button{border:0;border-radius:14px;background:#1c1100;color:#fff;padding:7px 12px;font-size:12px}</style>');
 </script>
 </body>
 </html>
