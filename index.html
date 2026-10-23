@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v54`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v55`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1778,6 +1778,68 @@ ILL.push(
  lim:['Алкоголь и курение.','Много жирного, копчёного и сладкого.','Кофеин: некоторым женщинам становится легче при его сокращении, попробуй, но это не доказанное лечение.'],
  red:['Новое плотное уплотнение, которое не меняется после месячных','Выделения из соска, особенно кровянистые','Изменение формы груди, втяжение кожи или соска, покраснение','Увеличение узлов в подмышке'],
  dr:'Самодиагностика и БАДы не заменяют осмотр. Любое новое уплотнение покажи врачу, не откладывай.'});
+/* v55: новый экран «Цикл» */
+let cySel='',cyMon='',cyEd=false;
+const addD=(d,n)=>new Date(Date.parse(d)+n*864e5).toISOString().slice(0,10);
+const difD=(a,b)=>Math.round((Date.parse(a)-Date.parse(b))/864e5);
+const MON=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const WD=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+const fmtD=d=>{const x=new Date(d+'T00:00:00Z');return x.getUTCDate()+' '+['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'][x.getUTCMonth()]};
+function cyStarts(u){const h=HL(u),c=u.cyl||{};const ds=Object.keys(c).filter(k=>c[k].f>0).sort();
+ let S=ds.filter(k=>!(c[addD(k,-1)]&&c[addD(k,-1)].f>0));if(!S.length&&h.last)S=[h.last];return S}
+function cyModel(u){const h=HL(u),len=+h.len||28,per=+h.per||5,S=cyStarts(u);if(!S.length)return null;
+ const last=S[S.length-1],pred=[];for(let k=1;k<=8;k++)pred.push(addD(last,len*k));
+ const all=S.concat(pred.filter(x=>x>last));
+ return{len,per,S,last,pred,all,ov:len-14}}
+function cyInfo(m,d,u){let st=null;for(const s of m.all)if(s<=d)st=s;if(!st)return null;
+ const n=difD(d,st)+1,fut=st>m.last,c=(u.cyl||{})[d],marked=!!(c&&c.f>0);
+ const isP=marked||((fut||(st===m.last&&d>today()))&&n<=m.per)||(st===m.last&&d<=today()&&!Object.keys(u.cyl||{}).length&&n<=m.per);
+ const fert=n>=m.ov-5&&n<=m.ov+1&&n<=m.len,ovd=n===m.ov;
+ let ph,cl;if(n<=m.per){ph='Менструация';cl='mn'}else if(n<m.ov-1){ph='Фолликулярная фаза';cl='fo'}else if(n<=m.ov+1){ph='Овуляция';cl='ov'}else if(n<m.len-4){ph='Лютеиновая фаза';cl='lu'}else{ph='Перед месячными';cl='pm'}
+ const ch=(n>=m.ov-2&&n<=m.ov+1)?'high':fert?'mid':'low';
+ return{n:Math.min(n,99),isP,marked,fert,ovd,ph,cl,ch,fut}}
+function cyBig(u,m,d){const I=cyInfo(m,d,u),tod=today(),adult=u.p&&u.p.age>=18;
+ const chT={low:'Низкая вероятность зачатия',mid:'Средняя вероятность зачатия',high:'Высокая вероятность зачатия'};
+ if(!I)return `<div class="cybig"><div class="cyc2"><div class="cyd1">${fmtD(d)}</div><div class="m">Нет данных до первого цикла</div></div></div>`;
+ const e=(u.cyl||{})[d];
+ return `<div class="cybig"><button class="cya" onclick="cySet('${addD(d,-1)}')">‹</button><div class="cyc2"><div class="cyd1">${d===tod?'Сегодня, ':''}${fmtD(d)}</div><div class="cyl1">${I.isP?'Месячные':I.ph}</div><div class="cyn">День ${I.n}</div>${adult?`<div class="cyp cyp-${I.ch}">${chT[I.ch]}</div>`:''}<button class="cyed" onclick="cyToggle('${d}')">${I.marked?'✎ Изменить':'＋ Отметить месячные'}</button></div><button class="cya" onclick="cySet('${addD(d,1)}')">›</button></div>`}
+function cySet(d){cySel=d;cyMon=d.slice(0,7);openHealth('me')}
+function cyToggle(d){const u=U();u.cyl=u.cyl||{};if(u.cyl[d]&&u.cyl[d].f>0)delete u.cyl[d];else u.cyl[d]=Object.assign(u.cyl[d]||{},{f:2});cylSync();save();render();openHealth('me')}
+function cyNew(){const t=today();cySel=t;const u=U(),h=HL(u),per=+h.per||5;u.cyl=u.cyl||{};u.cyl[t]=Object.assign(u.cyl[t]||{},{f:2});cylSync();save();render();openHealth('me')}
+function cyEdit(){cyEd=!cyEd;openHealth('me')}
+function cyField(k,v){const u=U(),h=HL(u);
+ if(k==='last'){if(!v)return;h.last=v;u.cyl=u.cyl||{};const per=+h.per||5;for(let i=0;i<per;i++){const d=addD(v,i);if(d<=today())u.cyl[d]=Object.assign(u.cyl[d]||{},{f:2})}}
+ else h[k]=Math.max(k==='len'?21:2,Math.min(k==='len'?45:10,+v||(k==='len'?28:5)));
+ save();render();openHealth('me')}
+function cyWeek(u,m,d){let o='';for(let i=-3;i<=3;i++){const x=addD(d,i),I=m&&cyInfo(m,x,u),dt=new Date(x+'T00:00:00Z');
+ o+=`<button class="cyw ${x===d?'sel':''} ${x===today()?'tod':''} ${I&&I.isP?'per':''}" onclick="cySet('${x}')"><span>${WD[dt.getUTCDay()]}</span><b>${dt.getUTCDate()}</b></button>`}return o}
+function cyCal(u,m){const [Y,Mo]=cyMon.split('-').map(Number),first=new Date(Date.UTC(Y,Mo-1,1)),dim=new Date(Date.UTC(Y,Mo,0)).getUTCDate(),off=(first.getUTCDay()+6)%7;
+ let g=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<i class="cyh">${x}</i>`).join('');for(let i=0;i<off;i++)g+='<i></i>';
+ for(let k=1;k<=dim;k++){const x=cyMon+'-'+String(k).padStart(2,'0'),I=m&&cyInfo(m,x,u);
+  const cls=['cyk',I&&I.marked?'pm':I&&I.isP?'pp':'',I&&I.fert&&!(I&&I.isP)?'fe':'',I&&I.ovd?'ov':'',x===today()?'tod':'',x===cySel?'sel':''].join(' ');
+  g+=`<button class="${cls}" onclick="cySet('${x}')">${k}</button>`}
+ const pm=addD(cyMon+'-01',-1).slice(0,7),nm=addD(cyMon+'-28',5).slice(0,7);
+ return `<div class="cyhd"><button class="cya" onclick="cyMon='${pm}';openHealth('me')">‹</button><b>${MON[Mo-1]} ${Y}</b><button class="cya" onclick="cyMon='${nm}';openHealth('me')">›</button></div><div class="cyg">${g}</div><div class="cyleg"><span><i class="cyk pm"></i>месячные</span><span><i class="cyk pp"></i>прогноз</span><span><i class="cyk fe"></i>фертильные дни</span><span><i class="cyk ov"></i>овуляция</span></div>`}
+function cycView(){const u=U(),h=HL(u),m=cyModel(u),t=today();if(!cySel)cySel=t;if(!cyMon)cyMon=cySel.slice(0,7);
+ const d=cySel,I=m&&cyInfo(m,d,u),e=(u.cyl||{})[d]||{};
+ const nxt=m&&m.all.find(s=>s>t)||null,dl=nxt?difD(nxt,t):null;
+ const tiles=`<div class="cyt"><button onclick="cyEdit()"><span>🔄</span><b>${m?m.len:(+h.len||28)}</b><small>дн. цикл</small></button><button onclick="cyEdit()"><span>📅</span><b>${m?fmtD(m.last):'—'}</b><small>последние</small></button><button onclick="cyEdit()"><span>🩸</span><b>${m?m.per:(+h.per||5)}</b><small>дн. месячные</small></button></div>`;
+ const ed=cyEd||!m?`<div class="hld"><p class="m"><b>Настройка цикла</b></p><label>Первый день последних месячных</label><input type="date" value="${h.last||''}" max="${t}" onchange="cyField('last',this.value)"><div class="row"><div><label>Цикл (дней)</label><input type="number" inputmode="numeric" value="${+h.len||28}" min="21" max="45" onchange="cyField('len',this.value)"></div><div><label>Месячные (дней)</label><input type="number" inputmode="numeric" value="${+h.per||5}" min="2" max="10" onchange="cyField('per',this.value)"></div></div><p class="m" style="font-size:12px">Если не знаешь точно, оставь 28 и 5. Приложение само уточнит по твоим отметкам.</p></div>`:'';
+ const fl=`<div class="cyb">${[['нет',0],['слабо',1],['средне',2],['сильно',3]].map(([l,v])=>`<button class="${(e.f||0)===v?'on':''}" onclick="cylMark('${d}',${v})">${l}</button>`).join('')}</div><div class="chips">${CSYM.map(s=>`<span class="chip2 ${(e.s||[]).includes(s)?'on':''}" onclick="cylSym('${d}','${s}')">${s}</span>`).join('')}</div>`;
+ const tip=I?CYT[I.cl]:null;
+ return `<h3>Цикл</h3>${tiles}${ed}<div class="cywk">${cyWeek(u,m,d)}</div>${m?cyBig(u,m,d):`<p class="m">Укажи дату последних месячных выше, и появится прогноз.</p>`}
+ <button class="btn" style="margin:10px 0" onclick="cyNew()">Месячные начались сегодня</button>
+ ${m?`<p class="m" style="text-align:center">${dl===null?'':dl===0?'Следующие месячные ожидаются сегодня.':`Следующие месячные примерно через ${dl} дн., ${fmtD(nxt)}.`} Даты ориентировочные.</p>`:''}
+ <div class="hld"><b>Отметки на ${fmtD(d)}</b><p class="m" style="margin:4px 0">Выделения:</p>${fl}</div>
+ ${tip?`<div class="hld"><b>🍽 Питание: ${tip[0]}</b><p class="m">${tip[1]}</p></div>`:''}
+ <h3 style="font-size:18px;margin-top:14px">Календарь</h3>${cyCal(u,m)}
+ ${m&&m.S.length>1?`<h3 style="font-size:18px;margin-top:14px">Мои циклы</h3>${m.S.slice(-6).map((s,i,a)=>i?`<p class="m">${fmtD(a[i-1])} → ${fmtD(s)}: цикл ${difD(s,a[i-1])} дн.</p>`:'').join('')}`:''}
+ <p class="m" style="margin-top:12px;opacity:.85">Прогноз по календарю не работает как контрацепция. Задержка, боль, сильное кровотечение или очень нерегулярный цикл: обратись к гинекологу.</p>`}
+const _oh55=openHealth;
+openHealth=function(tab){if(tab)hlTab=tab;const u=U();
+ if(hlTab==='me'&&isF(u)&&HL(u).st==='cyc'){_oh55('diets');hlTab='me';$('#hlBody').innerHTML=ill51Tabs()+cycView();return}
+ _oh55(tab)};
+document.head.insertAdjacentHTML('beforeend','<style>.cyt{display:flex;gap:8px;margin:8px 0}.cyt button{flex:1;background:linear-gradient(160deg,#ff5d8f,#d9407a);border:0;border-radius:16px;color:#fff;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px}.cyt b{font-size:17px}.cyt small{font-size:11px;opacity:.9}.cywk{display:flex;gap:4px;margin:10px 0}.cyw{flex:1;border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:14px;padding:6px 0;display:flex;flex-direction:column;align-items:center;font-size:11px}.cyw b{font-size:16px}.cyw.per{background:rgba(255,93,143,.25)}.cyw.tod{border-color:#ff5d8f}.cyw.sel{background:#ff5d8f;color:#fff}.cybig{display:flex;align-items:center;gap:6px;margin:6px 0}.cya{width:34px;height:44px;background:none;border:0;color:var(--txt);font-size:28px}.cyc2{flex:1;aspect-ratio:1;max-width:300px;margin:auto;border-radius:44% 56% 50% 50%/50% 46% 54% 50%;background:linear-gradient(160deg,#ff5d8f,#d9407a);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center;box-shadow:0 10px 30px rgba(217,64,122,.4)}.cyd1{font-family:Georgia,serif;font-style:italic;font-size:18px}.cyl1{font-size:15px;margin-top:6px;opacity:.95}.cyn{font-size:38px;font-weight:700;line-height:1.1}.cyp{font-size:13px;margin:4px 0}.cyed{margin-top:8px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.6);color:#fff;border-radius:20px;padding:7px 14px;font-size:13px}.cyhd{display:flex;align-items:center;justify-content:space-between;margin-top:6px}.cyg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:8px 0}.cyg i{font-style:normal}.cyh{text-align:center;font-size:11px;opacity:.6}.cyk{aspect-ratio:1;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--txt);font-size:13px;padding:0}.cyk.pm{background:#ff5d8f;color:#fff}.cyk.pp{border:1px dashed #ff5d8f}.cyk.fe{background:rgba(70,200,120,.5);color:#fff}.cyk.ov{border:2px solid #7ddc9a}.cyk.tod{box-shadow:0 0 0 2px var(--txt)}.cyk.sel{outline:2px solid var(--lime)}.cyleg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;opacity:.85}.cyleg span{display:flex;align-items:center;gap:4px}.cyleg .cyk{width:14px;height:14px;aspect-ratio:auto;display:inline-block}</style>');
 </script>
 </body>
 </html>
