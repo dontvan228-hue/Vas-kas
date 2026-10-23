@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v56`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v57`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1840,6 +1840,42 @@ openHealth=function(tab){if(tab)hlTab=tab;const u=U();
  if(hlTab==='me'&&isF(u)&&HL(u).st==='cyc'){_oh55('diets');hlTab='me';$('#hlBody').innerHTML=ill51Tabs()+cycView();return}
  _oh55(tab)};
 document.head.insertAdjacentHTML('beforeend','<style>.cyt{display:flex;gap:8px;margin:8px 0}.cyt button{flex:1;background:linear-gradient(160deg,#ff5d8f,#d9407a);border:0;border-radius:16px;color:#fff;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px}.cyt b{font-size:17px}.cyt small{font-size:11px;opacity:.9}.cywk{display:flex;gap:4px;margin:10px 0}.cyw{flex:1;border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:14px;padding:6px 0;display:flex;flex-direction:column;align-items:center;font-size:11px}.cyw b{font-size:16px}.cyw.per{background:rgba(255,93,143,.25)}.cyw.tod{border-color:#ff5d8f}.cyw.sel{background:#ff5d8f;color:#fff}.cybig{display:flex;align-items:center;gap:6px;margin:6px 0}.cya{width:28px;flex:none;height:44px;background:none;border:0;color:var(--txt);font-size:28px}.cyc2{flex:1;min-height:270px;max-width:300px;min-width:0;margin:auto;border-radius:44% 56% 50% 50%/50% 46% 54% 50%;background:linear-gradient(160deg,#ff5d8f,#d9407a);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center;box-shadow:0 10px 30px rgba(217,64,122,.4)}.cyd1{font-family:Georgia,serif;font-style:italic;font-size:18px}.cyl1{font-size:15px;margin-top:6px;opacity:.95}.cyn{font-size:38px;font-weight:700;line-height:1.1}.cyp{font-size:13px;margin:4px 0}.cyed{white-space:nowrap;margin-top:8px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.6);color:#fff;border-radius:20px;padding:7px 14px;font-size:13px}.cyhd{display:flex;align-items:center;justify-content:space-between;margin-top:6px}.cyg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:8px 0}.cyg i{font-style:normal}.cyh{text-align:center;font-size:11px;opacity:.6}.cyk{aspect-ratio:1;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--txt);font-size:13px;padding:0}.cyk.pm{background:#ff5d8f;color:#fff}.cyk.pp{border:1px dashed #ff5d8f}.cyk.fe{background:rgba(70,200,120,.5);color:#fff}.cyk.ov{border:2px solid #7ddc9a}.cyk.tod{box-shadow:0 0 0 2px var(--txt)}.cyk.sel{outline:2px solid var(--lime)}.cyleg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;opacity:.85}.cyleg span{display:flex;align-items:center;gap:4px}.cyleg .cyk{width:14px;height:14px;aspect-ratio:auto;display:inline-block}</style>');
+/* v57: фоны, своё фото, всё сохраняется в аккаунте и синхронизируется */
+const BG2=[['aurora','Свечение'],['daisy','Ромашки'],['hearts','Сердечки'],['stars','Звёзды'],['dots','Горошек'],['waves','Волны'],['sunset','Закат'],['flat','Спокойный'],['pic','Моё фото']];
+function applyLook(){const u=typeof U==='function'&&U(),L=u&&u.look;if(!L)return;const r=document.documentElement,d=r.dataset;
+ if(L.theme&&d.theme!==L.theme){d.theme=L.theme;d.mode=({cream:1,mint:1,calm:1,y2k:1})[L.theme]?'light':'dark';try{localStorage.setItem('flow_theme',L.theme)}catch(e){}}
+ if(L.bg&&d.bg!==L.bg){d.bg=L.bg;try{localStorage.setItem('flow_bg',L.bg)}catch(e){}}
+ if(L.pic)r.style.setProperty('--pic','url('+L.pic+')');else r.style.removeProperty('--pic');
+ r.style.setProperty('--dim',String(L.dim==null?.45:L.dim))}
+function lookSave(p){const u=U();if(!u)return;u.look=Object.assign(u.look||{},{theme:document.documentElement.dataset.theme,bg:document.documentElement.dataset.bg},p||{},{ts:Date.now()});save()}
+const _st57=setTheme;setTheme=function(id){_st57(id);lookSave();toast('Тема сохранена')};
+setBg=function(id){const u=U();if(id==='pic'&&!(u&&u.look&&u.look.pic)){pickPic();return}
+ document.documentElement.dataset.bg=id;try{localStorage.setItem('flow_bg',id)}catch(e){}hap();lookSave();applyLook();renderTheme()};
+function pickPic(){let i=document.getElementById('picIn');if(!i){document.body.insertAdjacentHTML('beforeend','<input type="file" id="picIn" accept="image/*" style="display:none" onchange="gotPic(this)">');i=document.getElementById('picIn')}i.value='';i.click()}
+function gotPic(inp){const f=inp.files&&inp.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{
+ const M=1000,k=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+ let q=.72,d=c.toDataURL('image/jpeg',q);while(d.length>450000&&q>.3){q-=.1;d=c.toDataURL('image/jpeg',q)}
+ const u=U();u.look=Object.assign(u.look||{},{pic:d,dim:(u.look&&u.look.dim)!=null?u.look.dim:.45});document.documentElement.dataset.bg='pic';try{localStorage.setItem('flow_bg','pic')}catch(e){}
+ lookSave();applyLook();renderTheme();toast('Фон сохранён')};im.onerror=()=>toast('Не удалось открыть фото');im.src=fr.result};fr.readAsDataURL(f)}
+function setDim(v){const u=U();u.look=Object.assign(u.look||{},{dim:+v});document.documentElement.style.setProperty('--dim',String(+v));clearTimeout(window._dimT);window._dimT=setTimeout(()=>{lookSave();},400)}
+function delPic(){const u=U();if(u.look){delete u.look.pic}document.documentElement.dataset.bg='aurora';try{localStorage.setItem('flow_bg','aurora')}catch(e){}lookSave();applyLook();renderTheme();toast('Фото удалено')}
+const _rt57=renderTheme;
+renderTheme=function(){_rt57();const u=U(),bg=document.documentElement.dataset.bg,e=document.getElementById('bgBox');if(!e||!u)return;
+ const L=u.look||{},ch=(on,l,f)=>`<span class="chip2 ${on?'on':''}" onclick="${f}">${l}</span>`;
+ e.innerHTML=BG2.map(x=>ch(bg===x[0],x[1]+(x[0]==='pic'&&!L.pic?' +':''),`setBg('${x[0]}')`)).join('')
+ +`<div style="margin-top:10px"><button class="btn ghost" style="margin:0" onclick="pickPic()">📷 ${L.pic?'Заменить фото':'Выбрать фото из галереи'}</button>${L.pic?`<label style="margin-top:10px">Затемнение фото (чтобы читался текст)</label><input type="range" min="0" max="85" value="${Math.round((L.dim==null?.45:L.dim)*100)}" oninput="setDim(this.value/100)" style="width:100%"><button class="btn ghost" style="margin-top:8px" onclick="delPic()">Удалить фото</button>`:''}<p class="m" style="font-size:12px;margin-top:6px">Тема и фон сохраняются в твоём аккаунте и появятся на других устройствах.</p></div>`};
+const _r57r=render;render=function(){_r57r();try{applyLook()}catch(e){}};
+const _mg57=clMergeInto;clMergeInto=function(u,r){let ch=_mg57(u,r);if(r&&r.look&&(!u.look||(r.look.ts||0)>(u.look.ts||0))){u.look=r.look;ch++;try{applyLook()}catch(e){}}return ch};
+const SVGP=s=>`url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+const bgCss=(id,img,size)=>`html[data-bg=${id}] body::before{opacity:.5}html[data-bg=${id}] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:${img};background-size:${size}}html[data-bg=${id}][data-mode=light] body::after{filter:invert(1)}`;
+document.head.insertAdjacentHTML('beforeend','<style>'+
+ bgCss('hearts',SVGP("<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><path d='M45 62C28 50 24 40 31 34c5-4 11-1 14 5 3-6 9-9 14-5 7 6 3 16-14 28z' fill='white' fill-opacity='.07'/></svg>"),'90px')+
+ bgCss('stars',SVGP("<svg xmlns='http://www.w3.org/2000/svg' width='110' height='110'><path d='M30 20l3 8 8 1-6 6 2 8-7-4-7 4 2-8-6-6 8-1z' fill='white' fill-opacity='.08'/><circle cx='80' cy='75' r='2' fill='white' fill-opacity='.12'/><circle cx='15' cy='85' r='1.5' fill='white' fill-opacity='.1'/></svg>"),'110px')+
+ bgCss('dots',SVGP("<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26'><circle cx='13' cy='13' r='2' fill='white' fill-opacity='.09'/></svg>"),'26px')+
+ bgCss('waves',SVGP("<svg xmlns='http://www.w3.org/2000/svg' width='120' height='40'><path d='M0 20Q30 0 60 20T120 20' fill='none' stroke='white' stroke-opacity='.07' stroke-width='2'/></svg>"),'120px 40px')+
+ 'html[data-bg=sunset] body::before{opacity:0}html[data-bg=sunset] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(var(--acc2),.35),rgba(var(--acc),.12) 55%,transparent)}'+
+ 'html[data-bg=pic] body::before{display:none}html[data-bg=pic] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(var(--bgd),var(--dim,.45)),rgba(var(--bgd),var(--dim,.45))),var(--pic,none) center/cover no-repeat}'+
+ '.hlrow{flex-direction:column;align-items:stretch!important;gap:10px!important}.hlrow .btn{width:100%!important;font-size:14px}'+'html[data-mode=light][data-bg=pic] body::after{background:linear-gradient(rgba(255,255,255,var(--dim,.45)),rgba(255,255,255,var(--dim,.45))),var(--pic,none) center/cover no-repeat}</style>');
 </script>
 </body>
 </html>
