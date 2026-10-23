@@ -32,7 +32,7 @@
 <meta name="apple-mobile-web-app-title" content="FLOW">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#3a0418">
-<script>try{var t=localStorage.getItem("flow_theme")||"wine";document.documentElement.dataset.theme=t;document.documentElement.dataset.mode=({cream:1,mint:1,calm:1,y2k:1})[t]?"light":"dark";document.documentElement.dataset.bg=localStorage.getItem("flow_bg")||"aurora"}catch(e){}</script>
+<script>try{var t=localStorage.getItem("flow_theme")||"wine";document.documentElement.dataset.theme=t;document.documentElement.dataset.mode=({cream:1,mint:1,calm:1,y2k:1,pearl:1})[t]?"light":"dark";document.documentElement.dataset.ui=localStorage.getItem("flow_ui")||"";document.documentElement.dataset.bg=localStorage.getItem("flow_bg")||"aurora"}catch(e){}</script>
 <style>
 :root{--bg:#3a0418;--bg2:#5a0a28;--card:rgba(255,255,255,.07);--line:rgba(var(--acc),.22);--lime:#c6e3a0;--txt:#fbf3ef;--mut:rgba(251,243,239,.68);--warn:#ff9a85;--r:18px}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v57`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v58`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1876,6 +1876,68 @@ document.head.insertAdjacentHTML('beforeend','<style>'+
  'html[data-bg=sunset] body::before{opacity:0}html[data-bg=sunset] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(var(--acc2),.35),rgba(var(--acc),.12) 55%,transparent)}'+
  'html[data-bg=pic] body::before{display:none}html[data-bg=pic] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(var(--bgd),var(--dim,.45)),rgba(var(--bgd),var(--dim,.45))),var(--pic,none) center/cover no-repeat}'+
  '.hlrow{flex-direction:column;align-items:stretch!important;gap:10px!important}.hlrow .btn{width:100%!important;font-size:14px}'+'html[data-mode=light][data-bg=pic] body::after{background:linear-gradient(rgba(255,255,255,var(--dim,.45)),rgba(255,255,255,var(--dim,.45))),var(--pic,none) center/cover no-repeat}</style>');
+/* v58: режимы оформления (карусель как в референсе), перламутр, неон, режим для бабушек, анимации */
+LIGHT.pearl=1;
+const MODES=[
+ {id:'modern',n:'Современный',c:'Бордо и лайм, героиня рядом',th:'wine',ui:'',bg:'aurora',a:'#6a0b2e',b:'#3a0418',ac:'#c6e3a0',tx:'#f4ead8'},
+ {id:'granny',n:'Для бабушек',c:'Крупно и просто: еда, вода, давление',th:'calm',ui:'granny',bg:'flat',a:'#fbf7ee',b:'#e4d9c2',ac:'#5f7a49',tx:'#2f281d'},
+ {id:'preg',n:'Для беременных',c:'Нежный перламутр, неделя и малыш',th:'pearl',ui:'preg',bg:'aurora',a:'#f3e9ff',b:'#ffd9ec',ac:'#8b5cf6',tx:'#2e2a52'},
+ {id:'glam',n:'Гламур',c:'Розовое золото и глянец',th:'glam',ui:'',bg:'aurora',a:'#4a2433',b:'#1d0a12',ac:'#f0b9a1',tx:'#fbeee8'},
+ {id:'y2k',n:'Y2K неон',c:'Неоновое свечение для молодых',th:'neon',ui:'y2k',bg:'stars',a:'#2a0a3a',b:'#07020c',ac:'#ff4d8d',tx:'#fbeaff'}];
+function curMode(){const d=document.documentElement.dataset,u=U(),m=u&&u.look&&u.look.mode;if(m&&MODES.find(x=>x.id===m))return m;return (MODES.find(x=>x.th===d.theme&&(x.ui||'')===(d.ui||''))||{}).id||''}
+function applyMode(id){const m=MODES.find(x=>x.id===id);if(!m)return;const r=document.documentElement,d=r.dataset;
+ r.classList.add('tx');d.theme=m.th;d.mode=LIGHT[m.th]?'light':'dark';d.ui=m.ui;d.bg=m.bg;
+ try{localStorage.setItem('flow_theme',m.th);localStorage.setItem('flow_ui',m.ui);localStorage.setItem('flow_bg',m.bg)}catch(e){}
+ const u=U();if(u){u.look=Object.assign(u.look||{},{theme:m.th,bg:m.bg,ui:m.ui,mode:m.id,ts:Date.now()});save()}
+ try{applyLook()}catch(e){}
+ setTimeout(()=>r.classList.remove('tx'),800);hap();snd('ok');renderTheme();try{render()}catch(e){}toast('Режим: '+m.n)}
+function modeCard(m,cur){return `<div class="mcd ${m.id===cur?'on':''}" data-id="${m.id}" onclick="mcTap('${m.id}')"><span class="stp" style="background:linear-gradient(160deg,${m.a},${m.b});color:${m.tx}"><i class="str" style="border-color:${m.ac};${m.id==='y2k'?'box-shadow:0 0 14px '+m.ac+',inset 0 0 10px '+m.ac:''}"><b style="color:${m.tx}">${m.id==='preg'?'24 нед':m.id==='granny'?'1460':'1460'}</b></i><em style="color:${m.tx}">${m.id==='preg'?'малыш с кукурузой':'осталось ккал'}</em><u style="background:${m.ac};color:${m.b}">+</u></span><b class="stn">${m.n}</b><small>${m.c}</small><span class="mcb">${m.id===cur?'✓ Включён':'Выбрать'}</span></div>`}
+function mcTap(id){const c=document.querySelector('.mcd[data-id="'+id+'"]'),car=c&&c.parentElement;
+ if(c&&c.dataset.ctr!=='1'&&car){car.scrollTo({left:c.offsetLeft-(car.clientWidth-c.offsetWidth)/2,behavior:'smooth'});return}
+ applyMode(id)}
+function mcUpdate(car){const cr=car.getBoundingClientRect(),cx=cr.left+cr.width/2;car.querySelectorAll('.mcd').forEach(c=>{const r=c.getBoundingClientRect(),d=(r.left+r.width/2-cx)/(r.width+14),a=Math.min(Math.abs(d),2);
+  c.style.transform=`perspective(700px) rotateY(${(-d*22).toFixed(1)}deg) scale(${(1-.2*a).toFixed(3)})`;c.style.opacity=(1-.38*a).toFixed(2);c.style.filter=a>.5?`blur(${((a-.5)*2.2).toFixed(1)}px)`:'none';c.dataset.ctr=a<.35?'1':'0'})}
+function mcInit(id,sel){const e=document.getElementById(id);if(!e)return;const cur=curMode();
+ e.innerHTML=`<div class="mcar" id="${id}C">${MODES.map(m=>modeCard(m,cur)).join('')}</div><p class="m" style="text-align:center;font-size:12px;margin:2px 0 0">Листай вбок и нажми на центральную карточку</p>`;
+ const car=document.getElementById(id+'C');let t=0;car.addEventListener('scroll',()=>{cancelAnimationFrame(t);t=requestAnimationFrame(()=>mcUpdate(car))},{passive:true});
+ const st=car.querySelector('.mcd.on')||car.querySelector('.mcd');if(st)car.scrollLeft=st.offsetLeft-(car.clientWidth-st.offsetWidth)/2;mcUpdate(car)}
+const _rt58=renderTheme;
+renderTheme=function(){_rt58();
+ const sw=document.getElementById('swBox');
+ if(sw&&!document.getElementById('modeBox')){sw.previousElementSibling.insertAdjacentHTML('beforebegin','<label>Режим оформления</label><div id="modeBox"></div>')}
+ if(document.getElementById('modeBox'))mcInit('modeBox');
+ const q=document.getElementById('qSw');if(q){const cur=document.documentElement.dataset.theme,h=TH.map(t=>`<div class="swi"><button class="swb ${t[0]===cur?'on':''}" style="background:linear-gradient(135deg,${t[2]} 50%,${t[3]} 50%)" onclick="setTheme('${t[0]}')"></button><small>${t[1]}</small></div>`).join('');
+  q.className='';q.style.display='block';q.innerHTML='<div id="qMc"></div><p class="m" style="margin:10px 0 4px">Или выберите цвет:</p><div class="sw">'+h+'</div>';mcInit('qMc')}};
+/* настройка вида: ui и ранняя загрузка */
+(function(){const _al=applyLook;applyLook=function(){_al();const u=U(),L=u&&u.look;if(!L)return;const r=document.documentElement;
+ if(L.theme)r.dataset.mode=LIGHT[L.theme]?'light':'dark';if(L.ui!==undefined&&r.dataset.ui!==(L.ui||'')){r.dataset.ui=L.ui||'';try{localStorage.setItem('flow_ui',L.ui||'')}catch(e){}}}})();
+/* быстрые кнопки для бабушек */
+function renderGranny(){const g=document.getElementById('greet'),old=document.getElementById('gqCard');
+ if(document.documentElement.dataset.ui!=='granny'){if(old)old.remove();return}
+ if(!g||old)return;g.insertAdjacentHTML('afterend','<div class="gq" id="gqCard"><button onclick="quickAdd()"><span>🍽</span>Что я съела</button><button onclick="setWater(day().water+1)"><span>💧</span>Выпила воду</button><button onclick="openHealth(\'meas\')"><span>❤️</span>Давление и сахар</button><button onclick="openHealth(\'my\')"><span>🩺</span>Моё здоровье</button></div>')}
+const _r58=render;render=function(){_r58();try{renderGranny()}catch(e){}};
+/* плавный переход между вкладками */
+const _go58=go;go=function(id,b){_go58(id,b);const s=document.getElementById('t-'+id);if(s){s.classList.remove('tin');void s.offsetWidth;s.classList.add('tin')}};
+document.head.insertAdjacentHTML('beforeend','<style>'+
+'html[data-theme=pearl]{--bg:#eee8ff;--bg2:#fbe9f4;--g1:#fbe9f4;--g2:#eee8ff;--g3:#dfeaff;--lime:#7c4ddb;--on:#ffffff;--acc:139,92,246;--bgd:238,232,255;--a1:#b79bff;--a2:#7c4ddb;--acc2:255,163,140;--txt:#2e2a52;--mut:rgba(46,42,82,.72)}'+
+'html[data-theme=neon]{--bg:#0d0414;--bg2:#2a0a3a;--g1:#2a0a3a;--g2:#12041c;--g3:#07020c;--lime:#ff4d8d;--on:#ffffff;--acc:255,77,141;--bgd:13,4,20;--a1:#ff6fa8;--a2:#c026d3;--acc2:139,92,246;--txt:#fbeaff;--mut:rgba(251,234,255,.74)}'+
+'html[data-theme=pearl] .card{background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.9);border-radius:30px;box-shadow:0 16px 44px rgba(124,77,219,.18),inset 0 1px 0 #fff;backdrop-filter:blur(14px)}'+
+'html[data-theme=pearl] body{background:linear-gradient(160deg,#f1e6ff,#ffe1ef 45%,#dcecff);background-attachment:fixed}html[data-theme=pearl] body::before{animation:drift 16s ease-in-out infinite alternate}'+
+'html[data-theme=pearl] .btn{border-radius:26px;box-shadow:0 8px 22px rgba(124,77,219,.35)}'+
+'html[data-theme=neon] body{background:radial-gradient(90% 55% at 80% 0,rgba(255,77,141,.28),transparent 60%),radial-gradient(80% 60% at 0 100%,rgba(139,92,246,.3),transparent 60%),#0d0414;background-attachment:fixed}html[data-theme=neon] body::before{animation:drift 14s ease-in-out infinite alternate}'+
+'html[data-theme=neon] .card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,77,141,.55);border-radius:26px;box-shadow:0 0 22px rgba(255,77,141,.22),inset 0 0 18px rgba(139,92,246,.12);backdrop-filter:blur(10px)}'+
+'html[data-theme=neon] .btn{background:transparent;border:2px solid #ff4d8d;color:#fff;border-radius:28px;box-shadow:0 0 16px rgba(255,77,141,.45),inset 0 0 12px rgba(255,77,141,.2);text-transform:none}html[data-theme=neon] .btn.ghost{border-color:rgba(139,92,246,.8);box-shadow:0 0 14px rgba(139,92,246,.35)}'+
+'html[data-theme=neon] h2,html[data-theme=neon] h3{letter-spacing:.12em;text-transform:uppercase}html[data-theme=neon] #rg{filter:drop-shadow(0 0 8px #ff4d8d)}'+
+'@keyframes drift{to{transform:translate(5%,4%) scale(1.08)}}@keyframes tabin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}.tab.tin{animation:tabin .45s cubic-bezier(.2,.8,.2,1)}'+
+'html.tx,html.tx body,html.tx .card,html.tx .btn,html.tx nav{transition:background .7s,background-color .7s,color .7s,border-color .7s,box-shadow .7s}'+
+'.mcar{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px calc(50% - 90px);-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -18px}.mcar::-webkit-scrollbar{display:none}'+
+'.mcd{flex:none;width:180px;scroll-snap-align:center;text-align:center;transition:transform .15s,opacity .15s,filter .15s;will-change:transform}.mcd .stp{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:210px;border-radius:30px;position:relative;box-shadow:0 14px 34px rgba(0,0,0,.35)}.mcd.on .stp{outline:3px solid var(--lime);outline-offset:3px}'+
+'.mcd .stn{display:block;margin-top:10px;font-size:15px}.mcd small{display:block;font-size:11px;opacity:.75;min-height:28px}.mcb{display:inline-block;margin-top:6px;padding:7px 16px;border-radius:20px;border:1px solid var(--line);font-size:12px}.mcd.on .mcb{background:var(--lime);color:var(--on);border-color:var(--lime)}'+
+'.gq{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.gq button{border:0;border-radius:24px;padding:22px 8px;font-size:19px;font-weight:700;background:var(--lime);color:var(--on);display:flex;flex-direction:column;align-items:center;gap:8px;line-height:1.15}.gq button span{font-size:38px}'+
+'html[data-ui=granny] body{zoom:1.12}html[data-ui=granny] #cbHero,html[data-ui=granny] #tiles,html[data-ui=granny] #nudge,html[data-ui=granny] #t-today .qa,html[data-ui=granny] #t-today .card:has(#wk),html[data-ui=granny] #t-today .card:has(#bzu),html[data-ui=granny] #t-today .card:has(#moodRow){display:none!important}'+
+'html[data-ui=granny] .card{border-radius:26px}html[data-ui=granny] .m{font-size:16px}html[data-ui=granny] .row label{font-size:10px;letter-spacing:0}'+
+'@media (prefers-reduced-motion:reduce){.tab.tin,html[data-theme=pearl] body::before,html[data-theme=neon] body::before{animation:none}.mcd{transition:none}}'+
+'</style>');
 </script>
 </body>
 </html>
