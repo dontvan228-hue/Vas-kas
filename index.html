@@ -988,7 +988,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v69`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v70`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -2229,6 +2229,104 @@ function gainUI(){const ring=$('#ringCard');let c=$('#gainCard');if(!isGain()){i
  c.innerHTML=html}
 const _r69=render;render=function(){_r69.apply(this,arguments);try{gainUI()}catch(e){}};
 document.head.insertAdjacentHTML('beforeend','<style>#gainCard .chips{display:flex;flex-wrap:wrap;gap:8px}#gainCard .chip2{font-size:13px}</style>');
+
+/* ===== v70: инструменты — лекарства, блюда, тренировки, отчёт, награды, роддом, крупный шрифт, быстрые ссылки, режим «Спорт» ===== */
+const _uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const tlA=(k)=>{const u=U();return u[k]||(u[k]=[])};
+const tlO=(k)=>{const u=U();return u[k]||(u[k]={})};
+let tlTab='med';
+const TLT=[['med','💊 Лекарства'],['dish','🍲 Блюда'],['wo','🏃 Тренировки'],['rep','📊 Отчёт'],['ach','🏆 Награды'],['bag','🤰 Роддом'],['more','⚙️ Ещё']];
+function openTools(tab){const u=U();if(!u)return;if(tab)tlTab=tab;let sh=$('#tlSheet');if(!sh){document.body.insertAdjacentHTML('beforeend','<div id="tlSheet" class="hlsh"><div class="hlin"><button class="hlx" onclick="closeTools()" aria-label="Закрыть">✕</button><div id="tlBody"></div></div></div>');sh=$('#tlSheet')}
+ const show=TLT.filter(t=>t[0]!=='bag'||(u.hl&&u.hl.st==='preg'));if(!show.find(t=>t[0]===tlTab))tlTab='med';
+ const F={med:tlMed,dish:tlDish,wo:tlWo,rep:tlRep,ach:tlAch,bag:tlBag,more:tlMore};
+ $('#tlBody').innerHTML=`<div class="hltabs" style="padding-right:44px">${show.map(t=>`<button class="${t[0]===tlTab?'on':''}" onclick="openTools('${t[0]}')">${t[1]}</button>`).join('')}</div>`+F[tlTab]();sh.classList.add('on');document.body.style.overflow='hidden'}
+function closeTools(){const s=$('#tlSheet');if(s)s.classList.remove('on');document.body.style.overflow='';try{render()}catch(e){}}
+/* --- лекарства --- */
+function tlMed(){const L=tlA('medl'),lg=tlO('medlog')[today()]||{};
+ return `<h3>Лекарства и витамины</h3><p class="m">Отмечай, что принял(а) сегодня. Назначения и дозы определяет врач, здесь только напоминалка.</p>`+
+ (L.length?L.map(m=>`<div class="item"><span><input type="checkbox" ${lg[m.id]?'checked':''} onchange="medTick('${m.id}',this.checked)" style="width:22px;height:22px;vertical-align:middle;margin-right:8px"> <b>${esc(m.n)}</b> ${m.dose?esc(m.dose)+' · ':''}${esc(m.t||'')}</span><button aria-label="Удалить" onclick="medDel('${m.id}')">✕</button></div>`).join(''):'<p class="m">Пока ничего нет. Добавь первое ниже.</p>')+
+ `<label>Название</label><input id="mdN" placeholder="Например: Витамин D" maxlength="40"><div class="row"><div><label>Время</label><input id="mdT" type="time" value="09:00"></div><div><label>Доза (необязательно)</label><input id="mdD" placeholder="1 таблетка" maxlength="20"></div></div><button class="btn" style="width:100%;margin-top:10px" onclick="medAdd()">Добавить</button>`+
+ (L.length?`<button class="btn ghost" style="width:100%;margin-top:10px" onclick="medIcs()">📅 Напоминания в календарь iPhone</button><p class="m" style="font-size:12px">Календарь напомнит и тогда, когда приложение закрыто. Веб-приложение само в фоне звонить не умеет, пока оно открыто, напоминание придёт и здесь.</p>`:'')+
+ `<button class="btn ghost" style="width:100%;margin-top:10px" onclick="closeTools();openHealth('meas')">🩸 Записать давление или сахар</button>`}
+function medAdd(){const n=$('#mdN').value.trim();if(!n)return toast('Впиши название');tlA('medl').push({id:_uid(),n,t:$('#mdT').value||'09:00',dose:$('#mdD').value.trim()});save();openTools('med')}
+function medDel(id){const u=U();u.medl=tlA('medl').filter(m=>m.id!==id);save();openTools('med')}
+function medTick(id,v){const l=tlO('medlog');(l[today()]||(l[today()]={}))[id]=v?1:0;save();if(v)toast('Отмечено ✔')}
+function medIcs(){const L=tlA('medl'),d0=today().replace(/-/g,''),ev=L.map((m,i)=>['BEGIN:VEVENT','UID:med'+m.id+'@vasskass','DTSTAMP:'+d0+'T000000Z','DTSTART:'+d0+'T'+(m.t||'09:00').replace(':','')+'00','DURATION:PT10M','RRULE:FREQ=DAILY','SUMMARY:Лекарство: '+m.n+(m.dose?' ('+m.dose+')':''),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+m.n,'TRIGGER:PT0M','END:VALARM','END:VEVENT'].join('\r\n'));
+ const b=new Blob(['BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//VASSKASS FLOW//RU\r\n'+ev.join('\r\n')+'\r\nEND:VCALENDAR'],{type:'text/calendar'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='flow-meds.ics';a.click();toast('Открой файл и добавь события в календарь')}
+(function(){setInterval(()=>{try{if(!me||!U()||!U().p)return;const t=hhmm(),lg=(tlO('medlog')[today()]||{});tlA('medl').forEach(m=>{if(m.t===t&&!lg[m.id])fire('m'+m.id,'Пора принять: '+m.n,m.dose||'Отметь в разделе «Лекарства»')})}catch(e){}},20000)})();
+/* --- мои блюда --- */
+function tlDish(){const L=tlA('dish');
+ return `<h3>Мои блюда</h3><p class="m">Собери блюдо из продуктов один раз, потом добавляй в дневник одним нажатием.</p>`+
+ (L.length?L.map(d=>`<div class="item"><span><b>${esc(d.n)}</b> · ${d.k} ккал</span><span><button class="btn sm" onclick="dishUse('${d.id}')">+ в дневник</button> <button aria-label="Удалить" onclick="dishDel('${d.id}')">✕</button></span></div>`).join(''):'<p class="m">Пока нет сохранённых блюд.</p>')+
+ `<label>Название блюда</label><input id="dsN" placeholder="Например: Мой завтрак" maxlength="40"><label>Из чего состоит (каждый продукт с новой строки: название, ккал)</label><textarea id="dsL" rows="4" placeholder="овсянка 60 г, 220&#10;банан, 90&#10;молоко 150 мл, 80" style="width:100%;border-radius:14px;padding:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--txt);font:inherit"></textarea><p class="m" id="dsT" style="margin-top:6px"></p><button class="btn" style="width:100%;margin-top:6px" onclick="dishSave()">Сохранить блюдо</button>`}
+function dishSum(t){return t.split('\n').reduce((a,l)=>{const m=l.match(/(\d+[.,]?\d*)\s*(?:ккал)?\s*$/);return a+(m?Math.round(+m[1].replace(',','.')):0)},0)}
+function dishSave(){const n=$('#dsN').value.trim(),t=$('#dsL').value,k=dishSum(t);if(!n)return toast('Впиши название блюда');if(!k)return toast('В конце каждой строки напиши калории числом');tlA('dish').push({id:_uid(),n,k});save();toast('Сохранено: '+k+' ккал');openTools('dish')}
+function dishUse(id){const d=tlA('dish').find(x=>x.id===id);if(!d)return;day().food.push({n:d.n,k:d.k});save();toast('Добавлено: +'+d.k+' ккал');try{render()}catch(e){}}
+function dishDel(id){U().dish=tlA('dish').filter(x=>x.id!==id);save();openTools('dish')}
+/* --- тренировки --- */
+const WOT=[['Ходьба',3.5],['Бег',8],['Силовая',5],['Йога',3],['Плавание',6],['Велосипед',6.8],['Танцы',5],['Другое',4]];
+function tlWo(){const L=tlA('wo'),S=tlA('str'),w7=L.filter(x=>dn(today())-dn(x.d)<=6),mn=w7.reduce((a,x)=>a+x.min,0),kc=w7.reduce((a,x)=>a+x.kcal,0);
+ const best={};S.forEach(x=>{(best[x.ex]||(best[x.ex]=[])).push(x)});
+ return `<h3>Тренировки</h3><p class="m">За 7 дней: ${w7.length} трен., ${mn} мин, около ${kc} ккал. Калории приблизительные и в дневник не добавляются.</p>`+
+ `<label>Что делали</label><select id="woT">${WOT.map((t,i)=>`<option value="${i}">${t[0]}</option>`).join('')}</select><label>Минут</label><input id="woM" type="number" inputmode="numeric" value="30" min="5" max="300"><button class="btn" style="width:100%;margin-top:10px" onclick="woAdd()">Записать тренировку</button>`+
+ (L.length?'<p class="m" style="margin-top:12px"><b>Последние</b></p>'+L.slice(-6).reverse().map(x=>`<div class="item"><span>${x.d.slice(5).split('-').reverse().join('.')} · ${esc(x.t)} · ${x.min} мин · ≈${x.kcal} ккал</span><button aria-label="Удалить" onclick="woDel('${x.id}')">✕</button></div>`).join(''):'')+
+ `<h3 style="margin-top:20px">Силовые подходы</h3><div class="row"><div><label>Упражнение</label><input id="stE" placeholder="Жим лёжа" maxlength="30"></div><div><label>Вес, кг</label><input id="stK" type="number" inputmode="decimal"></div></div><div class="row"><div><label>Повторов</label><input id="stR" type="number" inputmode="numeric" value="10"></div><div><label>Подходов</label><input id="stS" type="number" inputmode="numeric" value="3"></div></div><button class="btn ghost" style="width:100%;margin-top:10px" onclick="stAdd()">Записать подход</button>`+
+ Object.keys(best).slice(0,8).map(e=>{const a=best[e],l=a[a.length-1],p=a.length>1?a[a.length-2]:null,df=p?n1(l.kg-p.kg):0;return `<div class="item"><span><b>${esc(e)}</b> · ${l.kg} кг × ${l.r} × ${l.s}</span><span style="color:${df>0?'var(--lime)':'var(--mut)'}">${p?(df>0?'+':'')+df+' кг':'первая запись'}</span></div>`}).join('')}
+function woAdd(){const t=WOT[+$('#woT').value],m=Math.max(5,Math.min(300,+$('#woM').value||0)),kc=Math.round(t[1]*lastW()*m/60);tlA('wo').push({id:_uid(),d:today(),t:t[0],min:m,kcal:kc});save();toast('Записано, молодец! 💪');openTools('wo')}
+function woDel(id){U().wo=tlA('wo').filter(x=>x.id!==id);save();openTools('wo')}
+function stAdd(){const e=$('#stE').value.trim(),k=+$('#stK').value,r=+$('#stR').value||1,s=+$('#stS').value||1;if(!e||!(k>=0)||$('#stK').value==='')return toast('Впиши упражнение и вес');tlA('str').push({id:_uid(),d:today(),ex:e,kg:k,r,s});save();toast('Записано');openTools('wo')}
+/* --- недельный отчёт --- */
+function wkData(){const u=U(),p=plan(),a=[];for(let i=6;i>=0;i--)a.push(dstat(i));const lg=a.filter(x=>x.k>0),avg=lg.length?Math.round(lg.reduce((q,x)=>q+x.k,0)/lg.length):0,water=a.length?n1(a.reduce((q,x)=>q+x.w,0)/7):0;
+ const ok=lg.filter(x=>isGain()?x.k>=p.b*.9:x.k<=p.b).length,ws=u.weights.filter(x=>dn(today())-dn(x.d)<=7),dw=ws.length>1?n1(ws[ws.length-1].w-ws[0].w):null;
+ const wo=tlA('wo').filter(x=>dn(today())-dn(x.d)<=6),mn=wo.reduce((q,x)=>q+x.min,0),ml=tlA('medl').length,lgm=tlO('medlog');let tk=0;for(let i=0;i<7;i++){const d=new Date(Date.parse(today())-i*864e5).toISOString().slice(0,10);tk+=Object.values(lgm[d]||{}).filter(Boolean).length}
+ return{avg,days:lg.length,ok,water,dw,wo:wo.length,mn,medp:ml?Math.round(tk/(ml*7)*100):null,b:p.b}}
+function wkText(){const u=U(),d=wkData();const g=isGain();let t=`VASSKASS • FLOW — итоги недели\n${u.name}\n\n`;t+=`Записано дней с едой: ${d.days} из 7\nСредние калории: ${d.avg} (план ${d.b})\n${g?'Дней, когда съедено 90% плана и больше':'Дней в рамках плана'}: ${d.ok}\nВода в среднем: ${d.water} из 8 стаканов\n`;if(d.dw!==null)t+=`Вес за неделю: ${d.dw>0?'+':''}${d.dw} кг\n`;t+=`Тренировок: ${d.wo} (${d.mn} мин)\n`;if(d.medp!==null)t+=`Лекарства: принято ${d.medp}% по плану\n`;return t}
+function tlRep(){const d=wkData(),g=isGain(),sc=(d.days>=5?1:0)+(d.ok>=4?1:0)+(d.water>=5?1:0)+(d.wo>=2?1:0);
+ const say=sc>=3?'Отличная неделя! Ты держишь ритм, так и продолжай.':sc>=2?'Хорошая неделя. Есть что улучшить, но главное, ты не бросаешь.':'Неделя вышла непростой, это нормально. Начни с одной малой привычки: запиши завтрак.';
+ const row=(l,v)=>`<div class="item"><span>${l}</span><b>${v}</b></div>`;
+ return `<h3>Итоги недели</h3><p class="m">${say}</p>${row('Дней с записями',d.days+' из 7')}${row('Средние калории',d.avg+' (план '+d.b+')')}${row(g?'Дней с едой от 90% плана':'Дней в рамках плана',d.ok)}${row('Вода в день',d.water+' из 8')}${d.dw!==null?row('Вес за неделю',(d.dw>0?'+':'')+d.dw+' кг'):''}${row('Тренировки',d.wo+' · '+d.mn+' мин')}${d.medp!==null?row('Лекарства по плану',d.medp+'%'):''}
+ <button class="btn" style="width:100%;margin-top:14px" onclick="wkShare()">Отправить близким или врачу</button><p class="m" style="font-size:12px;margin-top:8px">Откроется меню iPhone: можно выбрать мессенджер или почту. Если меню недоступно, текст скопируется.</p>`}
+function wkShare(){const t=wkText();if(navigator.share)navigator.share({title:'Итоги недели',text:t}).catch(()=>{});else{try{navigator.clipboard.writeText(t);toast('Текст скопирован')}catch(e){toast('Не удалось скопировать')}}}
+/* --- награды --- */
+const ACH=[['🍽️','Первая запись',u=>Object.values(u.days).some(d=>d.food.length)],['🔥','Серия 3 дня',u=>streak()>=3],['🔥','Серия 7 дней',u=>streak()>=7],['🌟','Серия 30 дней',u=>streak()>=30],['💧','Вся вода за день',u=>Object.values(u.days).some(d=>d.water>=8)],['⚖️','Пять взвешиваний',u=>u.weights.length>=5],['📈','Четверть пути',u=>prog()>=.25&&u.weights.length>1],['🏁','Половина пути',u=>prog()>=.5&&u.weights.length>1],['🏆','Цель достигнута',u=>prog()>=1&&u.weights.length>1],['🏃','Первая тренировка',u=>tlA('wo').length>0],['💪','10 тренировок',u=>tlA('wo').length>=10],['💊','Лекарства по плану 7 дней',u=>{let n=0;const l=tlO('medlog');for(let i=0;i<7;i++){const d=new Date(Date.parse(today())-i*864e5).toISOString().slice(0,10);if(Object.values(l[d]||{}).some(Boolean))n++}return n>=7}],['🍲','Своё блюдо',u=>tlA('dish').length>0],['📓','100 записей еды',u=>Object.values(u.days).reduce((a,d)=>a+d.food.length,0)>=100]];
+function achCheck(){const u=U();if(!u||!u.p)return;const got=tlO('ach');ACH.forEach((a,i)=>{try{if(!got[i]&&a[2](u)){got[i]=Date.now();save();toast('🏆 Новая награда: '+a[1])}}catch(e){}})}
+function tlAch(){achCheck();const got=tlO('ach');return `<h3>Награды</h3><p class="m">Открыто ${Object.keys(got).length} из ${ACH.length}. Они открываются сами, пока ты ведёшь дневник.</p><div class="achg">${ACH.map((a,i)=>`<div class="ach ${got[i]?'on':''}"><span>${got[i]?a[0]:'🔒'}</span><small>${a[1]}</small></div>`).join('')}</div>`}
+/* --- роддом и вопросы врачу --- */
+const BAG=[['Документы',['Паспорт','Полис ОМС','Обменная карта','Родовой сертификат','СНИЛС','Договор или направление, если рожаешь платно']],['Для мамы',['Халат и сорочка','Тапочки','Бельё для послеродового периода','Прокладки послеродовые','Средства личной гигиены','Бутылка воды','Зарядка и телефон','Удобная одежда для выписки']],['Для малыша',['Подгузники','Влажные салфетки','Боди и распашонки','Шапочка и носочки','Одеяло или конверт на выписку','Автокресло']],['Вопросы врачу',['Какие анализы и УЗИ нужны в этом триместре?','Какие витамины и добавки принимать?','Какая прибавка веса для меня нормальна?','Какие симптомы значит срочно звонить?','Как и где планируем роды?','Какая физическая активность подходит?']]];
+function tlBag(){const cl=tlO('cl');return `<h3>Роддом и вопросы врачу</h3><p class="m">Отмечай, что собрано или что уже узнала. Список примерный, уточни у врача и в роддоме.</p>`+BAG.map((g,gi)=>`<p class="m" style="margin-top:14px"><b>${g[0]}</b></p>`+g[1].map((t,ti)=>`<div class="item"><span><input type="checkbox" ${cl[gi+'_'+ti]?'checked':''} onchange="clTick('${gi}_${ti}',this.checked)" style="width:22px;height:22px;vertical-align:middle;margin-right:8px">${t}</span></div>`).join('')).join('')}
+function clTick(k,v){tlO('cl')[k]=v?1:0;save()}
+/* --- ещё: крупный шрифт, быстрые ссылки --- */
+function tlMore(){const u=U(),base=location.origin+location.pathname;return `<h3>Ещё</h3><div class="tgr"><span>Крупный шрифт и кнопки</span><input type="checkbox" class="tg" ${u.bigfont?'checked':''} onchange="bigSet(this.checked)"></div><p class="m" style="font-size:12px">Всё в приложении станет крупнее. Подходит, если мелкий текст трудно читать.</p>
+ <h3 style="margin-top:20px">Быстрые кнопки для iPhone</h3><p class="m">В приложении «Команды» создай команду «Открыть URL» с одной из ссылок и добавь её на экран «Домой». Одно нажатие запишет стакан воды или вес.</p><div class="item"><span style="word-break:break-all;font-size:12px">${base}?add=water</span><button class="btn sm" onclick="cpy('${base}?add=water')">Копировать</button></div><div class="item"><span style="word-break:break-all;font-size:12px">${base}?w=65.5</span><button class="btn sm" onclick="cpy('${base}?w=65.5')">Копировать</button></div><p class="m" style="font-size:12px">Важно: такая ссылка откроется в Safari, а у приложения с экрана «Домой» своё хранилище. Чтобы данные совпали, войди в тот же аккаунт и в Safari, тогда всё сольётся через облако. Число после w= впиши своим весом.</p>
+ <button class="btn ghost" style="width:100%;margin-top:14px" onclick="wkShare2()">Поделиться итогами недели</button>`}
+function cpy(t){try{navigator.clipboard.writeText(t);toast('Скопировано')}catch(e){toast('Не удалось скопировать')}}
+function wkShare2(){wkShare()}
+function bigSet(v){U().bigfont=v;save();document.documentElement.classList.toggle('big',!!v)}
+function urlAct(){try{const q=new URLSearchParams(location.search);if(!me||!U()||!U().p)return false;let did=0;if(q.get('add')==='water'){const d=day();if(d.water<8){d.water++;did=1;toast('Вода +1 💧')}}const w=parseFloat((q.get('w')||'').replace(',','.'));if(w>=30&&w<=300){U().weights.push({d:today(),w:Math.round(w*10)/10});did=1;toast('Вес записан: '+w+' кг')}if(did){save();render()}if(q.has('add')||q.has('w'))history.replaceState(null,'',location.pathname);return true}catch(e){return false}}
+(function(){let n=0;const t=setInterval(()=>{n++;if(urlAct()||n>25)clearInterval(t)},400)})();
+/* --- входы в раздел --- */
+function toolsEntry(){const u=U();if(!u||!u.p)return;const mk=(id,host,pos)=>{if(!host||$('#'+id))return;host.insertAdjacentHTML(pos,`<div class="card" id="${id}"><h2>🧰 Ещё</h2><p class="m">Лекарства, свои блюда, тренировки, итоги недели, награды.</p><div class="chips"><span class="chip2" onclick="openTools('med')">💊 Лекарства</span><span class="chip2" onclick="openTools('dish')">🍲 Блюда</span><span class="chip2" onclick="openTools('wo')">🏃 Тренировки</span><span class="chip2" onclick="openTools('rep')">📊 Отчёт</span><span class="chip2" onclick="openTools('ach')">🏆 Награды</span></div></div>`)};
+ mk('tlEntry',$('#t-today'),'beforeend');mk('tlEntry2',$('#t-me'),'afterbegin');document.documentElement.classList.toggle('big',!!u.bigfont);try{achCheck()}catch(e){}}
+const _r70=render;render=function(){_r70.apply(this,arguments);try{toolsEntry()}catch(e){}};
+/* слияние с облаком */
+const _mg70=clMergeInto;clMergeInto=function(u,r){let ch=_mg70(u,r);if(!r)return ch;
+ ['medl','dish','wo','str'].forEach(k=>{if(Array.isArray(r[k])){const have=new Set((u[k]||[]).map(x=>x.id));r[k].forEach(x=>{if(x&&!have.has(x.id)){(u[k]=u[k]||[]).push(x);ch++}})}});
+ ['cl','ach'].forEach(k=>{if(r[k]){u[k]=u[k]||{};for(const i in r[k])if(!u[k][i]){u[k][i]=r[k][i];ch++}}});
+ if(r.medlog){u.medlog=u.medlog||{};for(const d in r.medlog){u.medlog[d]=u.medlog[d]||{};for(const i in r.medlog[d])if(u.medlog[d][i]===undefined){u.medlog[d][i]=r.medlog[d][i];ch++}}}
+ if(u.bigfont===undefined&&r.bigfont!==undefined){u.bigfont=r.bigfont;ch++}return ch};
+/* праздник на отметках пути при наборе веса */
+const _gu70=gainUI;gainUI=function(){_gu70();const u=U();if(!isGain()||!u||!u.p||u.weights.length<2)return;const P=prog(),c=CB();[.25,.5,.75,1].forEach(t=>{if(P>=t&&!(c.ms||(c.ms=[])).includes(t)){c.ms.push(t);c.coins=(c.coins||0)+10;save();try{HERC={slot:'celebrate',until:Date.now()+6000}}catch(e){}toast(`Героиня прошла ${Math.round(t*100)}% пути вместе с тобой! +10 🪙`)}})};
+/* режим «Спорт» */
+MODES.push({id:'sport',n:'Спорт',c:'Графит и оранжевый: тренировки и результат',th:'iron',ui:'',bg:'flat',a:'#2a2f38',b:'#14171c',ac:'#ff7a1a',tx:'#f2f4f7'});
+document.head.insertAdjacentHTML('beforeend','<style>'+
+'html[data-theme=iron]{--bg:#14171c;--bg2:#1f242c;--g1:#1f242c;--g2:#14171c;--g3:#0d0f13;--lime:#ff7a1a;--on:#14171c;--acc:255,122,26;--bgd:20,23,28;--a1:#ff9a4d;--a2:#e8620a;--acc2:80,170,255;--txt:#f2f4f7;--mut:rgba(242,244,247,.62);--warn:#ff6b5a;--line:rgba(255,255,255,.1)}'+
+'html[data-theme=iron] body{background:linear-gradient(180deg,#171b21,#0f1216)!important;background-attachment:fixed;font-family:"Avenir Next Condensed","Arial Narrow",-apple-system,system-ui,sans-serif}html[data-theme=iron] .serif{font-family:"Avenir Next Condensed","Arial Narrow",system-ui,sans-serif;font-weight:800}'+
+'html[data-theme=iron] .card{background:#1d222a;border:1px solid rgba(255,255,255,.07);border-left:3px solid #ff7a1a;border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.35)}html[data-theme=iron] h2,html[data-theme=iron] h3{text-transform:uppercase;letter-spacing:.08em}'+
+'html[data-theme=iron] .btn{border-radius:12px;background:linear-gradient(135deg,#ff9a4d,#ff7a1a);color:#14171c;font-weight:800;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 8px 18px rgba(255,122,26,.3)}html[data-theme=iron] .btn.ghost{background:transparent;color:#ff9a4d;border:1.5px solid #ff7a1a;box-shadow:none}'+
+'html[data-theme=iron] nav{background:rgba(24,28,34,.94);border:1px solid rgba(255,255,255,.08);border-radius:18px}html[data-theme=iron] .chip2.on{background:#ff7a1a;color:#14171c;border-color:#ff7a1a}'+
+'.achg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.ach{border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center;opacity:.5}.ach.on{opacity:1;background:rgba(var(--acc),.14);border-color:var(--lime)}.ach span{display:block;font-size:30px}.ach small{display:block;margin-top:4px;font-size:11px;line-height:1.25}'+
+'html.big body{zoom:1.16}html.big .btn,html.big .qo{padding-top:16px;padding-bottom:16px}'+
+'#tlBody textarea{margin-top:6px}.item button.btn{background:var(--lime);color:var(--on);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;white-space:nowrap;flex:none}.item{gap:10px}</style>');
 </script>
 </body>
 </html>
