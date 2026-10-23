@@ -978,7 +978,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v44`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v45`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1328,8 +1328,10 @@ function drawPor(r){let e=$('#shP');if(!e){e=document.createElement('div');e.id=
 
 /* v40: вход и регистрация сразу работают с облаком: те же почта и пароль, анкета не повторяется */
 const clRace=(p,ms)=>Promise.race([p,new Promise((_,no)=>setTimeout(()=>no(new Error('timeout')),ms))]);
-async function cloudTry(mail,pw){try{const s=await clRace(sbReq('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:mail,password:pw})}),9000);
-  CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=false;const c=await clRace(clPull(),9000);return {c}}catch(e){return null}}
+async function cloudTry(mail,pw){let s;try{s=await clRace(sbReq('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:mail,password:pw})}),15000)}catch(e){return null}
+  CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=false;
+  for(let i=0;i<3;i++){try{const c=await clRace(clPull(),15000);return {c}}catch(e){}}
+  return {fail:true}}
 async function cloudSignup(mail,pw){try{const s=await clRace(sbReq('/auth/v1/signup?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:JSON.stringify({email:mail,password:pw})}),9000);
   if(s&&s.access_token){CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=true;clSave();return true}}catch(e){}return false}
 doAuth=async function(){
@@ -1340,6 +1342,7 @@ doAuth=async function(){
   try{
     const lu=db.users[mail],localOk=!!(lu&&lu.hash===await hash(pw,lu.salt));
     const cr=await cloudTry(mail,pw);
+    if(cr&&cr.fail){CL=null;try{localStorage.removeItem('flow_cloud')}catch(e){}return err.textContent='Вход выполнен, но данные из облака не загрузились (плохой интернет). Нажмите «Войти» ещё раз'}
     if(cr){
       const c=cr.c;
       if(c&&c.data&&c.data.p&&!(localOk&&lu.p)){
@@ -1427,6 +1430,20 @@ function herPick42(){const s=document.getElementById('cbSet');if(!s||s.querySele
 const _rc42=renderChibi;
 renderChibi=function(a){try{const k=chKey();if(k!=='mira')chPre(k);HERDEF.face=chFace(k)}catch(e){}const r=_rc42(a);try{herPick42();const sd=document.querySelector('.cbside');if(sd&&!document.getElementById('herSw'))sd.insertAdjacentHTML('beforeend','<button id="herSw" aria-label="Сменить героя" onclick="herNext()">👭</button>')}catch(e){}return r};
 document.head.insertAdjacentHTML('beforeend','<style>#herPick .hpr{display:flex;gap:8px;margin:6px 0 16px}#herPick .hp{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 2px;border-radius:16px;border:2px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);font:inherit;font-size:11px;cursor:pointer}#herPick .hp.on{border-color:rgb(var(--acc));background:rgba(var(--acc),.14)}#herPick .hpi{width:52px;height:52px;border-radius:16px;overflow:hidden;background:#cdb99c;display:block}#herPick .hpi img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}</style>');
+
+/* v45: защита данных: в облако пишем только после загрузки и объединения того, что там лежит */
+function clMergeInto(u,r){if(!r||typeof r!=='object')return 0;let ch=0;u.days=u.days||{};const rd=r.days||{};
+ for(const k in rd){const a=u.days[k],b=rd[k];if(!b)continue;if(!a){u.days[k]=b;ch++;continue}if(((b.food||[]).length)>((a.food||[]).length)){u.days[k]=b;ch++}}
+ const have=new Set((u.weights||[]).map(w=>w.d));(r.weights||[]).forEach(w=>{if(w&&!have.has(w.d)){(u.weights=u.weights||[]).push(w);ch++}});
+ if(u.weights)u.weights.sort((x,y)=>x.d<y.d?-1:x.d>y.d?1:0);
+ const mine=new Set((u.my||[]).map(m=>String(m.n||'').toLowerCase()));(r.my||[]).forEach(m=>{if(m&&!mine.has(String(m.n||'').toLowerCase())){(u.my=u.my||[]).push(m);ch++}});
+ if(!u.p&&r.p){u.p=r.p;ch++}
+ return ch}
+let clMergedUid='';
+const _clPush45=clPush;
+clPush=async function(){
+ if(CL&&CL.user&&clMergedUid!==CL.user.id){const c=await clPull();if(c&&c.data){const u=U();if(u&&clMergeInto(u,c.data))save()}clMergedUid=CL.user.id}
+ return _clPush45()};
 </script>
 </body>
 </html>
