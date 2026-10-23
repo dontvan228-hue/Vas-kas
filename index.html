@@ -1914,7 +1914,7 @@ renderTheme=function(){_rt58();
 /* быстрые кнопки для бабушек */
 function renderGranny(){const g=document.getElementById('greet'),old=document.getElementById('gqCard');
  if(document.documentElement.dataset.ui!=='granny'){if(old)old.remove();return}
- if(!g||old)return;g.insertAdjacentHTML('afterend','<div class="gq" id="gqCard"><button onclick="quickAdd()"><span>🍽</span>Что я съела</button><button onclick="setWater(day().water+1)"><span>💧</span>Выпила воду</button><button onclick="openHealth(\'meas\')"><span>❤️</span>Давление и сахар</button><button onclick="openHealth(\'my\')"><span>🩺</span>Моё здоровье</button></div>')}
+ if(!g||old)return;g.insertAdjacentHTML('afterend','<div class="gq" id="gqCard"><button onclick="quickAdd()"><span>🥗</span>Что я съела</button><button onclick="setWater(day().water+1)"><span>💧</span>Выпила воду</button><button onclick="openHealth(\'meas\')"><span>❤️</span>Давление и сахар</button><button onclick="openHealth(\'my\')"><span>🩺</span>Моё здоровье</button></div>')}
 const _r58=render;render=function(){_r58();try{renderGranny()}catch(e){}};
 /* плавный переход между вкладками */
 const _go58=go;go=function(id,b){_go58(id,b);const s=document.getElementById('t-'+id);if(s){s.classList.remove('tin');void s.offsetWidth;s.classList.add('tin')}};
@@ -1965,6 +1965,48 @@ document.head.insertAdjacentHTML('beforeend','<style>.wh{position:relative;heigh
 '.whring{position:absolute;left:50%;bottom:-210px;width:560px;height:560px;margin-left:-280px;border-radius:50%;background:radial-gradient(circle,transparent 58%,rgba(var(--acc),.18) 59%,rgba(var(--acc2),.28) 72%,transparent 73%);border:1px solid rgba(var(--acc),.35);pointer-events:none}'+
 '.wh .mcd{position:absolute;left:50%;top:14px;margin-left:-90px;width:180px;transition:none;will-change:transform;transform-origin:50% 120%}.wh .mcd .mcb{display:none}.wh .mcd small{display:none}.wh .mcd .stn{display:none}.wh .mcd .stp{height:240px}'+
 '.whnm{text-align:center;margin-top:4px}.whnm b{display:block;font-size:18px}.whnm small{opacity:.75;font-size:12px}.whd{display:flex;justify-content:center;gap:8px;margin:8px 0}.whd i{width:8px;height:8px;border-radius:50%;background:var(--line)}.whd i.on{background:var(--lime);transform:scale(1.3)}.whbtn.on{opacity:.7}</style>');
+/* v61: переворот карточки в 3D за пальцем (как в видео) + выезд блоков при прокрутке */
+function fcFace(m,cur){return modeCard(m,cur).replace('class="mcd ','class="mcd fcf ').replace(/ onclick="mcTap\('[a-z0-9]+'\)"/,'')}
+function mcInit(id){const host=document.getElementById(id);if(!host)return;const n=MODES.length,cur=curMode();let idx=Math.max(0,MODES.findIndex(m=>m.id===cur));
+ const old=WH[id];if(old&&old.raf)cancelAnimationFrame(old.raf);
+ host.innerHTML=`<div class="fc"><div class="fcs fcl"></div><div class="fcs fcr"></div><div class="fcm"></div></div><div class="whnm"></div><div class="whd">${MODES.map(()=>'<i></i>').join('')}</div><button class="btn whbtn">Включить</button><p class="m" style="text-align:center;font-size:12px;margin:6px 0 0">Проведи по карточке пальцем или мышкой, она перевернётся</p>`;
+ const st=host.querySelector('.fc'),mid=host.querySelector('.fcm'),L=host.querySelector('.fcl'),R=host.querySelector('.fcr'),btn=host.querySelector('.whbtn');
+ const w=WH[id]={host,idx,ang:0,raf:0};let shown=-1,shownSide=-1;
+ const mod=k=>((k%n)+n)%n;
+ function paint(){const a=w.ang,eff=Math.abs(a)<=90?a:a-180*Math.sign(a),face=Math.abs(a)<=90?w.idx:mod(w.idx+(a<0?1:-1));
+  if(shown!==face){shown=face;mid.innerHTML=fcFace(MODES[face],curMode())}
+  mid.style.transform=`perspective(900px) rotateY(${eff.toFixed(1)}deg)`;mid.style.filter=`brightness(${(1-Math.abs(eff)/260).toFixed(2)})`;
+  if(shownSide!==w.idx){shownSide=w.idx;L.innerHTML=fcFace(MODES[mod(w.idx-1)],curMode());R.innerHTML=fcFace(MODES[mod(w.idx+1)],curMode())}
+  const pr=Math.min(1,Math.abs(a)/180);L.style.transform=`translateX(${(a>0?pr*40:0)}px) perspective(700px) rotateY(28deg) scale(${(.72+(a>0?pr*.28:0)).toFixed(3)})`;R.style.transform=`translateX(${(a<0?-pr*40:0)}px) perspective(700px) rotateY(-28deg) scale(${(.72+(a<0?pr*.28:0)).toFixed(3)})`;
+  L.style.opacity=(.55+(a>0?pr*.4:0)).toFixed(2);R.style.opacity=(.55+(a<0?pr*.4:0)).toFixed(2);
+  const m=MODES[w.idx],nm=host.querySelector('.whnm');if(nm.dataset.k!==m.id){nm.dataset.k=m.id;nm.innerHTML=`<b>${m.n}</b><small>${m.c}</small>`}
+  btn.textContent=m.id===curMode()?'✓ Включён':'Включить';btn.classList.toggle('on',m.id===curMode());
+  host.querySelectorAll('.whd i').forEach((e,i)=>e.classList.toggle('on',i===w.idx))}
+ function anim(to,done){cancelAnimationFrame(w.raf);const from=w.ang,t0=performance.now(),D=Math.max(180,Math.abs(to-from)*3.2);
+  const step=t=>{const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);w.ang=from+(to-from)*e;paint();if(k<1)w.raf=requestAnimationFrame(step);else if(done)done()};w.raf=requestAnimationFrame(step)}
+ function go1(dir){/* dir=+1: следующая (карточка уходит влево, угол отрицательный) */anim(-dir*180,()=>{w.idx=mod(w.idx+dir);w.ang=0;shown=-1;paint()})}
+ w.go1=go1;
+ let down=false,sx=0,moved=0;
+ st.addEventListener('pointerdown',e=>{down=true;moved=0;sx=e.clientX;cancelAnimationFrame(w.raf);try{st.setPointerCapture(e.pointerId)}catch(_){}});
+ st.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-sx;moved=Math.max(moved,Math.abs(dx));w.ang=Math.max(-179,Math.min(179,dx/1.1));paint()});
+ const up=e=>{if(!down)return;down=false;const a=w.ang;
+  if(moved<8){const t=e.target.closest&&e.target.closest('.fcs');w.ang=0;paint();if(t===L)go1(-1);else if(t===R)go1(1);else if(e.target.closest&&e.target.closest('.fcm'))applyMode(MODES[w.idx].id);return}
+  if(a<-45)anim(-180,()=>{w.idx=mod(w.idx+1);w.ang=0;shown=-1;paint()});else if(a>45)anim(180,()=>{w.idx=mod(w.idx-1);w.ang=0;shown=-1;paint()});else anim(0)};
+ st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
+ let wt=0;st.addEventListener('wheel',e=>{const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:0;if(!d||Date.now()-wt<500)return;wt=Date.now();e.preventDefault();go1(d>0?1:-1)},{passive:false});
+ host.tabIndex=0;host.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go1(1);if(e.key==='ArrowLeft')go1(-1);if(e.key==='Enter')applyMode(MODES[w.idx].id)});
+ btn.onclick=()=>applyMode(MODES[w.idx].id);paint()}
+/* выезд блоков при прокрутке */
+let RVO=null;
+function rvScan(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ if(!RVO)RVO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('rvin');RVO.unobserve(e.target)}}),{threshold:.08});
+ document.querySelectorAll('.tab.on > .card,.tab.on > .gq,.tab.on > .qa,.tab.on > .tiles').forEach(el=>{if(el.dataset.rv)return;el.dataset.rv='1';const r=el.getBoundingClientRect();if(r.top<innerHeight*.9&&r.bottom>0){return}el.classList.add('rv');RVO.observe(el)})}
+const _r61=render;render=function(){_r61();try{rvScan()}catch(e){}};
+const _go61=go;go=function(id,b){_go61(id,b);try{document.querySelectorAll('[data-rv]').forEach(e=>{});setTimeout(rvScan,60)}catch(e){}};
+document.head.insertAdjacentHTML('beforeend','<style>.fc{position:relative;height:340px;touch-action:pan-y;user-select:none;-webkit-user-select:none;margin:0 -18px;overflow:hidden}'+
+'.fcm,.fcs{position:absolute;top:10px;width:190px;left:50%;margin-left:-95px}.fcm{z-index:3;transition:none;will-change:transform;cursor:grab}.fcs{z-index:1;transition:none;will-change:transform}.fcl{margin-left:-215px}.fcr{margin-left:25px}'+
+'.fcm .mcd,.fcs .mcd{width:190px;transform:none!important;opacity:1!important;filter:none!important}.fcm .mcd .stp,.fcs .mcd .stp{height:270px}.fcf .mcb,.fcf small,.fcf .stn{display:none}.fcs .mcd{pointer-events:none}.fcm .mcd.on .stp{outline:3px solid var(--lime);outline-offset:3px}'+
+'.rv{opacity:0;transform:translateY(36px) scale(.98);transition:opacity .6s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1)}.rv.rvin{opacity:1;transform:none}</style>');
 </script>
 </body>
 </html>
