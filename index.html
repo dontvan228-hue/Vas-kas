@@ -978,7 +978,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v41`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v42`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1384,6 +1384,33 @@ function shopsNear(){const b=$('#shopsBox');if(!navigator.geolocation){b.innerHT
 let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY},{passive:true});
 document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
 
+
+/* v42: вторая героиня Алиса, выбор в настройках героини */
+const AL_V='42',AL_FILES=['idle','happy','angry','shy','eat','drink'],MIRA_FACE=HERDEF.face;
+const alSrc=k=>'alice/'+k+'.webp?v='+AL_V;
+const isAl=()=>{try{return CB().her==='alice'}catch(e){return false}};
+let ALDF=null,ALDL=0,ALPRE=0;
+function alLoadDance(){if(ALDF||ALDL)return;ALDL=1;fetch('alice/dance.json?v='+AL_V).then(r=>r.json()).then(a=>{ALDF=a.map(u=>{const i=new Image();i.src=u;return i});if(isAl())DFI=ALDF}).catch(()=>{ALDL=0})}
+function alPre(){if(ALPRE)return;ALPRE=1;AL_FILES.forEach(k=>{const i=new Image();i.src=alSrc(k)});alLoadDance()}
+const _al42=herSrc;
+herSrc=function(slot){
+ if(!isAl())return _al42(slot);
+ if(slot==='dance'){if(ALDF)return{src:'frames:dance',vid:false,exact:true};alLoadDance();return{src:alSrc('happy'),vid:false,exact:true}}
+ const M={idle:'idle',mid:'idle',goal:'idle',happy:'happy',wave:'happy',celebrate:'happy',kiss:'happy',angry:'angry',shy:'shy',eat:'eat',drink:'drink',sad:'idle',sleepy:'idle',blink:'idle'};
+ return{src:alSrc(M[slot]||'idle'),vid:false,exact:!(slot==='sad'||slot==='sleepy')}};
+const _dfl42=dfLoad;
+dfLoad=function(){if(isAl()){if(ALDF)DFI=ALDF;return}if(DFI&&DFI===ALDF)DFI=null;_dfl42()};
+function herPick(w){const c=CB();if((c.her||'mira')===w)return;c.her=w;
+ if(w==='alice'){if(c.name==='Чиби'||c.name==='Героиня')c.name='Алиса';alPre()}
+ else{if(c.name==='Алиса')c.name='Героиня';if(DFI&&DFI===ALDF)DFI=null}
+ HERDEF.face=w==='alice'?'alice/face.webp?v='+AL_V:MIRA_FACE;
+ save();HERCUR='';DFS=0;renderChibi(true);toast(w==='alice'?'Теперь с вами Алиса':'Вернулась прежняя героиня')}
+function herPick42(){const s=document.getElementById('cbSet');if(!s||s.querySelector('#herPick'))return;
+ const w=isAl()?'alice':'mira',b=(id,t,img)=>`<button type="button" class="hp ${w===id?'on':''}" onclick="herPick('${id}')"><span class="hpi"><img src="${img}" alt=""></span>${t}</button>`;
+ s.insertAdjacentHTML('afterbegin',`<div id="herPick"><label>Героиня</label><div class="hpr">${b('mira','Героиня',MIRA_FACE)}${b('alice','Алиса','alice/face.webp?v='+AL_V)}</div></div>`)}
+const _rc42=renderChibi;
+renderChibi=function(a){try{if(isAl()){alPre();HERDEF.face='alice/face.webp?v='+AL_V}else HERDEF.face=MIRA_FACE}catch(e){}const r=_rc42(a);try{herPick42();const sd=document.querySelector('.cbside');if(sd&&!document.getElementById('herSw'))sd.insertAdjacentHTML('beforeend','<button id="herSw" aria-label="Сменить героиню" onclick="herPick(isAl()?\'mira\':\'alice\')">👭</button>')}catch(e){}return r};
+document.head.insertAdjacentHTML('beforeend','<style>#herPick .hpr{display:flex;gap:10px;margin:6px 0 16px}#herPick .hp{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:16px;border:2px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);font:inherit;font-size:14px;cursor:pointer}#herPick .hp.on{border-color:rgb(var(--acc));background:rgba(var(--acc),.14)}#herPick .hpi{width:64px;height:64px;border-radius:18px;overflow:hidden;background:#cdb99c;display:block}#herPick .hpi img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}</style>');
 </script>
 </body>
 </html>
