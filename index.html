@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v67`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v68`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -2144,6 +2144,43 @@ function dueGo(){const l=$('#dcL').value,n=Math.max(21,Math.min(40,+$('#dcN').va
 const hlSheetOpen=()=>{const e=document.getElementById('hlSheet');return !!(e&&e.classList.contains('on'))};
 
 document.head.insertAdjacentHTML('beforeend','<style>details.dcb{border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:12px 0;text-align:left}details.dcb summary{cursor:pointer;list-style:none;display:block}details.dcb summary::-webkit-details-marker{display:none}details.dcb summary:after{content:"▾";float:right;opacity:.6}details.dcb[open] summary:after{content:"▴"}.dcin{padding-top:8px}.dcin .btn{width:100%}</style>');
+
+/* v68: слайдер героев как в референсе — цвет растекается от пальца, название и герой уезжают с разной скоростью */
+const HSC={alice:['#ff5a3c','#ff9a5c','Огонь и забота'],zhenya:['#2f6bff','#6fb2ff','Спокойствие и сила'],mira:['#12b8a6','#7ee6d2','Нежность и свет'],seit:['#8b3dff','#c28bff','Магия и юмор']};
+let hsI=0,hsBusy=false;
+function qcShow(){const b=$('#qBody');$('#qBar').style.width='96%';$('#qBack').hidden=false;
+ if(!qcSel)qcSel=QCH[hsI]; else hsI=Math.max(0,QCH.indexOf(qcSel));QCH.forEach(chPre);
+ b.innerHTML=`<div class="qt">Выбери своего героя</div><p class="m">Листай пальцем влево и вправо. Имя героя можно поменять.</p><div class="hs" id="hs"><div class="hsl" id="hsl"></div><div class="hsa hsp" onclick="hsGo(-1)">‹</div><div class="hsa hsn" onclick="hsGo(1)">›</div><div class="hsd" id="hsd">${QCH.map((k,i)=>`<i data-i="${i}"></i>`).join('')}</div></div><div id="qcDet"></div>`;
+ hsDraw(hsI);hsBind();qcDet()}
+function hsLayer(i){const k=QCH[i],c=HSC[k];return `<div class="hsw" style="background:linear-gradient(170deg,${c[1]} -20%,${c[0]} 55%)"><div class="hst"><b>${CHARS[k].name.toUpperCase()}</b><small>${c[2]}</small></div><img class="hsc" src="${chSrc(k,'idle')}" alt=""><div class="hsb"><span>${CHARS[k].name}</span><button type="button" class="hsplus" onclick="hsPick()">+</button></div></div>`}
+function hsDraw(i){const h=$('#hsl');h.innerHTML=hsLayer(i);const st=$('#hs');st.style.background=HSC[QCH[i]][0];document.querySelectorAll('#hsd i').forEach((e,j)=>e.classList.toggle('on',j===i))}
+function hsPick(){const d=$('#qcDet');if(d)d.scrollIntoView({behavior:'smooth',block:'center'})}
+function hsGo(dir,x,y){if(hsBusy)return;const n=QCH.length,ni=(hsI+dir+n)%n;hsBusy=true;hap();snd('tick');
+ const st=$('#hs'),old=$('#hsl'),W=st.clientWidth,r=st.getBoundingClientRect(),px=(x==null?(dir>0?W*.85:W*.15):x-r.left),py=(y==null?r.height*.6:y-r.top);
+ const nw=document.createElement('div');nw.className='hsl hsnew';nw.innerHTML=hsLayer(ni);nw.style.clipPath=`circle(0px at ${px}px ${py}px)`;st.insertBefore(nw,old.nextSibling);
+ const T=620,ease='cubic-bezier(.22,.8,.2,1)',mx=Math.hypot(W,r.height)*1.1,cur=getComputedStyle(old.querySelector('.hst')).transform;
+ const slide=(el,sel,from,to,dur,delay)=>{const e=el.querySelector(sel);if(e)e.animate([{transform:`translateX(${from}px)`,opacity:from===0?1:0},{transform:`translateX(${to}px)`,opacity:to===0?1:0}],{duration:dur,delay:delay||0,easing:ease,fill:'both'})};
+ const sg=-dir;
+ slide(old,'.hst',0,sg*W*.9,T);slide(old,'.hsc',0,sg*W*.45,T);slide(old,'.hsb',0,sg*W*.2,T*.8);
+ slide(nw,'.hst',-sg*W*.9,0,T,60);slide(nw,'.hsc',-sg*W*.55,0,T,110);slide(nw,'.hsb',-sg*W*.3,0,T,150);
+ const fin=()=>{old.remove();nw.classList.remove('hsnew');nw.id='hsl';nw.style.clipPath='';hsI=ni;qcSel=QCH[ni];st.style.background=HSC[qcSel][0];document.querySelectorAll('#hsd i').forEach((e,j)=>e.classList.toggle('on',j===ni));hsBusy=false;qcDet()};
+ if(nw.animate){const a=nw.animate([{clipPath:`circle(0px at ${px}px ${py}px)`},{clipPath:`circle(${mx}px at ${px}px ${py}px)`}],{duration:T,easing:ease,fill:'both'});a.onfinish=fin}else setTimeout(fin,T)}
+function hsBind(){const st=$('#hs');if(!st||st._b)return;st._b=1;let x0=0,y0=0,dx=0,on=0,lock='',t0=0;
+ const mv=()=>{const l=$('#hsl');if(!l)return;const t=l.querySelector('.hst'),c=l.querySelector('.hsc');if(t)t.style.transform=`translateX(${dx}px)`;if(c)c.style.transform=`translateX(${dx*.45}px) rotate(${dx/40}deg)`};
+ const down=(x,y)=>{if(hsBusy)return;on=1;x0=x;y0=y;dx=0;lock='';t0=Date.now()};
+ const move=(x,y,ev)=>{if(!on)return;const ax=x-x0,ay=y-y0;if(!lock&&Math.hypot(ax,ay)>8)lock=Math.abs(ax)>Math.abs(ay)*1.1?'h':'v';if(lock==='h'){dx=ax;mv();if(ev&&ev.cancelable)ev.preventDefault()}};
+ const up=(x,y)=>{if(!on)return;on=0;const l=$('#hsl');if(l){const t=l.querySelector('.hst'),c=l.querySelector('.hsc');if(t)t.style.transform='';if(c)c.style.transform=''}
+  if(lock==='h'&&(Math.abs(dx)>46||Math.abs(dx)/(Date.now()-t0+1)>.5))hsGo(dx<0?1:-1,x,y);dx=0};
+ st.addEventListener('touchstart',e=>{const t=e.touches[0];down(t.clientX,t.clientY)},{passive:true});
+ st.addEventListener('touchmove',e=>{const t=e.touches[0];move(t.clientX,t.clientY,e)},{passive:false});
+ st.addEventListener('touchend',e=>{const t=e.changedTouches[0];up(t.clientX,t.clientY)});
+ st.addEventListener('touchcancel',()=>{on=0;dx=0;mv()});
+ if(!('ontouchstart' in window)){st.addEventListener('mousedown',e=>down(e.clientX,e.clientY));window.addEventListener('mousemove',e=>move(e.clientX,e.clientY,e));window.addEventListener('mouseup',e=>up(e.clientX,e.clientY))}
+ st.querySelectorAll('#hsd i').forEach(e=>e.onclick=()=>{const j=+e.dataset.i;if(j!==hsI)hsGo(j>hsI?1:-1)})}
+function qcDet(){const k=qcSel,C=CHARS[k],d=document.getElementById('qcDet');if(!d)return;
+ d.innerHTML=`<div class="qcd2"><label>Имя героя</label><input id="qcName" value="${esc(C.name)}" maxlength="14"><button type="button" class="btn qcb" id="qcBtn" disabled onclick="qcOk()"><i></i><span>Выбрать: ${esc(C.name)}</span></button><p class="m" style="font-size:12px;margin-top:6px">Кнопка станет активной через секунду, чтобы не выбрать случайно. Героя и имя можно поменять потом в настройках.</p></div>`;
+ const btn=document.getElementById('qcBtn');btn.classList.add('wait');clearTimeout(qcT);qcT=setTimeout(()=>{const b=document.getElementById('qcBtn');if(b&&qcSel===k){b.disabled=false;b.classList.remove('wait')}},1100)}
+document.head.insertAdjacentHTML('beforeend','<style>.hs{position:relative;height:min(62vh,500px);min-height:380px;border-radius:38px;overflow:hidden;margin:14px 0;touch-action:pan-y;user-select:none;-webkit-user-select:none;box-shadow:0 18px 44px rgba(0,0,0,.35)}.hsl{position:absolute;inset:0}.hsnew{z-index:2}.hsw{position:absolute;inset:0;overflow:hidden;color:#fff}.hst{position:absolute;left:0;right:0;top:11%;text-align:center;z-index:1;pointer-events:none}.hst b{display:block;font-size:clamp(44px,15vw,72px);font-weight:900;letter-spacing:.02em;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,.12)}.hst small{display:block;margin-top:6px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.85}.hsc{position:absolute;left:50%;bottom:62px;height:68%;width:auto;max-width:88%;object-fit:contain;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 18px 24px rgba(0,0,0,.35));will-change:transform}.hsb{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:17px}.hsb span{text-shadow:0 2px 6px rgba(0,0,0,.25);position:absolute;left:20px;bottom:6px}.hsplus{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.28);backdrop-filter:blur(8px);color:#fff;font-size:28px;line-height:1;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}.hsa{position:absolute;top:50%;z-index:5;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:rgba(255,255,255,.22);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer}.hsp{left:10px}.hsn{right:10px}.hsd{position:absolute;left:0;right:0;top:12px;display:flex;justify-content:center;gap:6px;z-index:6;pointer-events:auto}.hsd i{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.5);transition:width .3s,background .3s;cursor:pointer}.hsd i.on{width:22px;background:#fff}.qcd2{margin-top:4px;animation:tabin .4s both}.qcd2 .qcb{width:100%}</style>');
 </script>
 </body>
 </html>
