@@ -458,12 +458,13 @@ const lastW=()=>{const w=U().weights,p=U().p||{};return w.length?w[w.length-1].w
 function saveProfile(){
   let sex=$('#oSex').value,age=+$('#oAge').value,h=+$('#oH').value,w=+$('#oW').value,t=+$('#oT').value;const e=$('#oErr');
   if(!(age>0&&h>0&&w>0&&t>0))return e.textContent='Заполните все поля числами';
-  if(age<14)return e.textContent='Приложение рассчитано на возраст от 14 лет.';if(age<18)t=w;
+  if(age<14)return e.textContent='Приложение рассчитано на возраст от 14 лет.';if(age<18&&!isGain())t=w;
   if(age>80||h<120||h>220||w<35||w>250)return e.textContent='Проверьте возраст, рост и вес — значения выглядят нереалистично';
   const minT=Math.ceil(18.5*(h/100)**2);
   if(t<minT&&age>=18)return e.textContent=`Цель ниже здорового ИМТ. Минимальная безопасная цель для вашего роста — около ${minT} кг.`;
+  if(isGain()){if(!(t>w))return e.textContent='Для набора веса цель должна быть больше текущего веса.';if(t>Math.round(25*(h/100)**2)&&age>=18)return e.textContent='Цель выше здорового ИМТ. Для вашего роста безопасная цель — не больше '+Math.round(25*(h/100)**2)+' кг.'}
   const u=U(),first=!u.p;
-  u.p={sex,age,h,t,act:+$('#oAct').value,pace:age<18?0:+$('#oPace').value,w0:first?w:u.p.w0};
+  u.p={sex,age,h,t,act:+$('#oAct').value,pace:age<18&&!isGain()?0:+$('#oPace').value,w0:first?w:u.p.w0};
   const ds=today(),ex=u.weights.find(x=>x.d===ds);
   if(ex)ex.w=w;else u.weights.push({d:ds,w});
   u.adapt=null;e.textContent='';save();show('app');render();initChat();toast('План готов');
@@ -733,7 +734,7 @@ function qRender(){const b=$('#qBody'),n=QZ.length;$('#qBar').style.width=((qi+1
 function qPick(i){if(qLock)return;qLock=1;const q=QZ[qi];qa[q[0]]=q[2][i][2];hap();snd('tick');qRender();setTimeout(()=>{qLock=0;qNext()},260)}
 function qNext(){qi++;qRender();window.scrollTo(0,0)}
 function qBack(){if(qi>-1){qi--;qRender()}}
-const GN={lose:'Снизить вес',keep:'Удержать вес',tone:'Подтянуть фигуру',aware:'Осознанное питание'},HT={sweet:'Тягу к сладкому гасим белком и кнопкой «Тяга — SOS».',night:'Вечерний голод: оставьте часть калорий на ужин и держите под рукой «Что съесть?».',guilt:'Срывы — часть пути. Приложение не стыдит: просто возвращаемся к плану.',time:'Нет времени: «Избранное» и «Повторить вчерашний день» записывают еду за секунды.',choice:'Не знаете, что выбрать: «Что съесть?» подскажет под ваш остаток.'};
+const GN={gain:'Набрать вес',lose:'Снизить вес',keep:'Удержать вес',tone:'Подтянуть фигуру',aware:'Осознанное питание'},HT={sweet:'Тягу к сладкому гасим белком и кнопкой «Тяга — SOS».',night:'Вечерний голод: оставьте часть калорий на ужин и держите под рукой «Что съесть?».',guilt:'Срывы — часть пути. Приложение не стыдит: просто возвращаемся к плану.',time:'Нет времени: «Избранное» и «Повторить вчерашний день» записывают еду за секунды.',choice:'Не знаете, что выбрать: «Что съесть?» подскажет под ваш остаток.'};
 function qSummary(){const a=qa,care=['preg','ed'].includes(a.health);$('#qBody').innerHTML=`<div class="qt">Ваш профиль готов</div><div class="item"><span>🎯 Цель</span><b>${GN[a.goal]}</b></div><div class="item"><span>🥑 Углеводы</span><b>${a.diet==='lc'?'до 30 г чистых':'до 100 г чистых'}</b></div><div class="item"><span>🔔 Напоминания</span><b>${a.rem==='off'?'выключены':'включены'}</b></div><p class="m" style="margin:12px 0">${HT[a.hard]}</p>${a.water==='0'?'<p class="m">💧 Начнём с малого: плюс один стакан воды в день.</p>':''}${a.sleep==='0'?'<p class="m">😴 Сон меньше 6 часов повышает аппетит — отмечайте его во вкладке «Сегодня».</p>':''}${care?'<p class="m" style="color:var(--warn);margin-top:8px">Беременность, кормление или расстройство питания в прошлом: план снижения веса нужно согласовать с врачом. Мы поставим самый мягкий темп.</p>':a.health==='dia'?'<p class="m" style="color:var(--warn);margin-top:8px">Диабет: питание и лекарства меняйте только вместе с врачом.</p>':''}<button class="btn" onclick="qFinish()">Рассчитать мой план</button>`}
 function qFinish(){const u=U(),a=qa,r=a.rem,n=NT();u.quiz=a;u.mg={net:a.diet==='lc'?30:100};n.on=r!=='off';n.meals=r==='mv'||r==='meals';n.water=r!=='off';n.weigh=r==='wv'||r==='mv';n.eve=r==='mv';n.fast=a.diet==='if';save();show('onb');
   const pc=$('#oPace'),care=['preg','ed'].includes(a.health);$('#oAct').value=a.act;if(a.goal==='keep'){$('#oT').value=$('#oW').value;pc.value='0'}
@@ -987,7 +988,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v68`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v69`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -2181,6 +2182,53 @@ function qcDet(){const k=qcSel,C=CHARS[k],d=document.getElementById('qcDet');if(
  d.innerHTML=`<div class="qcd2"><label>Имя героя</label><input id="qcName" value="${esc(C.name)}" maxlength="14"><button type="button" class="btn qcb" id="qcBtn" disabled onclick="qcOk()"><i></i><span>Выбрать: ${esc(C.name)}</span></button><p class="m" style="font-size:12px;margin-top:6px">Кнопка станет активной через секунду, чтобы не выбрать случайно. Героя и имя можно поменять потом в настройках.</p></div>`;
  const btn=document.getElementById('qcBtn');btn.classList.add('wait');clearTimeout(qcT);qcT=setTimeout(()=>{const b=document.getElementById('qcBtn');if(b&&qcSel===k){b.disabled=false;b.classList.remove('wait')}},1100)}
 document.head.insertAdjacentHTML('beforeend','<style>.hs{position:relative;height:min(62vh,500px);min-height:380px;border-radius:38px;overflow:hidden;margin:14px 0;touch-action:pan-y;user-select:none;-webkit-user-select:none;box-shadow:0 18px 44px rgba(0,0,0,.35)}.hsl{position:absolute;inset:0}.hsnew{z-index:2}.hsw{position:absolute;inset:0;overflow:hidden;color:#fff}.hst{position:absolute;left:0;right:0;top:11%;text-align:center;z-index:1;pointer-events:none}.hst b{display:block;font-size:clamp(44px,15vw,72px);font-weight:900;letter-spacing:.02em;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,.12)}.hst small{display:block;margin-top:6px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.85}.hsc{position:absolute;left:50%;bottom:62px;height:68%;width:auto;max-width:88%;object-fit:contain;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 18px 24px rgba(0,0,0,.35));will-change:transform}.hsb{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:17px}.hsb span{text-shadow:0 2px 6px rgba(0,0,0,.25);position:absolute;left:20px;bottom:6px}.hsplus{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.28);backdrop-filter:blur(8px);color:#fff;font-size:28px;line-height:1;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}.hsa{position:absolute;top:50%;z-index:5;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:rgba(255,255,255,.22);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer}.hsp{left:10px}.hsn{right:10px}.hsd{position:absolute;left:0;right:0;top:12px;display:flex;justify-content:center;gap:6px;z-index:6;pointer-events:auto}.hsd i{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.5);transition:width .3s,background .3s;cursor:pointer}.hsd i.on{width:22px;background:#fff}.qcd2{margin-top:4px;animation:tabin .4s both}.qcd2 .qcb{width:100%}</style>');
+
+/* v69: набор веса (спорт, восстановление, просто поправиться, по назначению врача) */
+const isGain=()=>{try{return !!(U()&&U().quiz&&U().quiz.goal==='gain')}catch(e){return false}};
+{const gi=QZ.findIndex(x=>x[0]==='goal');QZ[gi][2].splice(1,0,['📈','Набрать вес','gain']);
+QZ.splice(gi+1,0,['gwhy','Для чего вы хотите набрать вес?',[['🏋️','Для спорта: набрать мышцы','sport'],['🌱','Восстановиться после недоедания или расстройства питания','rec'],['🙂','Просто хочу поправиться','fit'],['🩺','Назначил врач или после болезни','med']]],['ghow','Как вам удобнее набирать?',[['🥜','Калорийные перекусы между едой','snack'],['🍝','Больше порции на основных приёмах','big'],['💪','Больше белка и силовые тренировки','muscle'],['🥛','Напитки и смузи, если плохой аппетит','drink']]])}
+const GQ=['gwhy','ghow'];
+qNext=function(){qi++;while(qi<QZ.length&&GQ.includes(QZ[qi][0])&&qa.goal!=='gain')qi++;qRender();window.scrollTo(0,0)};
+qBack=function(){if(qi>-1){qi--;while(qi>=0&&GQ.includes(QZ[qi][0])&&qa.goal!=='gain')qi--;qRender()}};
+const _qf69=qFinish;qFinish=function(){if(qa.goal==='gain'&&qa.gwhy==='rec'&&qa.health==='ok')qa.health='ed';_qf69();paceOpts();if(['preg','ed'].includes(qa.health)){const pc=$('#oPace');[...pc.options].forEach(o=>{if(o.value!=='.25'&&o.value!=='0')o.remove()});pc.value='.25'}if(isGain()){const w=+$('#oW').value||60;$('#oT').value=Math.round(w+3)}};
+const STDP=($('#oPace')||{}).innerHTML;
+function paceOpts(){const pc=$('#oPace');if(!pc)return;const p=U()&&U().p,cur=p&&p.pace;
+ if(isGain()){const q=U().quiz;pc.dataset.g=1;pc.innerHTML='<option value=".25">Мягкий: +0,25 кг в неделю</option><option value=".5">Умеренный: +0,5 кг в неделю</option>';const want=cur>0?cur:(q.gwhy==='sport'?.5:.25);pc.value=[...pc.options].some(o=>+o.value===want)?String(want).replace(/^0/,''):'.25'}
+ else if(pc.dataset.g){delete pc.dataset.g;pc.innerHTML=STDP;pc.value=cur!=null?[...pc.options].find(o=>+o.value===cur)?.value||'.5':'.5'}
+ if(!$('#oGoalSel')){const lb=document.querySelector('label[for=oT]')||$('#oT').previousElementSibling;$('#oT').insertAdjacentHTML('beforebegin','<label>Главная цель</label><select id="oGoalSel"><option value="lose">Снизить вес</option><option value="gain">Набрать вес</option><option value="keep">Удержать вес</option></select>')}
+ const g=U()&&U().quiz&&U().quiz.goal;$('#oGoalSel').value=g==='gain'?'gain':g==='keep'?'keep':'lose'}
+const _sh69=show;show=function(id){try{if(id==='onb'&&U())paceOpts()}catch(e){}_sh69(id);if(id==='onb'){try{paceOpts()}catch(e){}}};
+const _sp69=saveProfile;saveProfile=function(){const g=$('#oGoalSel')&&$('#oGoalSel').value,u=U();if(u&&g){const q=u.quiz||(u.quiz={});const prev=q.goal;if(g==='gain'){q.goal='gain';q.gwhy=q.gwhy||'fit';q.ghow=q.ghow||'snack'}else if(g==='keep'){q.goal='keep'}else if(prev==='gain'||prev==='keep'||!prev){q.goal='lose'}
+  if(g!=='gain'&&prev==='gain'){paceOpts()}if(g==='gain'&&prev!=='gain'){paceOpts()}}
+ return _sp69()};
+const _plan69=plan;plan=function(){if(!isGain())return _plan69();
+ const u=U(),p=u.p,w=lastW(),q=u.quiz||{},why=q.gwhy||'fit';
+ const bmr=10*w+6.25*p.h-5*p.age+(p.sex==='m'?5:-161),formula=bmr*p.act,tdee=u.adapt?u.adapt.t:formula;
+ const s=Math.min(((p.pace>0?p.pace:.25))*1100,why==='rec'?350:why==='sport'?550:450);
+ const b=Math.round((tdee+s)/10)*10;
+ return{b,ex:0,tdee:Math.round(tdee),formula:Math.round(formula),rate:s/1100,capped:false,w,left:Math.max(0,p.t-w),gain:true}};
+const _prog69=prog;prog=function(){if(!isGain())return _prog69();const u=U(),a=u.p.w0||u.p.w||lastW(),t=u.p.t;return !(t>a)?.5:Math.max(0,Math.min(1,(lastW()-a)/(t-a)))};
+const GWHY={sport:'для спорта и мышц',rec:'восстановление',fit:'просто поправиться',med:'по назначению врача'};
+const GHOW={snack:'калорийные перекусы',big:'больше порции',muscle:'белок и силовые',drink:'напитки и смузи'};
+const GFOOD={snack:[['🥜 Горсть орехов 30 г',180],['🍌 Банан с арахисовой пастой',260],['🥣 Йогурт с гранолой и мёдом',300],['🥑 Тост с авокадо и яйцом',320]],
+ big:[['🫒 Ложка оливкового масла в блюдо',90],['🧀 Сыр 40 г к обеду',140],['🍚 Добавка гарнира 100 г',130],['🥔 Картофель с маслом',200]],
+ muscle:[['🧀 Творог 200 г с мёдом',260],['🍗 Куриная грудка 150 г',250],['🥚 Два яйца и хлеб',270],['🐟 Лосось 120 г',250]],
+ drink:[['🥛 Смузи: молоко, банан, овсянка, арахисовая паста',450],['☕ Какао на молоке',180],['🥤 Кефир с мёдом и бананом',250],['🍯 Молочный коктейль дома',300]]};
+function gainAdd(i){const q=U().quiz||{},L=GFOOD[q.ghow||'snack'],f=L[i];if(!f)return;day().food.push({n:f[0],k:f[1]});save();toast('Добавлено: +'+f[1]+' ккал');render()}
+function gainUI(){const ring=$('#ringCard');let c=$('#gainCard');if(!isGain()){if(c)c.remove();return}
+ const u=U(),q=u.quiz||{},p=plan(),w=lastW(),why=q.gwhy||'fit',how=q.ghow||'snack',pr=Math.round(w*1.8);
+ $('#rL').textContent=($('#rL').textContent.indexOf('сверх')>-1)?'сверх плана, отлично':'осталось съесть, ккал';$('#rg').style.stroke='';
+ $('#planNote').textContent=`Цель: набор ≈ ${p.rate.toFixed(2).replace('.',',')} кг в неделю. Лучше съесть всю норму, чем недоесть.`;
+ const why_t={sport:`<p class="m">Чтобы вес шёл в мышцы, а не только в жир: белок около ${pr} г в день (по 25–35 г за приём), силовые тренировки 3 раза в неделю, сон 7–8 часов. Набирай не быстрее 0,25–0,5 кг в неделю.</p>`,
+  rec:`<p class="m" style="color:var(--warn)">Восстановление после недоедания или расстройства питания лучше вести вместе с врачом и психотерапевтом или диетологом: они подберут безопасный темп и объём. Приложение не заменяет лечение. Цифры здесь только ориентир. Если от учёта калорий становится тревожно или хочется есть меньше, не считай, а просто отмечай приёмы пищи и обратись за помощью.</p><p class="m">Ешь регулярно, 5–6 раз в день, и не пропускай приёмы. Вес будет расти медленно и неровно, это нормально.</p>`,
+  fit:`<p class="m">Добавляй калорийные продукты: орехи, авокадо, оливковое масло, сухофрукты, цельное молоко, сыр, пасту, рис. Ешь 5–6 раз в день небольшими порциями, это легче, чем две огромные.</p>`,
+  med:`<p class="m">Следуй рекомендациям врача по питанию и срокам. Приложение даёт только ориентир по калориям и помогает вести дневник.</p>`}[why];
+ const chips=GFOOD[how].map((f,i)=>`<span class="chip2" onclick="gainAdd(${i})">${f[0]} +${f[1]}</span>`).join('');
+ const html=`<h2>📈 Набор веса</h2><p class="m"><b>${GWHY[why]}</b> · способ: ${GHOW[how]}<br>Норма: ${p.b} ккал в день, цель ${u.p.t} кг (сейчас ${n1(w)}).</p>${why_t}<p class="m" style="margin-top:8px"><b>Добавь +200–300 ккал, нажав на подходящее:</b></p><div class="chips">${chips}</div><p class="m" style="margin-top:8px;font-size:12px">Взвешивайся раз в 1–2 недели утром, колебания на 1–2 кг из-за воды нормальны. Если вес не растёт 3–4 недели, добавь ещё 100–200 ккал.</p>`;
+ if(!c){c=document.createElement('div');c.className='card';c.id='gainCard';if(ring)ring.insertAdjacentElement('afterend',c);else return}
+ c.innerHTML=html}
+const _r69=render;render=function(){_r69.apply(this,arguments);try{gainUI()}catch(e){}};
+document.head.insertAdjacentHTML('beforeend','<style>#gainCard .chips{display:flex;flex-wrap:wrap;gap:8px}#gainCard .chip2{font-size:13px}</style>');
 </script>
 </body>
 </html>
