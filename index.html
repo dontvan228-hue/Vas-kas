@@ -986,7 +986,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v47`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v48`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1397,8 +1397,9 @@ document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>
 
 
 /* v43: выбор героя: Героиня, Алиса, Женя */
-const CH_V='47',MIRA_FACE=HERDEF.face;
+const CH_V='48',MIRA_FACE=HERDEF.face;
 const CHARS={
+ mira:{name:'Героиня',dir:'mira',male:false,files:['idle','happy','angry','shy','eat','drink']},
  alice:{name:'Алиса',dir:'alice',male:false,files:['idle','happy','angry','shy','eat','drink']},
  zhenya:{name:'Женя',dir:'zhenya',male:true,files:['idle','happy','shy','eat','drink']},
  seit:{name:'Сейтибрам',dir:'seit',male:true,files:['idle','happy','angry','shy','eat','drink']}};
@@ -1406,13 +1407,13 @@ const CHORD=['mira','alice','zhenya','seit'];
 const chKey=()=>{try{const k=CB().her;return CHARS[k]?k:'mira'}catch(e){return'mira'}};
 const isAl=()=>chKey()!=='mira';
 const chSrc=(k,f)=>CHARS[k].dir+'/'+f+'.webp?v='+CH_V;
-const chFace=k=>k==='mira'?MIRA_FACE:CHARS[k].dir+'/face.webp?v='+CH_V;
+const chFace=k=>CHARS[k].dir+'/face.webp?v='+CH_V;
 const CHDF={},CHDL={},CHPRE={};
 function chLoadDance(k){if(CHDF[k]||CHDL[k])return;CHDL[k]=1;fetch(CHARS[k].dir+'/dance.json?v='+CH_V).then(r=>r.json()).then(a=>{CHDF[k]=a.map(u=>{const i=new Image();i.src=u;return i});if(chKey()===k)DFI=CHDF[k]}).catch(()=>{CHDL[k]=0})}
 function chPre(k){if(!CHARS[k]||CHPRE[k])return;CHPRE[k]=1;CHARS[k].files.forEach(f=>{const i=new Image();i.src=chSrc(k,f)});chLoadDance(k)}
 const _al42=herSrc;
 herSrc=function(slot){
- const k=chKey();if(k==='mira')return _al42(slot);
+ const k=chKey();
  const C=CHARS[k];
  if(slot==='dance'){if(CHDF[k])return{src:'frames:dance',vid:false,exact:true};chLoadDance(k);return{src:chSrc(k,'happy'),vid:false,exact:true}}
  const M={idle:'idle',mid:'idle',goal:'idle',happy:'happy',wave:'happy',celebrate:'happy',kiss:'happy',angry:'angry',shy:'shy',eat:'eat',drink:'drink',sad:'idle',sleepy:'idle',blink:'idle'};
@@ -1428,15 +1429,15 @@ toast=function(t,a){try{const k=chKey();if(CHARS[k]&&CHARS[k].male)t=String(t).r
 function herPick(w){const c=CB();if(!CHARS[w]&&w!=='mira')return;if(chKey()===w)return;c.her=w;
  const old=['Чиби','Героиня','Алиса','Женя','Сейтибрам'];
  if(old.includes(c.name))c.name=w==='mira'?'Героиня':CHARS[w].name;
- if(w!=='mira')chPre(w);else if(DFI&&Object.values(CHDF).includes(DFI))DFI=null;
+ chPre(w);
  HERDEF.face=chFace(w);
- save();HERCUR='';DFS=0;renderChibi(true);toast(w==='mira'?'Вернулась прежняя героиня':'Теперь с вами '+CHARS[w].name)}
+ save();HERCUR='';DFS=0;renderChibi(true);toast('Теперь с вами '+CHARS[w].name)}
 function herNext(){const i=CHORD.indexOf(chKey());herPick(CHORD[(i+1)%CHORD.length])}
 function herPick42(){const s=document.getElementById('cbSet');if(!s||s.querySelector('#herPick'))return;
  const w=chKey(),nm={mira:'Героиня',alice:'Алиса',zhenya:'Женя',seit:'Сейтибрам'},b=id=>`<button type="button" class="hp ${w===id?'on':''}" onclick="herPick('${id}')"><span class="hpi"><img src="${chFace(id)}" alt=""></span>${nm[id]}</button>`;
  s.insertAdjacentHTML('afterbegin',`<div id="herPick"><label>Герой</label><div class="hpr">${CHORD.map(b).join('')}</div></div>`)}
 const _rc42=renderChibi;
-renderChibi=function(a){try{const k=chKey();if(k!=='mira')chPre(k);HERDEF.face=chFace(k)}catch(e){}const r=_rc42(a);try{herPick42();const sd=document.querySelector('.cbside');if(sd&&!document.getElementById('herSw'))sd.insertAdjacentHTML('beforeend','<button id="herSw" aria-label="Сменить героя" onclick="herNext()">👭</button>')}catch(e){}return r};
+renderChibi=function(a){try{const k=chKey();chPre(k);HERDEF.face=chFace(k)}catch(e){}const r=_rc42(a);try{herPick42();const sd=document.querySelector('.cbside');if(sd&&!document.getElementById('herSw'))sd.insertAdjacentHTML('beforeend','<button id="herSw" aria-label="Сменить героя" onclick="herNext()">👭</button>')}catch(e){}return r};
 document.head.insertAdjacentHTML('beforeend','<style>#herPick .hpr{display:flex;gap:8px;margin:6px 0 16px}#herPick .hp{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 2px;border-radius:16px;border:2px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);font:inherit;font-size:11px;cursor:pointer}#herPick .hp.on{border-color:rgb(var(--acc));background:rgba(var(--acc),.14)}#herPick .hpi{width:52px;height:52px;border-radius:16px;overflow:hidden;background:#cdb99c;display:block}#herPick .hpi img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}</style>');
 
 /* v45: защита данных: в облако пишем только после загрузки и объединения того, что там лежит */
@@ -1461,7 +1462,8 @@ setInterval(()=>{if(document.visibilityState==='visible')clRefresh46()},60000);
 
 /* v47: танец убран: герои только в статичных позах, без анимации кадров */
 const _herAct47=herAct;herAct=function(a){return _herAct47(a==='dance'?'happy':a)};
-chLoadDance=function(){};
+chLoadDance=function(){};dfLoad=function(){};
+HERDEF.face=chFace(chKey());
 </script>
 </body>
 </html>
