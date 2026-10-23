@@ -978,7 +978,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v45`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v46`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1444,6 +1444,12 @@ const _clPush45=clPush;
 clPush=async function(){
  if(CL&&CL.user&&clMergedUid!==CL.user.id){const c=await clPull();if(c&&c.data){const u=U();if(u&&clMergeInto(u,c.data))save()}clMergedUid=CL.user.id}
  return _clPush45()};
+
+/* v46: подтягиваем изменения с других устройств: при открытии приложения и раз в минуту */
+async function clRefresh46(){try{if(!CL||!CL.ready||!me||!U()||clBusy||clMergedUid!==CL.user.id)return;clBusy=true;const c=await clPull();clBusy=false;if(!c||!c.data)return;const u=U();let ch=clMergeInto(u,c.data);for(const k in (c.data.days||{})){const a=u.days[k],b=c.data.days[k];if(a&&b&&(b.water||0)>(a.water||0)){a.water=b.water;ch++}}if(ch){save();render()}}catch(e){clBusy=false}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')clRefresh46()});
+window.addEventListener('focus',clRefresh46);
+setInterval(()=>{if(document.visibilityState==='visible')clRefresh46()},60000);
 </script>
 </body>
 </html>
