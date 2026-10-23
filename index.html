@@ -274,7 +274,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
   <p class="m" style="text-align:center;margin-top:6px">Бесплатный помощник для спокойного и безопасного похудения</p>
   <div class="tabs2"><button id="tLogin" class="on" onclick="authMode('login')">Вход</button><button id="tReg" onclick="authMode('reg')">Регистрация</button></div>
   <div id="fName" hidden><label>Имя</label><input id="aName" autocomplete="given-name"></div>
-  <label>Почта</label><input id="aMail" type="email" autocomplete="email" value="dontvan228@gmail.com">
+  <label>Почта</label><input id="aMail" type="email" autocomplete="email" placeholder="you@mail.ru">
   <label>Пароль (от 6 символов)</label><input id="aPass" type="password" autocomplete="current-password">
   <div class="err" id="aErr"></div>
   <button class="btn" id="aBtn" onclick="doAuth()">Войти</button>
@@ -446,15 +446,15 @@ async function doAuth(){
     const u=db.users[mail];
     if(!u||u.hash!==await hash(pw,u.salt))return err.textContent='Неверная почта или пароль';
   }
-  me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();
+  me=mail;db.session=mail;try{localStorage.setItem('flow_last_mail',mail)}catch(e){}save();err.textContent='';$('#aPass').value='';enter();
 }
 function enter(){const u=U();if(!u.p){if(!u.quiz)startQuiz();else show('onb')}else{show('app');render();initChat()}}
-function logout(){db.session=null;me=null;save();show('auth')}
+function logout(){db.session=null;me=null;save();show('auth');try{const m=localStorage.getItem('flow_last_mail');if(m&&$('#aMail'))$('#aMail').value=m}catch(e){}}
 function delAcc(){if(confirm('Удалить аккаунт и все данные на этом устройстве? Это нельзя отменить.')){delete db.users[me];logout()}}
 function exportData(){const b=new Blob([JSON.stringify(U(),null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='flow-data.json';a.click()}
 
 /* ---------- profile & plan ---------- */
-const lastW=()=>{const w=U().weights;return w.length?w[w.length-1].w:U().p.w0};
+const lastW=()=>{const w=U().weights,p=U().p||{};return w.length?w[w.length-1].w:(p.w0||p.w||60)};
 function saveProfile(){
   let sex=$('#oSex').value,age=+$('#oAge').value,h=+$('#oH').value,w=+$('#oW').value,t=+$('#oT').value;const e=$('#oErr');
   if(!(age>0&&h>0&&w>0&&t>0))return e.textContent='Заполните все поля числами';
@@ -603,7 +603,7 @@ async function analyze(){
 authMode('login');
 setTimeout(()=>{
   $('#splash').style.opacity=0;setTimeout(()=>$('#splash').remove(),700);
-  if(db.session&&db.users[db.session]){me=db.session;enter()}else show('auth');
+  if(db.session&&db.users[db.session]){me=db.session;enter()}else{show('auth');try{const m=localStorage.getItem('flow_last_mail');if(m&&$('#aMail'))$('#aMail').value=m}catch(e){}}
 },1500);
 
 /* ===== Carb module: macros, barcode, fasting, exercise, ketones, recipes (free) ===== */
@@ -699,7 +699,7 @@ function renderFav(){if(!$('#favList'))return;const f=U().fav||[];$('#favList').
 function report(){const u=U(),p=plan(),a=[];let t=`VASSKASS • FLOW — отчёт за ${RNG} дн.\n${u.name}\n\n`;for(let i=RNG-1;i>=0;i--)a.push(dstat(i));a.forEach(x=>t+=`${x.ds}: ${x.k} ккал, чистые углеводы ${n1(x.net)} г, вода ${x.w}/8\n`);const lg=a.filter(x=>x.k);return t+`\nСредняя калорийность: ${lg.length?Math.round(lg.reduce((s,x)=>s+x.k,0)/lg.length):0} (план ${p.b})\nВес сейчас: ${lastW()} кг, цель ${u.p.t} кг\nСерия: ${streak()} дн.\n`}
 function mailReport(){const to=$('#mlTo').value.trim();if(!/^\S+@\S+\.\S+$/.test(to))return toast('Проверьте адрес почты');U().email=to;save();location.href=`mailto:${to}?subject=${encodeURIComponent('VASSKASS • FLOW: мой отчёт')}&body=${encodeURIComponent(report())}`}
 function copyReport(){navigator.clipboard.writeText(report()).then(()=>toast('Отчёт скопирован'),()=>toast('Не удалось скопировать'))}
-const _r3=render;render=function(){_r3();renderStats();renderFav();renderMood();if(!$('#mlTo').value)$('#mlTo').value=U().email||'dontvan228@gmail.com'};
+const _r3=render;render=function(){_r3();renderStats();renderFav();renderMood();if(!$('#mlTo').value)$('#mlTo').value=U().email||(me&&me.includes('@')?me:'')};
 
 /* ===== v5: themes, quiz, notifications, smart helpers ===== */
 const TH=[['wine','Вишня и лайм','#6a0b2e','#c6e3a0'],['choc','Шоколад и карамель','#5C3A26','#d79d68'],['emer','Изумруд','#1a422f','#f3ebd6'],['cher','Вишнёвый закат','#943131','#e2c8b2'],['sea','Морская пена','#2f5566','#bad2da'],['pow','Пудровый','#5C3A26','#A9C4D6']];
@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v65`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v66`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1338,11 +1338,12 @@ function drawPor(r){let e=$('#shP');if(!e){e=document.createElement('div');e.id=
 /* v40: вход и регистрация сразу работают с облаком: те же почта и пароль, анкета не повторяется */
 const clRace=(p,ms)=>Promise.race([p,new Promise((_,no)=>setTimeout(()=>no(new Error('timeout')),ms))]);
 async function cloudTry(mail,pw){let s;try{s=await clRace(sbReq('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:mail,password:pw})}),15000)}catch(e){return null}
+  if(!s||!s.user||!s.user.id)return null;
   CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=false;
   for(let i=0;i<3;i++){try{const c=await clRace(clPull(),15000);return {c}}catch(e){}}
   return {fail:true}}
 async function cloudSignup(mail,pw){try{const s=await clRace(sbReq('/auth/v1/signup?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:JSON.stringify({email:mail,password:pw})}),9000);
-  if(s&&s.access_token){CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=true;clSave();return true}}catch(e){}return false}
+  if(s&&s.access_token&&s.user){CL={user:{id:s.user.id,email:s.user.email||mail}};clSet(s);CL.ready=true;clSave();return true}}catch(e){}return false}
 doAuth=async function(){
   const mail=$('#aMail').value.trim().toLowerCase(),pw=$('#aPass').value,err=$('#aErr'),btn=$('#aBtn');
   if(!/^\S+@\S+\.\S+$/.test(mail))return err.textContent='Введите корректную почту';
@@ -1357,16 +1358,16 @@ doAuth=async function(){
       if(c&&c.data&&c.data.p&&!(localOk&&lu.p)){
         const salt=lu?lu.salt:Math.random().toString(36).slice(2),h=await hash(pw,salt);
         db.users[mail]=Object.assign({},c.data,{salt,hash:h});CL.ready=true;CL.has=true;CL.last=null;clSave();
-        me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();toast('С возвращением! Данные из облака на месте');return}
+        me=mail;db.session=mail;try{localStorage.setItem('flow_last_mail',mail)}catch(e){}save();err.textContent='';$('#aPass').value='';enter();toast('С возвращением! Данные из облака на месте');return}
       if(!db.users[mail]){const salt=Math.random().toString(36).slice(2);db.users[mail]={name:$('#aName').value.trim()||'Друг',salt,hash:await hash(pw,salt),p:null,days:{},weights:[],adapt:null}}
       else if(!localOk){const salt=db.users[mail].salt;db.users[mail].hash=await hash(pw,salt)}
       CL.ready=!(c&&c.data&&c.data.p);CL.has=!!c;clSave();
-      me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();return}
+      me=mail;db.session=mail;try{localStorage.setItem('flow_last_mail',mail)}catch(e){}save();err.textContent='';$('#aPass').value='';enter();return}
     if(mode==='reg'&&!db.users[mail]){
       const salt=Math.random().toString(36).slice(2);
       db.users[mail]={name:$('#aName').value.trim()||'Друг',salt,hash:await hash(pw,salt),p:null,days:{},weights:[],adapt:null};
-      me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();cloudSignup(mail,pw);return}
-    if(mode==='reg'&&localOk){me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter();return}
+      me=mail;db.session=mail;try{localStorage.setItem('flow_last_mail',mail)}catch(e){}save();err.textContent='';$('#aPass').value='';enter();cloudSignup(mail,pw);return}
+    if(mode==='reg'&&localOk){me=mail;db.session=mail;try{localStorage.setItem('flow_last_mail',mail)}catch(e){}save();err.textContent='';$('#aPass').value='';enter();return}
     if(mode==='reg')return err.textContent='Эта почта уже зарегистрирована. Войдите или проверьте пароль';
     if(!localOk)return err.textContent='Неверная почта или пароль';
     me=mail;db.session=mail;save();err.textContent='';$('#aPass').value='';enter()
@@ -1653,7 +1654,7 @@ openHealth=function(tab){
 function ill51Tabs(){const u=U(),f=isF(u),t=hlTab;
  return `<div class="hltabs">${f?`<button class="${t==='me'?'on':''}" onclick="openHealth('me')">Для меня</button>`:''}<button class="${t==='diets'?'on':''}" onclick="openHealth('diets')">Диеты</button><button class="${t==='ill'?'on':''}" onclick="openHealth('ill')">Болезни</button></div>`}
 const _hs51=hlSet;hlSet=function(k,v){const u=U(),h=HL(u);h[k]=v;save();openHealth(hlTab==='ill'?'me':hlTab);render()};
-document.head.insertAdjacentHTML('beforeend','<style>.hlin details.hld summary{cursor:pointer;list-style:none}.hlin details.hld summary::-webkit-details-marker{display:none}.hlin details.hld summary:after{content:"▾";float:right;opacity:.6}.hlin details[open].hld summary:after{content:"▴"}.hlin ul.m{padding-left:20px;margin:4px 0 8px}.hlin ul.m li{margin:3px 0}.hltabs button{font-size:13px;padding:10px 6px}</style>');
+document.head.insertAdjacentHTML('beforeend','<style>.hlin details.hld summary{cursor:pointer;list-style:none}.hlin details.hld summary::-webkit-details-marker{display:none}.hlin details.hld>summary:after{content:"▾";float:right;opacity:.6}.hlin details[open].hld>summary:after{content:"▴"}.hlin ul.m{padding-left:20px;margin:4px 0 8px}.hlin ul.m li{margin:3px 0}.hltabs button{font-size:13px;padding:10px 6px}</style>');
 /* v52: все диеты в план, отметки месячных по дням, журнал показателей */
 const DK=['med','lc','if','prot','dash','veg','nosug','plate'];
 DIETS.forEach((d,i)=>{d.k=DK[i]});
@@ -2100,20 +2101,20 @@ const _mg65=clMergeInto;clMergeInto=function(u,r){let ch=_mg65(u,r);if(!r)return
 document.head.insertAdjacentHTML('beforeend','<style>'+
 /* ====== Y2K: HUD / бенто ====== */
 'html[data-ui=y2k] body{font-family:ui-monospace,"SF Mono",Menlo,monospace}html[data-ui=y2k] .greet{font-family:ui-monospace,Menlo,monospace;font-size:15px;text-transform:uppercase;letter-spacing:.14em;color:#ff4d8d;margin-bottom:10px}'+
-'html[data-ui=y2k] #t-today{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}html[data-ui=y2k] #t-today>*{grid-column:1/-1;margin-bottom:0}html[data-ui=y2k] #ringCard{order:1}html[data-ui=y2k] #y2Lv{order:2}html[data-ui=y2k] #greet{order:0}html[data-ui=y2k] #hlCard{order:6}html[data-ui=y2k] #cbHero{order:3;grid-column:1/-1}html[data-ui=y2k] #tiles{order:4;grid-column:1/-1}html[data-ui=y2k] #t-today>*:not(#greet):not(#y2Lv):not(#cbHero):not(#tiles):not(#hlCard):not(#ringCard){order:7}'+
+'html[data-ui=y2k] #t-today.on{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}html[data-ui=y2k] #t-today>*{grid-column:1/-1;margin-bottom:0}html[data-ui=y2k] #ringCard{order:1}html[data-ui=y2k] #y2Lv{order:2}html[data-ui=y2k] #greet{order:0}html[data-ui=y2k] #hlCard{order:6}html[data-ui=y2k] #cbHero{order:3;grid-column:1/-1}html[data-ui=y2k] #tiles{order:4;grid-column:1/-1}html[data-ui=y2k] #t-today>*:not(#greet):not(#y2Lv):not(#cbHero):not(#tiles):not(#hlCard):not(#ringCard){order:7}'+
 'html[data-ui=y2k] .ringbox{width:auto;height:auto;margin:0}html[data-ui=y2k] .ringbox svg{display:none}html[data-ui=y2k] .ringbox .c{position:static;align-items:flex-start}html[data-ui=y2k] #rN{font-size:76px;line-height:1;font-family:ui-monospace,Menlo,monospace;color:#fff;text-shadow:0 0 18px #ff4d8d,0 0 40px rgba(255,77,141,.6)}html[data-ui=y2k] #rL{text-transform:uppercase;letter-spacing:.2em;font-size:11px}'+
 '.y2b{height:10px;border-radius:5px;background:rgba(255,255,255,.08);margin-top:12px;width:100%;overflow:hidden;box-shadow:inset 0 0 8px rgba(0,0,0,.5)}.y2b i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#ff4d8d);box-shadow:0 0 14px #ff4d8d;transition:width .8s cubic-bezier(.2,.8,.2,1)}'+
 'html[data-ui=y2k] .card{border-radius:6px!important;border-width:1px!important;position:relative}html[data-ui=y2k] .card::before,html[data-ui=y2k] .card::after{content:"";position:absolute;width:14px;height:14px;border:2px solid #ff4d8d;pointer-events:none}html[data-ui=y2k] .card::before{left:-1px;top:-1px;border-right:0;border-bottom:0}html[data-ui=y2k] .card::after{right:-1px;bottom:-1px;border-left:0;border-top:0}'+
 '.y2h{display:flex;align-items:center;gap:10px}.y2h span{font-size:11px;letter-spacing:.2em;color:#ff4d8d}.y2h b{font-size:40px;color:#fff;text-shadow:0 0 14px #8b5cf6}.y2x{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.y2x i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#ff4d8d);box-shadow:0 0 12px #ff4d8d}.y2h small{font-size:11px;opacity:.8}.y2bd{display:flex;gap:8px;margin-top:12px}.y2bd span{flex:1;border:1px solid rgba(139,92,246,.6);border-radius:4px;padding:8px 4px;text-align:center;font-size:13px;box-shadow:0 0 10px rgba(139,92,246,.3) inset}.y2bd i{display:block;font-style:normal;font-size:20px}'+
 'html[data-ui=y2k] nav{left:22px;right:22px;border-radius:40px;border:1.5px solid #ff4d8d;box-shadow:0 0 24px rgba(255,77,141,.5),inset 0 0 14px rgba(255,77,141,.2);background:rgba(13,4,20,.85)}html[data-ui=y2k] nav button em{display:none}html[data-ui=y2k] nav button.on em{display:block;color:#ff4d8d;text-transform:uppercase;letter-spacing:.14em;font-size:9px}html[data-ui=y2k] nav svg{width:26px;height:26px}'+
 /* ====== БЕРЕМЕННЫЕ: мягкая, круглая ====== */
-'html[data-ui=preg] body{font-family:ui-rounded,"SF Pro Rounded","Avenir Next Rounded",system-ui,sans-serif}html[data-ui=preg] .greet{font-family:ui-rounded,Georgia,serif;text-align:center;font-size:22px}html[data-ui=preg] #t-today{display:flex;flex-direction:column}html[data-ui=preg] #greet{order:0}html[data-ui=preg] #pgHero{order:1}html[data-ui=preg] #pgTip{order:2}html[data-ui=preg] #pgKick{order:3}html[data-ui=preg] #hlCard{order:4}html[data-ui=preg] #ringCard{order:5}html[data-ui=preg] #t-today>*:not(#greet):not(#pgHero):not(#pgTip):not(#pgKick):not(#hlCard):not(#ringCard){order:6}'+
+'html[data-ui=preg] body{font-family:ui-rounded,"SF Pro Rounded","Avenir Next Rounded",system-ui,sans-serif}html[data-ui=preg] .greet{font-family:ui-rounded,Georgia,serif;text-align:center;font-size:22px}html[data-ui=preg] #t-today.on{display:flex;flex-direction:column}html[data-ui=preg] #greet{order:0}html[data-ui=preg] #pgHero{order:1}html[data-ui=preg] #pgTip{order:2}html[data-ui=preg] #pgKick{order:3}html[data-ui=preg] #hlCard{order:4}html[data-ui=preg] #ringCard{order:5}html[data-ui=preg] #t-today>*:not(#greet):not(#pgHero):not(#pgTip):not(#pgKick):not(#hlCard):not(#ringCard){order:6}'+
 'html[data-ui=preg] #ringCard .ringbox svg{display:none}html[data-ui=preg] .ringbox{width:auto;height:auto;margin:0}html[data-ui=preg] .ringbox .c{position:static}html[data-ui=preg] #rN{font-size:44px}'+
 '.pgr{position:relative;width:250px;height:250px;margin:6px auto}.pgr svg{width:250px;height:250px;transform:rotate(-90deg)}.pgr circle{fill:none;stroke-width:16;stroke-linecap:round}.pgr .pb{stroke:rgba(139,92,246,.15)}.pgr .pf{stroke:url(#pgg);stroke:#a67cf5;transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 8px rgba(166,124,245,.5))}.pgc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}.pgc small{font-size:12px;opacity:.7}.pgc b{font-size:72px;line-height:1;color:#7c4ddb}.pgc span{font-size:15px}.pgc em{font-style:normal;font-size:13px;margin-top:6px;opacity:.8}.pgl{text-align:center;font-size:15px;margin:0}.pgp{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pgp span{padding:8px 14px;border-radius:20px;background:rgba(139,92,246,.14);font-size:13px}'+
 'html[data-ui=preg] .card{border-radius:36px!important;padding:22px!important}html[data-ui=preg] nav{border-radius:36px;left:18px;right:18px}html[data-ui=preg] nav button em{font-size:11px}'+
 /* ====== ГЛАМУР: журнал ====== */
 'html[data-ui=glam] body{font-family:Georgia,"Times New Roman",serif}html[data-ui=glam] .greet{font-size:34px;text-align:center;font-style:italic;font-weight:400;border-bottom:1px solid rgba(var(--acc),.5);padding-bottom:14px}html[data-ui=glam] h2,html[data-ui=glam] h3{font-family:Georgia,serif;font-weight:400;text-transform:uppercase;letter-spacing:.32em;font-size:12px;text-align:center;color:var(--lime)}'+
-'html[data-ui=glam] #t-today{display:flex;flex-direction:column}html[data-ui=glam] #greet{order:0}html[data-ui=glam] #cbHero{order:1}html[data-ui=glam] #glRit{order:2}html[data-ui=glam] #hlCard{order:3}html[data-ui=glam] #ringCard{order:4}html[data-ui=glam] #t-today>*:not(#greet):not(#cbHero):not(#glRit):not(#hlCard):not(#ringCard){order:5}'+
+'html[data-ui=glam] #t-today.on{display:flex;flex-direction:column}html[data-ui=glam] #greet{order:0}html[data-ui=glam] #cbHero{order:1}html[data-ui=glam] #glRit{order:2}html[data-ui=glam] #hlCard{order:3}html[data-ui=glam] #ringCard{order:4}html[data-ui=glam] #t-today>*:not(#greet):not(#cbHero):not(#glRit):not(#hlCard):not(#ringCard){order:5}'+
 'html[data-ui=glam] .card{border-radius:0!important;background:transparent!important;border:0!important;border-top:1px solid rgba(var(--acc),.55)!important;border-bottom:1px solid rgba(var(--acc),.25)!important;box-shadow:none!important;backdrop-filter:none!important;padding:20px 4px!important}'+
 'html[data-ui=glam] #ringCard .ringbox{width:150px;height:150px;float:left;margin:0 16px 0 0}html[data-ui=glam] #rN{font-size:42px}html[data-ui=glam] .stats{display:block}html[data-ui=glam] .btn{border-radius:0;background:transparent!important;border:1px solid var(--lime);color:var(--lime)!important;text-transform:uppercase;letter-spacing:.2em;font-size:12px;box-shadow:none}'+
 'html[data-ui=glam] nav{left:0;right:0;bottom:0;border-radius:0;border:0;border-top:1px solid rgba(var(--acc),.5);background:rgba(var(--bgd),.95)}html[data-ui=glam] nav svg{display:none}html[data-ui=glam] nav button em{font-size:11px;text-transform:uppercase;letter-spacing:.24em;font-style:normal}html[data-ui=glam] nav .on{border-bottom:2px solid var(--lime)}html[data-ui=glam] nav .fab{margin:0;width:auto;height:auto;border-radius:0;background:none;box-shadow:none;font-size:26px;color:var(--lime)!important}'+
