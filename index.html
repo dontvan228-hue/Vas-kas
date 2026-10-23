@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v51`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v52`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1654,6 +1654,92 @@ function ill51Tabs(){const u=U(),f=isF(u),t=hlTab;
  return `<div class="hltabs">${f?`<button class="${t==='me'?'on':''}" onclick="openHealth('me')">Для меня</button>`:''}<button class="${t==='diets'?'on':''}" onclick="openHealth('diets')">Диеты</button><button class="${t==='ill'?'on':''}" onclick="openHealth('ill')">Болезни</button></div>`}
 const _hs51=hlSet;hlSet=function(k,v){const u=U(),h=HL(u);h[k]=v;save();openHealth(hlTab==='ill'?'me':hlTab);render()};
 document.head.insertAdjacentHTML('beforeend','<style>.hlin details.hld summary{cursor:pointer;list-style:none}.hlin details.hld summary::-webkit-details-marker{display:none}.hlin details.hld summary:after{content:"▾";float:right;opacity:.6}.hlin details[open].hld summary:after{content:"▴"}.hlin ul.m{padding-left:20px;margin:4px 0 8px}.hlin ul.m li{margin:3px 0}.hltabs button{font-size:13px;padding:10px 6px}</style>');
+/* v52: все диеты в план, отметки месячных по дням, журнал показателей */
+const DK=['med','lc','if','prot','dash','veg','nosug','plate'];
+DIETS.forEach((d,i)=>{d.k=DK[i]});
+const DR={
+ med:['Овощи в каждый приём','Рыба или бобовые вместо мяса','Оливковое масло вместо сливочного','Цельные крупы вместо белых'],
+ lc:['Без сахара и выпечки','Гарнир только маленькой порцией','Белок и овощи в каждый приём'],
+ if:['Окно еды 8 часов, остальное вода или чай без сахара','Не перекусывать ночью'],
+ prot:['Белок в каждый приём (яйца, рыба, творог, мясо, бобовые)','Овощи рядом с белком','Вода в течение дня'],
+ dash:['Не досаливать и меньше готового','Овощи и фрукты 4–5 порций','Нежирное молочное и цельные крупы','Давление измерить и записать'],
+ veg:['Белок из бобовых, яиц, творога или тофу','Источник железа и витамина C','Орехи или семена горсть'],
+ nosug:['Без сладких напитков и соков','Без сладкой выпечки и конфет','Читать состав: сахар не в первых строках'],
+ plate:['Половина тарелки овощи','Четверть белок, четверть гарнир','Есть медленно, без счёта']};
+const dietObj=u=>DIETS.find(d=>d.k===(u.diet||''));
+DIETS.forEach(d=>{d.apply=d.k});
+applyDiet=function(k){const u=U();u.diet=k;
+ if(k==='lc'){u.mg={net:30};u.quiz=Object.assign(u.quiz||{},{diet:'lc'})}
+ else{if((u.quiz||{}).diet==='lc'||(u.mg&&u.mg.net===30)){u.mg={net:100};u.quiz=Object.assign(u.quiz||{},{diet:''})}}
+ if(k==='if')NT().fast=true;else if(NT().fast&&u.diet!=='if')NT().fast=false;
+ save();render();openHealth('diets');toast('Диета в плане: '+(dietObj(u)||{}).n)};
+function dietOff(){const u=U();u.diet='';if((u.mg||{}).net===30)u.mg={net:100};NT().fast=false;save();render();openHealth('diets');toast('Диета снята')}
+function dietTick(i){const u=U(),d=day();d.dc=d.dc||[];const j=d.dc.indexOf(i);j<0?d.dc.push(i):d.dc.splice(j,1);save();render()}
+const _oh52a=openHealth;
+/* карточка диеты на главной */
+function renderDietCard(){const u=U();if(!u||!u.p)return;const g=$('#greet');if(!g)return;let c=$('#dtCard');
+ const d=dietObj(u);if(!d){if(c)c.remove();return}
+ if(!c){const a=$('#hlCard')||g;a.insertAdjacentHTML('afterend','<div class="card" id="dtCard"></div>');c=$('#dtCard')}
+ const dd=day(),done=dd.dc||[];
+ c.innerHTML=`<b>${d.e} Моя диета: ${esc(d.n)}</b><div class="dtl">${DR[d.k].map((r,i)=>`<label class="dtr"><input type="checkbox" ${done.includes(i)?'checked':''} onchange="dietTick(${i})"><span>${esc(r)}</span></label>`).join('')}</div><p class="m" style="font-size:12px">Сегодня выполнено ${done.length} из ${DR[d.k].length}. <a href="#" onclick="openHealth('diets');return false" style="color:var(--lime)">Подробнее</a></p>`}
+const _r52=render;render=function(){_r52();try{renderDietCard()}catch(e){}};
+/* отметки месячных по дням */
+const CSYM=['Боль','Слабость','Вздутие','Тяга к сладкому','Тревога','Головная боль'];
+function cylMark(d,f){const u=U();u.cyl=u.cyl||{};if(f===0)delete u.cyl[d];else u.cyl[d]=Object.assign(u.cyl[d]||{},{f});cylSync();save();render();openHealth('me')}
+function cylSym(d,s){const u=U();u.cyl=u.cyl||{};const e=u.cyl[d]=u.cyl[d]||{f:0};e.s=e.s||[];const j=e.s.indexOf(s);j<0?e.s.push(s):e.s.splice(j,1);save();openHealth('me')}
+const dprev=d=>new Date(Date.parse(d)-864e5).toISOString().slice(0,10);
+function cylSync(){const u=U(),h=HL(u),c=u.cyl||{};const ds=Object.keys(c).filter(k=>c[k].f>0).sort();if(!ds.length)return;
+ const starts=ds.filter(k=>!(c[dprev(k)]&&c[dprev(k)].f>0));const st=starts[starts.length-1];
+ let n=0,x=st;while(c[x]&&c[x].f>0){n++;x=new Date(Date.parse(x)+864e5).toISOString().slice(0,10)}
+ h.last=st;if(n>=2)h.per=n;
+ if(starts.length>=2){const g=starts.slice(-4).map((s,i,a)=>i?(Date.parse(s)-Date.parse(a[i-1]))/864e5:0).slice(1).filter(v=>v>=18&&v<=45);if(g.length)h.len=Math.round(g.reduce((a,b)=>a+b)/g.length)}}
+function cylStrip(){const u=U(),c=u.cyl||{};let o='';const FL=['','капля','средне','сильно'];
+ for(let i=0;i<14;i++){const d=new Date(Date.now()-i*864e5).toISOString().slice(0,10),e=c[d],f=e?e.f:0;
+  o+=`<div class="cyd ${f?'on':''}"><b>${d.slice(8)}.${d.slice(5,7)}${i===0?' · сегодня':''}</b><span class="cyb"><button class="${f===0?'on':''}" onclick="cylMark('${d}',0)">нет</button><button class="${f===1?'on':''}" onclick="cylMark('${d}',1)">слабо</button><button class="${f===2?'on':''}" onclick="cylMark('${d}',2)">средне</button><button class="${f===3?'on':''}" onclick="cylMark('${d}',3)">сильно</button></span>${f?`<span class="chips">${CSYM.map(s=>`<span class="chip2 ${(e.s||[]).includes(s)?'on':''}" onclick="cylSym('${d}','${s}')">${s}</span>`).join('')}</span>`:''}</div>`}
+ return o}
+/* показатели */
+const MK={sug:{n:'Сахар крови',u:'ммоль/л',e:'🩸'},bp:{n:'Давление',u:'мм рт. ст.',e:'❤️'},pul:{n:'Пульс',u:'уд/мин',e:'💓'},tmp:{n:'Температура',u:'°C',e:'🌡️'}};
+function measNote(k,v,v2,ctx){
+ if(k==='sug'){if(v<3.9)return['low','Низковато. Съешь что-то сладкое с углеводами и, если повторяется, скажи врачу.'];
+  if(ctx==='f'){if(v<=5.5)return['ok','В пределах обычных ориентиров натощак.'];if(v<7)return['mid','Чуть выше ориентира натощак. Покажи врачу, особенно если повторяется.'];return['hi','Высоко натощак. Обратись к врачу в ближайшее время.']}
+  if(v<7.8)return['ok','В пределах обычных ориентиров после еды.'];if(v<11)return['mid','Выше ориентира после еды. Покажи врачу.'];return['hi','Очень высоко. Обратись к врачу сегодня, при жажде, тошноте, слабости звони 103/112.']}
+ if(k==='bp'){if(v>=180||v2>=120)return['hi','Очень высокое. Присядь, отдохни, повтори через 5 минут. Если так же или есть боль в груди, слабость, нарушение речи, вызывай 103/112.'];
+  if(v>=140||v2>=90)return['hi','Повышено. Покажи врачу, лекарства сама не подбирай.'];if(v<90||v2<60)return['mid','Низковато. Если есть слабость или обмороки, скажи врачу.'];if(v>=130||v2>=85)return['mid','Чуть выше идеала. Меньше соли, больше движения, наблюдай.'];return['ok','Хорошие цифры.']}
+ if(k==='pul'){if(v<50||v>110)return['mid','Необычный пульс в покое. Если есть слабость, боль в груди или одышка, обратись к врачу.'];return['ok','Пульс в обычных пределах.']}
+ if(k==='tmp'){if(v>=38.5)return['hi','Высокая температура. Пей воду и обратись к врачу, особенно если больше 3 дней или есть боль, одышка.'];if(v>=37.3)return['mid','Слегка повышена. Отдых и вода, наблюдай.'];return['ok','Нормальная температура.']}
+ return['ok','']}
+function measAdd(){const k=$('#mK').value,v=parseFloat(String($('#mV').value).replace(',','.')),v2=parseFloat(String($('#mV2').value).replace(',','.')),ctx=$('#mC')?$('#mC').value:'';
+ if(!(v>0)||(k==='bp'&&!(v2>0)))return toast('Введи значение');const u=U();(u.meas=u.meas||[]).push({d:today(),ts:Date.now(),k,v,v2:k==='bp'?v2:null,c:ctx});save();openHealth('meas')}
+function measDel(ts){const u=U();u.meas=(u.meas||[]).filter(m=>m.ts!==ts);save();openHealth('meas')}
+function measView(){const u=U(),M=(u.meas||[]).slice().sort((a,b)=>b.ts-a.ts).slice(0,30);
+ const opt=Object.keys(MK).map(k=>`<option value="${k}">${MK[k].e} ${MK[k].n}</option>`).join('');
+ return `<h3>Мои показатели</h3><p class="m">Записывай сахар, давление, пульс, температуру. Данные видишь только ты. Подсказки ориентировочные и не заменяют врача.</p>
+ <label>Что измеряла</label><select id="mK" onchange="mkUi()">${opt}</select>
+ <div class="row"><div><label id="mL1">Значение</label><input id="mV" inputmode="decimal" placeholder="5.2"></div><div id="mW2" style="display:none"><label>Нижнее</label><input id="mV2" inputmode="decimal" placeholder="80"></div></div>
+ <div id="mCW"><label>Когда</label><select id="mC"><option value="f">Натощак</option><option value="a">После еды</option></select></div>
+ <button class="btn" onclick="measAdd()">Записать</button>
+ ${M.length?M.map(m=>{const n=measNote(m.k,m.v,m.v2,m.c),K=MK[m.k];return `<div class="hld"><b>${K.e} ${m.k==='bp'?m.v+'/'+m.v2:m.v} ${K.u}</b> <span class="m">· ${m.d.slice(8)}.${m.d.slice(5,7)}${m.k==='sug'?(m.c==='f'?' натощак':' после еды'):''}</span><button class="hlx2" onclick="measDel(${m.ts})" aria-label="Удалить">✕</button><p class="m ms-${n[0]}">${n[1]}</p></div>`}).join(''):'<p class="m">Пока пусто.</p>'}
+ <p class="m" style="margin-top:12px;opacity:.85">При плохом самочувствии не жди цифр: обратись к врачу, при боли в груди, нарушении речи, потере сознания звони 103 или 112.</p>`}
+function mkUi(){const k=$('#mK').value;$('#mW2').style.display=k==='bp'?'':'none';$('#mCW').style.display=k==='sug'?'':'none';$('#mL1').textContent=k==='bp'?'Верхнее':'Значение';$('#mV').placeholder={sug:'5.2',bp:'120',pul:'70',tmp:'36.6'}[k]}
+/* вкладки и открытие */
+ill51Tabs=function(){const u=U(),f=isF(u),t=hlTab,b=(k,l)=>`<button class="${t===k?'on':''}" onclick="openHealth('${k}')">${l}</button>`;
+ return `<div class="hltabs">${f?b('me','Цикл'):''}${b('diets','Диеты')}${b('ill','Болезни')}${b('meas','Показатели')}</div>`};
+const _oh52=openHealth;
+openHealth=function(tab){if(tab)hlTab=tab;
+ if(hlTab==='meas'){_oh52('ill');hlTab='meas';$('#hlBody').innerHTML=ill51Tabs()+measView();mkUi();return}
+ _oh52(tab);
+ const u=U();
+ if(hlTab==='me'&&isF(u)&&HL(u).st==='cyc'){const b=$('#hlBody');b.insertAdjacentHTML('beforeend',`<h3 style="font-size:18px;margin-top:16px">Отметить дни</h3><p class="m">Нажимай каждый день, пока идут месячные. Даты и длина цикла обновятся сами. Работает на любом телефоне.</p><div class="cyl">${cylStrip()}</div>`)}
+ if(hlTab==='diets'){const b=$('#hlBody'),d=dietObj(u);if(d)b.insertAdjacentHTML('afterbegin',`<div class="hld"><b>Сейчас в плане: ${d.e} ${esc(d.n)}</b><button class="btn ghost" style="margin-top:6px" onclick="dietOff()">Снять диету</button></div>`)}
+};
+/* синхронизация новых данных */
+const _mg52=clMergeInto;
+clMergeInto=function(u,r){let ch=_mg52(u,r);if(!r||typeof r!=='object')return ch;
+ if(r.cyl){u.cyl=u.cyl||{};for(const k in r.cyl)if(!u.cyl[k]){u.cyl[k]=r.cyl[k];ch++}}
+ if(r.meas){const have=new Set((u.meas||[]).map(m=>m.ts));(r.meas||[]).forEach(m=>{if(m&&!have.has(m.ts)){(u.meas=u.meas||[]).push(m);ch++}})}
+ if(!u.hl&&r.hl){u.hl=r.hl;ch++}if(u.diet===undefined&&r.diet){u.diet=r.diet;ch++}
+ return ch};
+document.head.insertAdjacentHTML('beforeend','<style>.dtl{margin:8px 0}.dtr{display:flex;gap:10px;align-items:flex-start;margin:6px 0;font-size:14px}.dtr input{width:20px;height:20px;margin-top:2px;flex:none}.cyd{border-top:1px solid var(--line);padding:8px 0}.cyb{display:flex;gap:6px;margin:6px 0}.cyb button{flex:1;padding:8px 2px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--txt);font-size:12px}.cyb button.on{background:var(--lime);color:#000;border-color:var(--lime)}.cyd.on b{color:var(--lime)}.hlx2{float:right;background:none;border:0;color:var(--txt);opacity:.6;font-size:15px}.ms-ok{color:#7ddc9a}.ms-mid{color:#f0c060}.ms-hi{color:#ff8a80}.hltabs button{font-size:12px;padding:9px 2px}</style>');
 </script>
 </body>
 </html>
