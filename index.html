@@ -978,7 +978,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v42`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v43`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1385,32 +1385,47 @@ let _tx=0,_ty=0;document.addEventListener('touchstart',e=>{_tx=e.touches[0].clie
 document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>Math.abs(e.touches[0].clientY-_ty)&&e.cancelable&&!e.target.closest('input[type=range],.hs,[data-hs]'))e.preventDefault()},{passive:false});
 
 
-/* v42: вторая героиня Алиса, выбор в настройках героини */
-const AL_V='42',AL_FILES=['idle','happy','angry','shy','eat','drink'],MIRA_FACE=HERDEF.face;
-const alSrc=k=>'alice/'+k+'.webp?v='+AL_V;
-const isAl=()=>{try{return CB().her==='alice'}catch(e){return false}};
-let ALDF=null,ALDL=0,ALPRE=0;
-function alLoadDance(){if(ALDF||ALDL)return;ALDL=1;fetch('alice/dance.json?v='+AL_V).then(r=>r.json()).then(a=>{ALDF=a.map(u=>{const i=new Image();i.src=u;return i});if(isAl())DFI=ALDF}).catch(()=>{ALDL=0})}
-function alPre(){if(ALPRE)return;ALPRE=1;AL_FILES.forEach(k=>{const i=new Image();i.src=alSrc(k)});alLoadDance()}
+/* v43: выбор героя: Героиня, Алиса, Женя */
+const CH_V='43',MIRA_FACE=HERDEF.face;
+const CHARS={
+ alice:{name:'Алиса',dir:'alice',male:false,files:['idle','happy','angry','shy','eat','drink']},
+ zhenya:{name:'Женя',dir:'zhenya',male:true,files:['idle','happy','shy','eat','drink']}};
+const CHORD=['mira','alice','zhenya'];
+const chKey=()=>{try{const k=CB().her;return CHARS[k]?k:'mira'}catch(e){return'mira'}};
+const isAl=()=>chKey()!=='mira';
+const chSrc=(k,f)=>CHARS[k].dir+'/'+f+'.webp?v='+CH_V;
+const chFace=k=>k==='mira'?MIRA_FACE:CHARS[k].dir+'/face.webp?v='+CH_V;
+const CHDF={},CHDL={},CHPRE={};
+function chLoadDance(k){if(CHDF[k]||CHDL[k])return;CHDL[k]=1;fetch(CHARS[k].dir+'/dance.json?v='+CH_V).then(r=>r.json()).then(a=>{CHDF[k]=a.map(u=>{const i=new Image();i.src=u;return i});if(chKey()===k)DFI=CHDF[k]}).catch(()=>{CHDL[k]=0})}
+function chPre(k){if(!CHARS[k]||CHPRE[k])return;CHPRE[k]=1;CHARS[k].files.forEach(f=>{const i=new Image();i.src=chSrc(k,f)});chLoadDance(k)}
 const _al42=herSrc;
 herSrc=function(slot){
- if(!isAl())return _al42(slot);
- if(slot==='dance'){if(ALDF)return{src:'frames:dance',vid:false,exact:true};alLoadDance();return{src:alSrc('happy'),vid:false,exact:true}}
+ const k=chKey();if(k==='mira')return _al42(slot);
+ const C=CHARS[k];
+ if(slot==='dance'){if(CHDF[k])return{src:'frames:dance',vid:false,exact:true};chLoadDance(k);return{src:chSrc(k,'happy'),vid:false,exact:true}}
  const M={idle:'idle',mid:'idle',goal:'idle',happy:'happy',wave:'happy',celebrate:'happy',kiss:'happy',angry:'angry',shy:'shy',eat:'eat',drink:'drink',sad:'idle',sleepy:'idle',blink:'idle'};
- return{src:alSrc(M[slot]||'idle'),vid:false,exact:!(slot==='sad'||slot==='sleepy')}};
+ let f=M[slot]||'idle',ex=!(slot==='sad'||slot==='sleepy');
+ if(!C.files.includes(f)){f='idle';ex=false}
+ return{src:chSrc(k,f),vid:false,exact:ex}};
 const _dfl42=dfLoad;
-dfLoad=function(){if(isAl()){if(ALDF)DFI=ALDF;return}if(DFI&&DFI===ALDF)DFI=null;_dfl42()};
-function herPick(w){const c=CB();if((c.her||'mira')===w)return;c.her=w;
- if(w==='alice'){if(c.name==='Чиби'||c.name==='Героиня')c.name='Алиса';alPre()}
- else{if(c.name==='Алиса')c.name='Героиня';if(DFI&&DFI===ALDF)DFI=null}
- HERDEF.face=w==='alice'?'alice/face.webp?v='+AL_V:MIRA_FACE;
- save();HERCUR='';DFS=0;renderChibi(true);toast(w==='alice'?'Теперь с вами Алиса':'Вернулась прежняя героиня')}
+dfLoad=function(){const k=chKey();if(k!=='mira'){if(CHDF[k])DFI=CHDF[k];return}if(DFI&&Object.values(CHDF).includes(DFI))DFI=null;_dfl42()};
+const _cs43=cbSay;
+cbSay=function(){const t=_cs43();return CHARS[chKey()]&&CHARS[chKey()].male?String(t).replace('СЕРДИТАЯ','СЕРДИТЫЙ'):t};
+const _ts43=toast;
+toast=function(t,a){try{const k=chKey();if(CHARS[k]&&CHARS[k].male)t=String(t).replace(/Героиня прошла/,CB().name+' прошёл')}catch(e){}return _ts43(t,a)};
+function herPick(w){const c=CB();if(!CHARS[w]&&w!=='mira')return;if(chKey()===w)return;c.her=w;
+ const old=['Чиби','Героиня','Алиса','Женя'];
+ if(old.includes(c.name))c.name=w==='mira'?'Героиня':CHARS[w].name;
+ if(w!=='mira')chPre(w);else if(DFI&&Object.values(CHDF).includes(DFI))DFI=null;
+ HERDEF.face=chFace(w);
+ save();HERCUR='';DFS=0;renderChibi(true);toast(w==='mira'?'Вернулась прежняя героиня':'Теперь с вами '+CHARS[w].name)}
+function herNext(){const i=CHORD.indexOf(chKey());herPick(CHORD[(i+1)%CHORD.length])}
 function herPick42(){const s=document.getElementById('cbSet');if(!s||s.querySelector('#herPick'))return;
- const w=isAl()?'alice':'mira',b=(id,t,img)=>`<button type="button" class="hp ${w===id?'on':''}" onclick="herPick('${id}')"><span class="hpi"><img src="${img}" alt=""></span>${t}</button>`;
- s.insertAdjacentHTML('afterbegin',`<div id="herPick"><label>Героиня</label><div class="hpr">${b('mira','Героиня',MIRA_FACE)}${b('alice','Алиса','alice/face.webp?v='+AL_V)}</div></div>`)}
+ const w=chKey(),nm={mira:'Героиня',alice:'Алиса',zhenya:'Женя'},b=id=>`<button type="button" class="hp ${w===id?'on':''}" onclick="herPick('${id}')"><span class="hpi"><img src="${chFace(id)}" alt=""></span>${nm[id]}</button>`;
+ s.insertAdjacentHTML('afterbegin',`<div id="herPick"><label>Герой</label><div class="hpr">${CHORD.map(b).join('')}</div></div>`)}
 const _rc42=renderChibi;
-renderChibi=function(a){try{if(isAl()){alPre();HERDEF.face='alice/face.webp?v='+AL_V}else HERDEF.face=MIRA_FACE}catch(e){}const r=_rc42(a);try{herPick42();const sd=document.querySelector('.cbside');if(sd&&!document.getElementById('herSw'))sd.insertAdjacentHTML('beforeend','<button id="herSw" aria-label="Сменить героиню" onclick="herPick(isAl()?\'mira\':\'alice\')">👭</button>')}catch(e){}return r};
-document.head.insertAdjacentHTML('beforeend','<style>#herPick .hpr{display:flex;gap:10px;margin:6px 0 16px}#herPick .hp{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:16px;border:2px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);font:inherit;font-size:14px;cursor:pointer}#herPick .hp.on{border-color:rgb(var(--acc));background:rgba(var(--acc),.14)}#herPick .hpi{width:64px;height:64px;border-radius:18px;overflow:hidden;background:#cdb99c;display:block}#herPick .hpi img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}</style>');
+renderChibi=function(a){try{const k=chKey();if(k!=='mira')chPre(k);HERDEF.face=chFace(k)}catch(e){}const r=_rc42(a);try{herPick42();const sd=document.querySelector('.cbside');if(sd&&!document.getElementById('herSw'))sd.insertAdjacentHTML('beforeend','<button id="herSw" aria-label="Сменить героя" onclick="herNext()">👭</button>')}catch(e){}return r};
+document.head.insertAdjacentHTML('beforeend','<style>#herPick .hpr{display:flex;gap:8px;margin:6px 0 16px}#herPick .hp{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:16px;border:2px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);font:inherit;font-size:13px;cursor:pointer}#herPick .hp.on{border-color:rgb(var(--acc));background:rgba(var(--acc),.14)}#herPick .hpi{width:56px;height:56px;border-radius:16px;overflow:hidden;background:#cdb99c;display:block}#herPick .hpi img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}</style>');
 </script>
 </body>
 </html>
