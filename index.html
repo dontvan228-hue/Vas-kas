@@ -987,7 +987,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v64`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v65`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1545,7 +1545,7 @@ const affToday=u=>{const A=isF(u)?AFF_F:AFF_M,d=Date.parse(today())/864e5|0;retu
 function hlSummary(u){const h=HL(u),st=h.st;
  if(!isF(u)||st==='male')return 'Диеты и советы по питанию.';
  if(st==='cyc'){const c=cycInfo(u);return c?`День цикла ${c.n} из ${c.len}: ${c.ph}.`:'Укажи дату последних месячных, и я подскажу питание по дням цикла.'}
- if(st==='preg'){const w=pregWeek(u);return w?`Неделя ${w}: малыш примерно с ${babyOf(w)}.`:'Укажи предполагаемую дату родов.'}
+ if(st==='preg'){const w=pregWeek(u);return w?`Неделя ${w}: размер малыша примерно как ${babyOf(w)}.`:'Укажи предполагаемую дату родов.'}
  if(st==='feed')return 'Кормление: энергии нужно больше, плану добавлено немного калорий.';
  if(st==='men')return 'Менопауза: питание для костей, сна и самочувствия.';
  return 'Настрой раздел: цикл, беременность, кормление или менопауза.'}
@@ -1567,7 +1567,7 @@ function openHealth(tab){const u=U();if(tab)hlTab=tab;else if(!isF(u))hlTab='die
    if(c){const t=CYT[c.cl];b+=`<div class="hld"><b>День ${c.n}: ${t[0]}</b><p class="m">${t[1]}</p><p class="m">До следующих месячных примерно ${c.next} дн. Даты ориентировочные, цикл может смещаться.</p></div>`}
    else b+='<p class="m">Введите дату, и появятся советы по дням.</p>'}
   if(h.st==='preg'){const w=pregWeek(u),ex=lifeExtra(u);b+=`<label>Предполагаемая дата родов</label><input type="date" value="${h.due||''}" onchange="hlSet('due',this.value)">`;
-   if(w)b+=`<div class="hld"><b>Неделя ${w} · ${w<14?'1':w<28?'2':'3'} триместр</b><p class="m">Малыш примерно с ${babyOf(w)}.</p><p class="m">${PREG_OK}</p><p class="m" style="color:var(--warn)">${PREG_NO}</p><p class="m">Похудение отключено. ${ex?`К норме добавлено ${ex} ккал (ориентир для этого срока).`:'В первом триместре добавка калорий обычно не нужна.'} Точную норму и вес назначает врач.</p><div class="chips"><span class="chip2 ${h.noex?'on':''}" onclick="hlSet('noex',${!h.noex})">Без добавки калорий</span></div></div>`}
+   if(w)b+=`<div class="hld"><b>Неделя ${w} · ${w<14?'1':w<28?'2':'3'} триместр</b><p class="m">Размер малыша примерно как ${babyOf(w)}.</p><p class="m">${PREG_OK}</p><p class="m" style="color:var(--warn)">${PREG_NO}</p><p class="m">Похудение отключено. ${ex?`К норме добавлено ${ex} ккал (ориентир для этого срока).`:'В первом триместре добавка калорий обычно не нужна.'} Точную норму и вес назначает врач.</p><div class="chips"><span class="chip2 ${h.noex?'on':''}" onclick="hlSet('noex',${!h.noex})">Без добавки калорий</span></div></div>`}
   if(h.st==='feed')b+=`<div class="hld"><b>Кормление грудью</b><p class="m">Организму нужно больше энергии и воды. К норме добавлено 330 ккал, похудение отключено. Ешь регулярно, пей воду по жажде, добавь белок и кальций. Резко не худей: молока может стать меньше. Алкоголь и энергетики исключи или согласуй с врачом.</p><div class="chips"><span class="chip2 ${h.noex?'on':''}" onclick="hlSet('noex',${!h.noex})">Без добавки калорий</span></div></div>`;
   if(h.st==='men')b+=`<div class="hld"><b>Менопауза и перименопауза</b><p class="m">${MENO}</p></div>`;
   if(h.st==='none'||!h.st)b+='<p class="m">Выбери этап, и появятся подходящие советы. Данные хранятся только у тебя в аккаунте.</p>';
@@ -2058,6 +2058,70 @@ function testUi(){
 const _r64=render;render=function(){_r64();try{(async()=>{OWNER=typeof me==='string'&&me&&(await sha256(me.trim().toLowerCase()))===OWNER_H;testUi()})()}catch(e){}};
 if(isTest())document.addEventListener('DOMContentLoaded',testUi);
 document.head.insertAdjacentHTML('beforeend','<style>#tstBar{position:fixed;left:0;right:0;top:0;z-index:300;background:#e8870c;color:#1c1100;font-size:13px;font-weight:700;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:calc(6px + env(safe-area-inset-top)) 12px 6px}#tstBar button{border:0;border-radius:14px;background:#1c1100;color:#fff;padding:7px 12px;font-size:12px}</style>');
+/* v65: по-настоящему разные интерфейсы: разная главная, навигация, шрифты, блоки */
+MODES.find(m=>m.id==='glam').ui='glam';
+const dd0=u=>{try{return dDiff(today(),HL(u).due)}catch(e){return 0}};
+function modeCards(){const r=document.documentElement.dataset.ui||'',t=document.getElementById('t-today'),u=U();if(!t||!u||!u.p)return;
+ ['pgHero','y2Lv','glRit','pgKick','pgTip'].forEach(id=>{const e=document.getElementById(id);if(e&&!(
+   (r==='preg'&&(id==='pgHero'||id==='pgKick'||id==='pgTip'))||(r==='y2k'&&id==='y2Lv')||(r==='glam'&&id==='glRit')))e.remove()});
+ const put=(id,html,after)=>{let e=document.getElementById(id);if(!e){const h=document.createElement('div');h.id=id;h.className='card';if(after&&document.getElementById(after))document.getElementById(after).insertAdjacentElement('afterend',h);else t.insertBefore(h,t.firstChild);e=h}
+  if(e.dataset.h!==html){e.dataset.h=html;e.innerHTML=html}};
+ const rb=t.querySelector('.ringbox');if(rb&&rb.closest('.card'))rb.closest('.card').id='ringCard';
+ const day0=day(),pl=plan(),eat=eaten(day0);
+ /* ---- беременные ---- */
+ if(r==='preg'){const h=HL(u),w=h.due?pregWeek(u):0,left=h.due?dd0(u):0;
+  let hero;
+  if(!w){hero=`<h2 style="text-align:center">Беременность</h2><p class="m" style="text-align:center">Укажи предполагаемую дату родов, и здесь появятся неделя, малыш и советы.</p><input type="date" id="pgDue" onchange="pgSetDue(this.value)"><p class="m" style="text-align:center;font-size:12px;margin-top:8px">Дату можно взять из заключения врача. Её можно изменить в «Здоровье».</p>`}
+  else{const p=Math.min(1,w/40),C=2*Math.PI*105,tri=w<14?'1 триместр':w<28?'2 триместр':'3 триместр';
+   hero=`<div class="pgr"><svg viewBox="0 0 250 250"><circle cx="125" cy="125" r="105" class="pb"/><circle cx="125" cy="125" r="105" class="pf" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-p)).toFixed(1)}"/></svg><div class="pgc"><small>${tri}</small><b>${w}</b><span>неделя</span><em>размер малыша как ${babyOf(w)}</em></div></div><p class="pgl">${left>0?`До родов примерно ${left} дн.`:'Срок родов наступил, скоро встреча!'}</p>`}
+  put('pgHero',hero);
+  const ex=lifeExtra(u);
+  put('pgTip',`<h2>Питание сегодня</h2><p class="m">${PREG_OK}</p><p class="m" style="color:var(--warn)">${PREG_NO}</p><div class="pgp"><span>🍽 Осталось ${Math.max(0,pl.b-eat)} ккал</span><span>💧 ${day0.water||0} стак.</span></div>`,'pgHero');
+  if(w>=20){const k=(u.kick||{})[today()]||0;put('pgKick',`<h2>Шевеления малыша</h2><p class="m">Нажимай, когда чувствуешь шевеление. Сегодня: <b>${k}</b></p><button class="btn" onclick="pgKick()">＋ Малыш пошевелился</button><p class="m" style="font-size:12px">Если малыш стал двигаться заметно меньше обычного, сразу обратись к врачу или в роддом.</p>`,'pgTip')}
+  else{const e=document.getElementById('pgKick');if(e)e.remove()}}
+ /* ---- Y2K ---- */
+ if(r==='y2k'){const xp=Object.keys(u.days||{}).filter(d=>u.days[d].food&&u.days[d].food.length).length+((u.weights||[]).length),lv=1+Math.floor(xp/4),pr=(xp%4)/4;
+  put('y2Lv',`<div class="y2h"><span>LVL</span><b>${lv}</b><div class="y2x"><i style="width:${Math.round(pr*100)}%"></i></div><small>${xp%4}/4 XP</small></div><div class="y2bd">${[['🔥','стрик'],['💧',(day0.water||0)+'/8'],['⚡',Math.round(eat/Math.max(1,pl.b)*100)+'%']].map(a=>`<span><i>${a[0]}</i>${a[1]}</span>`).join('')}</div>`);
+  }
+ barMode(r,eat,pl);
+ /* ---- гламур ---- */
+ if(r==='glam'){const L=['Выпить воду','Сон 7–8 часов','Прогулка','Уход за кожей','10 минут тишины'],I=['💧','😴','🚶','✨','🧘'],c=((u.rit||{})[today()])||[];
+  put('glRit',`<h2>Ритуалы красоты</h2>${L.map((l,i)=>`<label class="glr"><input type="checkbox" ${c.includes(i)?'checked':''} onchange="glTick(${i})"><span>${I[i]} ${l}</span></label>`).join('')}<p class="m" style="font-size:12px">Ты красивая уже сейчас. Это просто приятная забота о себе.</p>`,'greet')}}
+function barMode(r,eat,pl){const rc=document.querySelector('#ringCard .c'),old=document.getElementById('y2Bar');if(r!=='y2k'&&r!=='granny'){if(old)old.remove();return}
+ if(rc&&!old)rc.insertAdjacentHTML('beforeend','<div class="y2b" id="y2Bar"><i></i></div>');const bar=document.querySelector('#y2Bar i');if(bar)bar.style.width=Math.min(100,Math.round(eat/Math.max(1,pl.b)*100))+'%'}
+function pgSetDue(v){if(!v)return;const u=U(),h=HL(u);h.due=v;h.st='preg';save();render()}
+function pgKick(){const u=U();u.kick=u.kick||{};u.kick[today()]=(u.kick[today()]||0)+1;hap();save();render()}
+function glTick(i){const u=U();u.rit=u.rit||{};const a=u.rit[today()]=u.rit[today()]||[],j=a.indexOf(i);j<0?a.push(i):a.splice(j,1);save();render()}
+const _r65=render;render=function(){_r65();try{modeCards()}catch(e){console.error(e)}};
+const _am65=applyMode;applyMode=function(id){_am65(id);try{modeCards()}catch(e){}};
+/* облако: новые данные */
+const _mg65=clMergeInto;clMergeInto=function(u,r){let ch=_mg65(u,r);if(!r)return ch;
+ ['kick','rit'].forEach(k=>{if(r[k]){u[k]=u[k]||{};for(const d in r[k])if(!u[k][d]){u[k][d]=r[k][d];ch++}}});return ch};
+document.head.insertAdjacentHTML('beforeend','<style>'+
+/* ====== Y2K: HUD / бенто ====== */
+'html[data-ui=y2k] body{font-family:ui-monospace,"SF Mono",Menlo,monospace}html[data-ui=y2k] .greet{font-family:ui-monospace,Menlo,monospace;font-size:15px;text-transform:uppercase;letter-spacing:.14em;color:#ff4d8d;margin-bottom:10px}'+
+'html[data-ui=y2k] #t-today{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}html[data-ui=y2k] #t-today>*{grid-column:1/-1;margin-bottom:0}html[data-ui=y2k] #ringCard{order:1}html[data-ui=y2k] #y2Lv{order:2}html[data-ui=y2k] #greet{order:0}html[data-ui=y2k] #hlCard{order:6}html[data-ui=y2k] #cbHero{order:3;grid-column:1/-1}html[data-ui=y2k] #tiles{order:4;grid-column:1/-1}html[data-ui=y2k] #t-today>*:not(#greet):not(#y2Lv):not(#cbHero):not(#tiles):not(#hlCard):not(#ringCard){order:7}'+
+'html[data-ui=y2k] .ringbox{width:auto;height:auto;margin:0}html[data-ui=y2k] .ringbox svg{display:none}html[data-ui=y2k] .ringbox .c{position:static;align-items:flex-start}html[data-ui=y2k] #rN{font-size:76px;line-height:1;font-family:ui-monospace,Menlo,monospace;color:#fff;text-shadow:0 0 18px #ff4d8d,0 0 40px rgba(255,77,141,.6)}html[data-ui=y2k] #rL{text-transform:uppercase;letter-spacing:.2em;font-size:11px}'+
+'.y2b{height:10px;border-radius:5px;background:rgba(255,255,255,.08);margin-top:12px;width:100%;overflow:hidden;box-shadow:inset 0 0 8px rgba(0,0,0,.5)}.y2b i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#ff4d8d);box-shadow:0 0 14px #ff4d8d;transition:width .8s cubic-bezier(.2,.8,.2,1)}'+
+'html[data-ui=y2k] .card{border-radius:6px!important;border-width:1px!important;position:relative}html[data-ui=y2k] .card::before,html[data-ui=y2k] .card::after{content:"";position:absolute;width:14px;height:14px;border:2px solid #ff4d8d;pointer-events:none}html[data-ui=y2k] .card::before{left:-1px;top:-1px;border-right:0;border-bottom:0}html[data-ui=y2k] .card::after{right:-1px;bottom:-1px;border-left:0;border-top:0}'+
+'.y2h{display:flex;align-items:center;gap:10px}.y2h span{font-size:11px;letter-spacing:.2em;color:#ff4d8d}.y2h b{font-size:40px;color:#fff;text-shadow:0 0 14px #8b5cf6}.y2x{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.y2x i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#ff4d8d);box-shadow:0 0 12px #ff4d8d}.y2h small{font-size:11px;opacity:.8}.y2bd{display:flex;gap:8px;margin-top:12px}.y2bd span{flex:1;border:1px solid rgba(139,92,246,.6);border-radius:4px;padding:8px 4px;text-align:center;font-size:13px;box-shadow:0 0 10px rgba(139,92,246,.3) inset}.y2bd i{display:block;font-style:normal;font-size:20px}'+
+'html[data-ui=y2k] nav{left:22px;right:22px;border-radius:40px;border:1.5px solid #ff4d8d;box-shadow:0 0 24px rgba(255,77,141,.5),inset 0 0 14px rgba(255,77,141,.2);background:rgba(13,4,20,.85)}html[data-ui=y2k] nav button em{display:none}html[data-ui=y2k] nav button.on em{display:block;color:#ff4d8d;text-transform:uppercase;letter-spacing:.14em;font-size:9px}html[data-ui=y2k] nav svg{width:26px;height:26px}'+
+/* ====== БЕРЕМЕННЫЕ: мягкая, круглая ====== */
+'html[data-ui=preg] body{font-family:ui-rounded,"SF Pro Rounded","Avenir Next Rounded",system-ui,sans-serif}html[data-ui=preg] .greet{font-family:ui-rounded,Georgia,serif;text-align:center;font-size:22px}html[data-ui=preg] #t-today{display:flex;flex-direction:column}html[data-ui=preg] #greet{order:0}html[data-ui=preg] #pgHero{order:1}html[data-ui=preg] #pgTip{order:2}html[data-ui=preg] #pgKick{order:3}html[data-ui=preg] #hlCard{order:4}html[data-ui=preg] #ringCard{order:5}html[data-ui=preg] #t-today>*:not(#greet):not(#pgHero):not(#pgTip):not(#pgKick):not(#hlCard):not(#ringCard){order:6}'+
+'html[data-ui=preg] #ringCard .ringbox svg{display:none}html[data-ui=preg] .ringbox{width:auto;height:auto;margin:0}html[data-ui=preg] .ringbox .c{position:static}html[data-ui=preg] #rN{font-size:44px}'+
+'.pgr{position:relative;width:250px;height:250px;margin:6px auto}.pgr svg{width:250px;height:250px;transform:rotate(-90deg)}.pgr circle{fill:none;stroke-width:16;stroke-linecap:round}.pgr .pb{stroke:rgba(139,92,246,.15)}.pgr .pf{stroke:url(#pgg);stroke:#a67cf5;transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 8px rgba(166,124,245,.5))}.pgc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}.pgc small{font-size:12px;opacity:.7}.pgc b{font-size:72px;line-height:1;color:#7c4ddb}.pgc span{font-size:15px}.pgc em{font-style:normal;font-size:13px;margin-top:6px;opacity:.8}.pgl{text-align:center;font-size:15px;margin:0}.pgp{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pgp span{padding:8px 14px;border-radius:20px;background:rgba(139,92,246,.14);font-size:13px}'+
+'html[data-ui=preg] .card{border-radius:36px!important;padding:22px!important}html[data-ui=preg] nav{border-radius:36px;left:18px;right:18px}html[data-ui=preg] nav button em{font-size:11px}'+
+/* ====== ГЛАМУР: журнал ====== */
+'html[data-ui=glam] body{font-family:Georgia,"Times New Roman",serif}html[data-ui=glam] .greet{font-size:34px;text-align:center;font-style:italic;font-weight:400;border-bottom:1px solid rgba(var(--acc),.5);padding-bottom:14px}html[data-ui=glam] h2,html[data-ui=glam] h3{font-family:Georgia,serif;font-weight:400;text-transform:uppercase;letter-spacing:.32em;font-size:12px;text-align:center;color:var(--lime)}'+
+'html[data-ui=glam] #t-today{display:flex;flex-direction:column}html[data-ui=glam] #greet{order:0}html[data-ui=glam] #cbHero{order:1}html[data-ui=glam] #glRit{order:2}html[data-ui=glam] #hlCard{order:3}html[data-ui=glam] #ringCard{order:4}html[data-ui=glam] #t-today>*:not(#greet):not(#cbHero):not(#glRit):not(#hlCard):not(#ringCard){order:5}'+
+'html[data-ui=glam] .card{border-radius:0!important;background:transparent!important;border:0!important;border-top:1px solid rgba(var(--acc),.55)!important;border-bottom:1px solid rgba(var(--acc),.25)!important;box-shadow:none!important;backdrop-filter:none!important;padding:20px 4px!important}'+
+'html[data-ui=glam] #ringCard .ringbox{width:150px;height:150px;float:left;margin:0 16px 0 0}html[data-ui=glam] #rN{font-size:42px}html[data-ui=glam] .stats{display:block}html[data-ui=glam] .btn{border-radius:0;background:transparent!important;border:1px solid var(--lime);color:var(--lime)!important;text-transform:uppercase;letter-spacing:.2em;font-size:12px;box-shadow:none}'+
+'html[data-ui=glam] nav{left:0;right:0;bottom:0;border-radius:0;border:0;border-top:1px solid rgba(var(--acc),.5);background:rgba(var(--bgd),.95)}html[data-ui=glam] nav svg{display:none}html[data-ui=glam] nav button em{font-size:11px;text-transform:uppercase;letter-spacing:.24em;font-style:normal}html[data-ui=glam] nav .on{border-bottom:2px solid var(--lime)}html[data-ui=glam] nav .fab{margin:0;width:auto;height:auto;border-radius:0;background:none;box-shadow:none;font-size:26px;color:var(--lime)!important}'+
+'.glr{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(var(--acc),.18);font-size:16px}.glr input{width:20px;height:20px;accent-color:var(--lime)}'+
+/* ====== БАБУШКИ: огромное и простое ====== */
+'html[data-ui=granny] nav button:nth-child(2),html[data-ui=granny] nav button:nth-child(4){display:none}html[data-ui=granny] nav button em{font-size:15px;font-weight:700}html[data-ui=granny] nav svg{width:32px;height:32px}html[data-ui=granny] #rN{font-size:84px}html[data-ui=granny] .ringbox{width:auto;height:auto;margin:0}html[data-ui=granny] .ringbox svg{display:none}html[data-ui=granny] .ringbox .c{position:static}html[data-ui=granny] .y2b{height:16px;background:rgba(0,0,0,.1)}html[data-ui=granny] .y2b i{background:var(--lime);box-shadow:none}html[data-ui=granny] .stats{display:none}html[data-ui=granny] #planNote{display:none}html[data-ui=granny] .greet{font-size:32px;font-weight:700}html[data-ui=granny] body{font-weight:500}html[data-ui=granny] .card{border:2px solid rgba(var(--acc),.55)}'+
+'html[data-ui=granny] .cbtop .nm b{font-size:15px}html[data-ui=preg] .row label{font-size:10px;letter-spacing:0}'+
+'</style>');
 </script>
 </body>
 </html>
