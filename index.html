@@ -988,7 +988,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v70`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v71`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -2286,7 +2286,7 @@ function tlRep(){const d=wkData(),g=isGain(),sc=(d.days>=5?1:0)+(d.ok>=4?1:0)+(d
  const row=(l,v)=>`<div class="item"><span>${l}</span><b>${v}</b></div>`;
  return `<h3>Итоги недели</h3><p class="m">${say}</p>${row('Дней с записями',d.days+' из 7')}${row('Средние калории',d.avg+' (план '+d.b+')')}${row(g?'Дней с едой от 90% плана':'Дней в рамках плана',d.ok)}${row('Вода в день',d.water+' из 8')}${d.dw!==null?row('Вес за неделю',(d.dw>0?'+':'')+d.dw+' кг'):''}${row('Тренировки',d.wo+' · '+d.mn+' мин')}${d.medp!==null?row('Лекарства по плану',d.medp+'%'):''}
  <button class="btn" style="width:100%;margin-top:14px" onclick="wkShare()">Отправить близким или врачу</button><p class="m" style="font-size:12px;margin-top:8px">Откроется меню iPhone: можно выбрать мессенджер или почту. Если меню недоступно, текст скопируется.</p>`}
-function wkShare(){const t=wkText();if(navigator.share)navigator.share({title:'Итоги недели',text:t}).catch(()=>{});else{try{navigator.clipboard.writeText(t);toast('Текст скопирован')}catch(e){toast('Не удалось скопировать')}}}
+function wkShare(){const t=wkText();if(navigator.share)navigator.share({title:'Итоги недели',text:t}).catch(()=>{});else{try{navigator.clipboard.writeText(t).then(()=>toast('Текст скопирован'),()=>toast('Не удалось скопировать'))}catch(e){toast('Не удалось скопировать')}}}
 /* --- награды --- */
 const ACH=[['🍽️','Первая запись',u=>Object.values(u.days).some(d=>d.food.length)],['🔥','Серия 3 дня',u=>streak()>=3],['🔥','Серия 7 дней',u=>streak()>=7],['🌟','Серия 30 дней',u=>streak()>=30],['💧','Вся вода за день',u=>Object.values(u.days).some(d=>d.water>=8)],['⚖️','Пять взвешиваний',u=>u.weights.length>=5],['📈','Четверть пути',u=>prog()>=.25&&u.weights.length>1],['🏁','Половина пути',u=>prog()>=.5&&u.weights.length>1],['🏆','Цель достигнута',u=>prog()>=1&&u.weights.length>1],['🏃','Первая тренировка',u=>tlA('wo').length>0],['💪','10 тренировок',u=>tlA('wo').length>=10],['💊','Лекарства по плану 7 дней',u=>{let n=0;const l=tlO('medlog');for(let i=0;i<7;i++){const d=new Date(Date.parse(today())-i*864e5).toISOString().slice(0,10);if(Object.values(l[d]||{}).some(Boolean))n++}return n>=7}],['🍲','Своё блюдо',u=>tlA('dish').length>0],['📓','100 записей еды',u=>Object.values(u.days).reduce((a,d)=>a+d.food.length,0)>=100]];
 function achCheck(){const u=U();if(!u||!u.p)return;const got=tlO('ach');ACH.forEach((a,i)=>{try{if(!got[i]&&a[2](u)){got[i]=Date.now();save();toast('🏆 Новая награда: '+a[1])}}catch(e){}})}
@@ -2299,7 +2299,7 @@ function clTick(k,v){tlO('cl')[k]=v?1:0;save()}
 function tlMore(){const u=U(),base=location.origin+location.pathname;return `<h3>Ещё</h3><div class="tgr"><span>Крупный шрифт и кнопки</span><input type="checkbox" class="tg" ${u.bigfont?'checked':''} onchange="bigSet(this.checked)"></div><p class="m" style="font-size:12px">Всё в приложении станет крупнее. Подходит, если мелкий текст трудно читать.</p>
  <h3 style="margin-top:20px">Быстрые кнопки для iPhone</h3><p class="m">В приложении «Команды» создай команду «Открыть URL» с одной из ссылок и добавь её на экран «Домой». Одно нажатие запишет стакан воды или вес.</p><div class="item"><span style="word-break:break-all;font-size:12px">${base}?add=water</span><button class="btn sm" onclick="cpy('${base}?add=water')">Копировать</button></div><div class="item"><span style="word-break:break-all;font-size:12px">${base}?w=65.5</span><button class="btn sm" onclick="cpy('${base}?w=65.5')">Копировать</button></div><p class="m" style="font-size:12px">Важно: такая ссылка откроется в Safari, а у приложения с экрана «Домой» своё хранилище. Чтобы данные совпали, войди в тот же аккаунт и в Safari, тогда всё сольётся через облако. Число после w= впиши своим весом.</p>
  <button class="btn ghost" style="width:100%;margin-top:14px" onclick="wkShare2()">Поделиться итогами недели</button>`}
-function cpy(t){try{navigator.clipboard.writeText(t);toast('Скопировано')}catch(e){toast('Не удалось скопировать')}}
+function cpy(t){try{navigator.clipboard.writeText(t).then(()=>toast('Скопировано'),()=>toast('Не удалось скопировать'))}catch(e){toast('Не удалось скопировать')}}
 function wkShare2(){wkShare()}
 function bigSet(v){U().bigfont=v;save();document.documentElement.classList.toggle('big',!!v)}
 function urlAct(){try{const q=new URLSearchParams(location.search);if(!me||!U()||!U().p)return false;let did=0;if(q.get('add')==='water'){const d=day();if(d.water<8){d.water++;did=1;toast('Вода +1 💧')}}const w=parseFloat((q.get('w')||'').replace(',','.'));if(w>=30&&w<=300){U().weights.push({d:today(),w:Math.round(w*10)/10});did=1;toast('Вес записан: '+w+' кг')}if(did){save();render()}if(q.has('add')||q.has('w'))history.replaceState(null,'',location.pathname);return true}catch(e){return false}}
@@ -2327,6 +2327,53 @@ document.head.insertAdjacentHTML('beforeend','<style>'+
 '.achg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.ach{border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center;opacity:.5}.ach.on{opacity:1;background:rgba(var(--acc),.14);border-color:var(--lime)}.ach span{display:block;font-size:30px}.ach small{display:block;margin-top:4px;font-size:11px;line-height:1.25}'+
 'html.big body{zoom:1.16}html.big .btn,html.big .qo{padding-top:16px;padding-bottom:16px}'+
 '#tlBody textarea{margin-top:6px}.item button.btn{background:var(--lime);color:var(--on);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;white-space:nowrap;flex:none}.item{gap:10px}</style>');
+
+/* ===== v71: мужчинам мужское, женщинам женское ===== */
+const isMan=()=>{try{return !!U()&&!isF(U())}catch(e){return false}};
+/* режимы */
+const MODES_ALL=MODES.slice();
+function fitModes(){const hide=isMan()?['preg','glam']:[];const keep=MODES_ALL.filter(m=>!hide.includes(m.id));if(keep.length===MODES.length&&keep.every((m,i)=>m===MODES[i]))return false;MODES.length=0;keep.forEach(m=>MODES.push(m));return true}
+function manMode(){try{if(!isMan())return;const u=U(),m=u.look&&u.look.mode;if(m==='preg'||m==='glam'){applyMode('sport')}}catch(e){}}
+/* вопросы анкеты по полу */
+const _qr71=qRender;
+qRender=function(){try{const man=qa.sex==='m',h=QZ.find(x=>x[0]==='health'),g=QZ.find(x=>x[0]==='goal');
+ if(h){if(!h._all)h._all=h[2].slice();h[2]=man?h._all.filter(o=>o[2]!=='preg'):h._all.slice()}
+ if(g){g[2].forEach(o=>{if(o[2]==='lose')o[1]=man?'Похудеть, сушка':'Снизить вес';if(o[2]==='gain')o[1]=man?'Набрать мышечную массу':'Набрать вес';if(o[2]==='tone')o[1]=man?'Рельеф и форма':'Подтянуть фигуру';if(o[2]==='aware')o[1]='Просто для себя: следить за питанием'})}}catch(e){}
+ _qr71.apply(this,arguments)};
+GN.aware='Для себя: осознанное питание';GN.tone=GN.tone||'Подтянуть фигуру';
+const _sp71=saveProfile;saveProfile=function(){try{const q=U()&&U().quiz,g=$('#oGoalSel')&&$('#oGoalSel').value;if((q&&(q.goal==='keep'||q.goal==='aware')&&(!g||g==='keep'))){$('#oT').value=$('#oW').value}}catch(e){}return _sp71()};
+const _qf71=qFinish;qFinish=function(){_qf71();try{if(qa.goal==='aware'){const pc=$('#oPace');$('#oT').value=$('#oW').value;if([...pc.options].some(o=>o.value==='0'))pc.value='0'}}catch(e){}};
+/* здоровье: мужская версия */
+ILL.push({k:'pro',e:'🛡️',n:'Простата и мочеиспускание',
+ do:['Пей воду в течение дня, но меньше за 2–3 часа до сна.','Овощи, томаты, рыба, орехи, цельные крупы, оливковое масло.','Двигайся: ходьба около 30 минут в день, не сиди подолгу без перерыва.','Следи за весом: лишний вес связан с проблемами мочеиспускания.','После 45–50 лет обсуди с врачом осмотр и анализ ПСА, особенно если у родственников была болезнь простаты.'],
+ lim:['Алкоголь и много кофе, особенно вечером.','Курение.','Долгое сидение, переохлаждение.'],
+ red:['Нет мочи или сильная боль внизу живота','Кровь в моче или сперме','Температура и озноб с болью при мочеиспускании','Резкая боль в яичке или паху','Слабая струя и частые ночные позывы дольше 2–3 недель'],
+ dr:'Проблемы мочеиспускания у мужчин лучше показать урологу, на ранней стадии они хорошо лечатся.'},
+{k:'chk',e:'🩺',n:'Ежегодный мужской чекап',
+ do:['Раз в год: давление, холестерин, сахар крови, вес и обхват талии (тревожно от 94 см).','Общий анализ крови и мочи, по назначению врача печёночные пробы.','Осмотр кожи и родинок.','Сон 7–8 часов, ходьба или тренировки 150 минут в неделю.','Вакцинация и осмотры по возрасту уточни у терапевта.'],
+ lim:['Курение и вейпы.','Алкоголь больше умеренных доз.','Игнорирование боли в груди и одышки: «само пройдёт».'],
+ red:['Давящая боль в груди, отдающая в руку или челюсть','Внезапная слабость в одной половине тела, нарушение речи','Одышка в покое','Чёрный стул, рвота кровью'],
+ dr:'Профилактика проще лечения: запишись к терапевту раз в год, даже если ничего не болит.'});
+const ILL_F=['brc','ovc','pcos'],ILL_M=['pro','chk'];
+const illFor=u=>ILL.filter(d=>isF(u)?!ILL_M.includes(d.k):!ILL_F.includes(d.k)&&d.k!=='cys');
+myView=function(){const u=U(),h=HL(u),f=isF(u),cs=h.cond||[],L=illFor(u);
+ const st=(v,l)=>`<span class="chip2 ${h.st===v?'on':''}" onclick="hlStage('${v}')">${l}</span>`;
+ const sel=L.filter(d=>cs.includes(d.k));
+ return `<h3>Моё здоровье</h3><p class="m">${f?'Ты не одна. ':''}Отметь всё, что тебя касается: можно несколько пунктов сразу${f?', например цикл и диабет':''}. Советы подстроятся.</p>`
+ +(f?`<p class="m" style="margin-top:10px"><b>Этап жизни</b> (выбери один)</p><div class="chips">${st('cyc','Цикл')}${st('preg','Беременность')}${st('feed','Кормлю')}${st('men','Менопауза')}${st('none','Не показывать')}</div><button class="btn ghost" onclick="openHealth('me')">Настроить цикл и отметить дни</button>`:'')
+ +`<p class="m" style="margin-top:12px"><b>Мои состояния</b> (можно несколько)</p><div class="chips">${L.map(d=>`<span class="chip2 ${cs.includes(d.k)?'on':''}" onclick="hlCond('${d.k}')">${d.e} ${d.n.split(' (')[0]}</span>`).join('')}</div>`
+ +(sel.length?`<h3 style="font-size:18px;margin-top:14px">Мои советы</h3>`+sel.map(d=>illItem(d,sel.length===1)).join(''):'<p class="m">Если ничего не отмечено, смотри общий справочник ниже.</p>')
+ +`<details class="hld" style="margin-top:14px"><summary><b>📚 Справочник по всем болезням</b></summary>${L.filter(d=>!cs.includes(d.k)).map(d=>illItem(d,false)).join('')}</details>`
+ +`<p class="m" style="margin-top:14px;opacity:.85">${ILL_NOTE} В России скорая: 103 или 112. В любом случае обратись к врачу.</p>`};
+/* слова: Герой / Героиня по выбранному персонажу, смайлик для мужчин */
+const HRW=[[/Героиня прошла/g,'Герой прошёл'],[/героиня/g,'герой'],[/Героиня/g,'Герой'],[/Героини/g,'Героя'],[/героини/g,'героя'],[/Героине/g,'Герою'],[/героине/g,'герою'],[/Героиней/g,'Героем'],[/героиней/g,'героем']];
+function heroWords(){try{const u=U();if(!u||!u.p)return;const male=!!(CHARS[chKey()]&&CHARS[chKey()].male);if(male){const w=document.createTreeWalker($('#app'),NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){let t=n.nodeValue,o=t;HRW.forEach(r=>{t=t.replace(r[0],r[1])});if(t!==o)n.nodeValue=t}}
+ if(isMan()){const e=document.querySelector('#hlCard p');if(e&&e.firstChild&&e.firstChild.nodeValue&&e.firstChild.nodeValue.indexOf('💗')>-1)e.firstChild.nodeValue=e.firstChild.nodeValue.replace('💗','💪')}}catch(e){}}
+let _hwT=0;const _hwQ=()=>{if(_hwT)return;_hwT=requestAnimationFrame(()=>{_hwT=0;heroWords()})};
+try{new MutationObserver(_hwQ).observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}
+const _r71=render;render=function(){if(fitModes())try{renderTheme()}catch(e){}manMode();_r71.apply(this,arguments);_hwQ()};
+const _sh71=show;show=function(id){_sh71(id);if(id==='app'){fitModes();manMode()}};
+fitModes();
 </script>
 </body>
 </html>
