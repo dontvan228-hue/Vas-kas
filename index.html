@@ -2023,7 +2023,7 @@ document.head.insertAdjacentHTML('beforeend','<style>.fc{position:relative;heigh
 '.fcov{position:absolute;inset:0;z-index:4;touch-action:pan-y}.fcn{position:absolute;top:120px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.35);color:#fff;font-size:26px;line-height:1}.fcprev{left:22px}.fcnext{right:22px}.rv{opacity:0;transform:translateY(36px) scale(.98);transition:opacity .6s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1)}.rv.rvin{opacity:1;transform:none}</style>');
 /* v63: выбор героя в конце опроса (с подтверждением, чтобы не нажать случайно) */
 const QCH=['alice','zhenya','mira','seit'];let qaChar=false,qcSel='',qcT=0;
-const _sq63=startQuiz;startQuiz=function(){qaChar=false;qcSel='';_sq63()};
+const _sq63=startQuiz;startQuiz=function(){qaChar=false;qcSel='';try{hsI=0}catch(e){};_sq63()};
 const _qr63=qRender;
 qRender=function(){if(qi>=QZ.length&&!qaChar){qcShow();return}_qr63()};
 function qcShow(){const b=$('#qBody');$('#qBar').style.width='96%';$('#qBack').hidden=false;
