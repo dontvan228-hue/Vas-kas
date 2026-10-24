@@ -1,7 +1,7 @@
 {
   "name": "VASSKASS • FLOW",
   "short_name": "FLOW",
-  "description": "Бесплатный трекер похудения с виртуальной героиней",
+  "description": "Бесплатный трекер питания и привычек (бета)",
   "lang": "ru",
   "start_url": "./",
   "scope": "./",
