@@ -988,7 +988,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v71`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v72`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -2088,8 +2088,8 @@ function modeCards(){const r=document.documentElement.dataset.ui||'',t=document.
   }
  barMode(r,eat,pl);
  /* ---- гламур ---- */
- if(r==='glam'){const L=['Выпить воду','Сон 7–8 часов','Прогулка','Уход за кожей','10 минут тишины'],I=['💧','😴','🚶','✨','🧘'],c=((u.rit||{})[today()])||[];
-  put('glRit',`<h2>Ритуалы красоты</h2>${L.map((l,i)=>`<label class="glr"><input type="checkbox" ${c.includes(i)?'checked':''} onchange="glTick(${i})"><span>${I[i]} ${l}</span></label>`).join('')}<p class="m" style="font-size:12px">Ты красивая уже сейчас. Это просто приятная забота о себе.</p>`,'greet')}}
+ if(r==='glam'){const M_=isMan(),L=M_?['Выпить воду','Сон 7–8 часов','Прогулка','Тренировка или зарядка','10 минут тишины']:['Выпить воду','Сон 7–8 часов','Прогулка','Уход за кожей','10 минут тишины'],I=M_?['💧','😴','🚶','💪','🧘']:['💧','😴','🚶','✨','🧘'],c=((u.rit||{})[today()])||[];
+  put('glRit',`<h2>${M_?'Привычки дня':'Ритуалы красоты'}</h2>${L.map((l,i)=>`<label class="glr"><input type="checkbox" ${c.includes(i)?'checked':''} onchange="glTick(${i})"><span>${I[i]} ${l}</span></label>`).join('')}<p class="m" style="font-size:12px">${M_?'Маленькие шаги каждый день делают сильнее.':'Ты красивая уже сейчас. Это просто приятная забота о себе.'}</p>`,'greet')}}
 function barMode(r,eat,pl){const rc=document.querySelector('#ringCard .c'),old=document.getElementById('y2Bar');if(r!=='y2k'&&r!=='granny'){if(old)old.remove();return}
  if(rc&&!old)rc.insertAdjacentHTML('beforeend','<div class="y2b" id="y2Bar"><i></i></div>');const bar=document.querySelector('#y2Bar i');if(bar)bar.style.width=Math.min(100,Math.round(eat/Math.max(1,pl.b)*100))+'%'}
 function pgSetDue(v){if(!v)return;const u=U(),h=HL(u);h.due=v;h.st='preg';save();render()}
@@ -2374,6 +2374,42 @@ try{new MutationObserver(_hwQ).observe(document.body,{childList:true,subtree:tru
 const _r71=render;render=function(){if(fitModes())try{renderTheme()}catch(e){}manMode();_r71.apply(this,arguments);_hwQ()};
 const _sh71=show;show=function(id){_sh71(id);if(id==='app'){fitModes();manMode()}};
 fitModes();
+
+/* ===== v72: отдельные ветки для мужчин и женщин: анкета, оформления, рационы при болезнях ===== */
+/* анкета: общий пропуск вопросов (по полу и по цели) */
+const _skip72=()=>{const q=QZ[qi];if(!q)return false;if(q[0]==='life'&&qa.sex!=='f')return true;if((q[0]==='gwhy'||q[0]==='ghow')&&qa.goal!=='gain')return true;return false};
+qNext=function(){qi++;while(qi<QZ.length&&_skip72())qi++;qRender();window.scrollTo(0,0)};
+qBack=function(){if(qi>-1){qi--;while(qi>-1&&_skip72())qi--;qRender()}};
+/* новые мужские оформления */
+MODES_ALL.forEach(m=>{});
+MODES_ALL.push(
+ {id:'mstd',n:'Стандартный',c:'Сталь и лёд: спокойный мужской вид',th:'steel',ui:'',bg:'flat',a:'#1b2634',b:'#0d131b',ac:'#7cc4ff',tx:'#eaf1f8'},
+ {id:'forest',n:'Лес',c:'Тёмная хвоя и песок: спокойно и надёжно',th:'forest',ui:'',bg:'flat',a:'#1a2e23',b:'#0a140f',ac:'#d7c48a',tx:'#eef0e6'},
+ {id:'biz',n:'Бизнес',c:'Тёмно-синий и золото: строго и дорого',th:'biz',ui:'glam',bg:'flat',a:'#18213a',b:'#080c17',ac:'#d9b45f',tx:'#f3efe6'},
+ {id:'grandpa',n:'Для дедушек',c:'Крупно и просто: еда, вода, давление',th:'calm',ui:'granny',bg:'flat',a:'#fbf7ee',b:'#e4d9c2',ac:'#5f7a49',tx:'#2f281d'});
+const MG_ORDER={m:['mstd','snow','sport','forest','biz','grandpa'],f:['modern','snow','granny','preg','glam','y2k']};
+fitModes=function(){const keep=MG_ORDER[isMan()?'m':'f'].map(id=>MODES_ALL.find(m=>m.id===id)).filter(Boolean);if(keep.length===MODES.length&&keep.every((m,i)=>m===MODES[i]))return false;MODES.length=0;keep.forEach(m=>MODES.push(m));return true};
+manMode=function(){try{const u=U();if(!u||!u.p)return;const id=u.look&&u.look.mode;if(id&&!MODES.some(m=>m.id===id))applyMode(isMan()?'mstd':'modern');else if(!id&&isMan()&&document.documentElement.dataset.theme==='wine'&&!document.documentElement.dataset.ui)applyMode('mstd')}catch(e){}};
+document.head.insertAdjacentHTML('beforeend','<style>'+
+'html[data-theme=steel]{--bg:#0d131b;--bg2:#1b2634;--g1:#1b2634;--g2:#0d131b;--g3:#070b10;--lime:#7cc4ff;--on:#0d131b;--acc:124,196,255;--bgd:13,19,27;--a1:#a6d8ff;--a2:#4fa6e8;--acc2:255,176,102;--txt:#eaf1f8;--mut:rgba(234,241,248,.62);--line:rgba(124,196,255,.2)}'+
+'html[data-theme=steel] body{background:linear-gradient(180deg,#131c27,#0a0f15)!important;background-attachment:fixed}html[data-theme=steel] .card{background:rgba(27,38,52,.85);border:1px solid rgba(124,196,255,.16);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}html[data-theme=steel] .btn{border-radius:12px;font-weight:700}'+
+'html[data-theme=forest]{--bg:#0a140f;--bg2:#1a2e23;--g1:#1a2e23;--g2:#0a140f;--g3:#050b08;--lime:#d7c48a;--on:#0a140f;--acc:215,196,138;--bgd:10,20,15;--a1:#ead9a2;--a2:#bba768;--acc2:120,170,120;--txt:#eef0e6;--mut:rgba(238,240,230,.62);--line:rgba(215,196,138,.2)}'+
+'html[data-theme=forest] body{background:radial-gradient(90% 50% at 85% 0,rgba(120,170,120,.18),transparent 60%),linear-gradient(180deg,#10201a,#08110c)!important;background-attachment:fixed}html[data-theme=forest] .card{background:rgba(26,46,35,.8);border:1px solid rgba(215,196,138,.18);border-radius:14px}html[data-theme=forest] h2,html[data-theme=forest] h3{letter-spacing:.06em;text-transform:uppercase}'+
+'html[data-theme=biz]{--bg:#080c17;--bg2:#18213a;--g1:#18213a;--g2:#0b1020;--g3:#05080f;--lime:#d9b45f;--on:#0b1020;--acc:217,180,95;--bgd:8,12,23;--a1:#ecd08a;--a2:#b8923f;--acc2:150,170,220;--txt:#f3efe6;--mut:rgba(243,239,230,.64);--line:rgba(217,180,95,.28)}'+
+'html[data-theme=biz] .card{border-color:rgba(217,180,95,.35);box-shadow:0 14px 34px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,235,190,.12)}html[data-theme=biz] h2{letter-spacing:.08em;text-transform:uppercase;font-size:13px}'+
+'</style>');
+/* рационы при болезнях: отдельно для мужчин и женщин */
+const ILLSEX={
+ ane:{f:'У женщин частая причина: обильные месячные, беременность, кормление. Железо в еде: красное мясо, печень, бобовые, гречка, плюс витамин C. Чай и кофе не вместе с едой. Дозу препарата железа назначает врач.',m:'У мужчин анемия редко бывает «просто от питания»: нужно найти причину, например скрытую кровопотерю в желудке или кишечнике. Не принимай железо сам без обследования.'},
+ heart:{f:'Риск растёт после менопаузы. Признаки инфаркта у женщин бывают нетипичными: слабость, тошнота, одышка, боль в спине или челюсти. Не жди, что «пройдёт».',m:'Риск болезней сердца у мужчин начинает расти раньше, примерно с 40–45 лет. Следи за давлением, холестерином и обхватом талии, не терпи боль в груди. Соль, алкоголь и колбасы лучше сократить.'},
+ bone:{f:'После менопаузы кости теряют плотность быстрее: кальций (молочное, сардины, брокколи), витамин D, силовые нагрузки. Обсуди с врачом денситометрию после 50–55 лет.',m:'Остеопороз у мужчин реже, но бывает при алкоголе, курении, длительном приёме гормонов. Кальций, витамин D и силовые тренировки полезны.'},
+ thy:{f:'Болезни щитовидной железы у женщин встречаются чаще. Если планируешь беременность, сначала проверь ТТГ.',m:'У мужчин они реже, но признаки похожи: усталость, изменение веса, сердцебиение. При жалобах сдай анализ на ТТГ.'},
+ chol:{f:'После менопаузы холестерин часто растёт: проверяй липиды раз в год.',m:'Мужчинам полезно проверять холестерин с 35–40 лет. Опасен жир на животе: обхват талии от 94 см повышает риск.'},
+ dia:{f:'Риск выше при СПКЯ и после гестационного диабета. При беременности сахар ведёт только врач.',m:'Мужчины чаще накапливают жир на животе при инсулинорезистентности. Ходьба после еды и силовые тренировки улучшают чувствительность к инсулину.'},
+ edema:{f:'Перед месячными отёки бывают из-за гормонов: меньше соли, больше воды и движения.',m:'Отёки ног у мужчин чаще повод проверить сердце, почки и вены: не откладывай визит к врачу.'},
+ gi:{f:'Изжога и тошнота бывают при беременности. Лекарства перед приёмом согласуй с врачом.',m:'Алкоголь, курение и стресс чаще ухудшают гастрит и изжогу: начни с них.'},
+ kid:{f:'Инфекции мочевых путей у женщин чаще осложняют почки: цистит не лечи самостоятельно долго.',m:'Камни в почках у мужчин бывают чаще: пей достаточно воды, меньше соли и не злоупотребляй белковыми добавками без назначения.'}};
+const _ii72=illItem;illItem=function(d,o){let h=_ii72(d,o);const n=ILLSEX[d.k];if(n){const m=isMan(),t=m?n.m:n.f;if(t)h=h.replace(/<\/details>$/,`<p class="m" style="margin-top:6px"><b>${m?'👨 Мужчинам':'👩 Женщинам'}:</b> ${t}</p></details>`)}return h};
 </script>
 </body>
 </html>
