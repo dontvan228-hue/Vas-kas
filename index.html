@@ -988,7 +988,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v73`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v74`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -2329,7 +2329,7 @@ document.head.insertAdjacentHTML('beforeend','<style>'+
 '#tlBody textarea{margin-top:6px}.item button.btn{background:var(--lime);color:var(--on);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;white-space:nowrap;flex:none}.item{gap:10px}</style>');
 
 /* ===== v71: мужчинам мужское, женщинам женское ===== */
-const isMan=()=>{try{return !!U()&&!isF(U())}catch(e){return false}};
+let isMan=()=>{try{return !!U()&&!isF(U())}catch(e){return false}};
 /* режимы */
 const MODES_ALL=MODES.slice();
 function fitModes(){const hide=isMan()?['preg','glam']:[];const keep=MODES_ALL.filter(m=>!hide.includes(m.id));if(keep.length===MODES.length&&keep.every((m,i)=>m===MODES[i]))return false;MODES.length=0;keep.forEach(m=>MODES.push(m));return true}
@@ -2415,6 +2415,24 @@ const _ii72=illItem;illItem=function(d,o){let h=_ii72(d,o);const n=ILLSEX[d.k];i
 AFF_M.push('Дисциплина — это забота о будущем себе. Спасибо, что идёшь по плану.','Сильное тело строится из еды, сна и воды, а не из срывов и героизма.','Один пропущенный день ничего не отменяет. Возвращаемся и продолжаем.','Ты не обязан быть идеальным. Достаточно быть здоровым и бодрым.','Сравнивай себя только с собой вчерашним.','Ты справлялся с большим, справишься и с этим.','Отдых тоже часть тренировки: сон и вода работают на тебя.','Результат приходит к тем, кто продолжает. Ты уже в процессе.','Забота о здоровье — это сила, а не слабость.','Маленький шаг сегодня лучше большого плана на завтра.','Тело делает для тебя тысячу дел в день. Дай ему воды и отдыха.');
 const MALE_FIX=[[/Что я съела/g,'Что я съел'],[/(?<![а-яё])съела(?![а-яё])/g,'съел'],[/(?<![а-яё])выпила(?![а-яё])/g,'выпил'],[/Выпила воду/g,'Выпил воду'],[/[Ее]сли съела/g,m=>m[0]+'сли съел'],[/Я СЕРДИТАЯ/g,'Я СЕРДИТЫЙ'],[/Ты красива\b/g,'Ты силён'],[/вчерашней\b/g,'вчерашним']];
 (function(){const old=heroWords;heroWords=function(){old();try{if(!isMan())return;const w=document.createTreeWalker($('#app'),NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){let t=n.nodeValue,o=t;MALE_FIX.forEach(r=>{t=t.replace(r[0],r[1])});if(t!==o)n.nodeValue=t}}catch(e){}}})();
+
+/* ===== v74: сначала пол, потом оформление ===== */
+const _isMan74=isMan;
+const inQuiz=()=>{try{const q=document.getElementById('quiz');return !!q&&!q.hidden&&typeof qa==='object'&&qi>=0}catch(e){return false}};
+isMan=function(){if(inQuiz()&&qa.sex)return qa.sex==='m';return _isMan74()};
+{const si=QZ.findIndex(x=>x[0]==='sex');QZ.splice(si+1,0,['look','Выбери оформление',[]])}
+const _skip74=_skip72;
+const _qr74=qRender;
+qRender=function(){const b=$('#qBody');
+ if(qi<0){_qr74.apply(this,arguments);const w=$('#qSw');if(w){const p=w.previousElementSibling;if(p&&p.tagName==='P')p.textContent='Несколько коротких вопросов, и план станет вашим. Сначала ответьте, кто вы, чтобы показать подходящие оформления.';w.remove()}return}
+ if(qi<QZ.length&&QZ[qi][0]==='look'){const man=qa.sex==='m';$('#qBar').style.width=((qi+1)/(QZ.length+1)*100)+'%';$('#qBack').hidden=false;
+  fitModes();try{const id=curMode();if(!MODES.some(m=>m.id===id))applyMode(man?'mstd':'modern')}catch(e){}
+  b.innerHTML=`<p class="m">Вопрос ${qi+1} из ${QZ.length}</p><div class="qt">Выбери оформление</div><p class="m">Листай карточки пальцем. ${man?'Эти оформления подобраны для мужчин.':'Эти оформления подобраны для женщин.'} Потом можно сменить в «Профиле».</p><div class="sw" id="qSw" style="margin:14px 0"></div><button class="btn" onclick="qNext()">Дальше</button>`;
+  try{renderTheme()}catch(e){}return}
+ _qr74.apply(this,arguments)};
+
+const TH_ALL=TH.slice();
+(function(){const f=fitModes;fitModes=function(){const r=f();const hide=isMan()?['cher','pow','wine']:[];const k=TH_ALL.filter(t=>!hide.includes(t[0]));if(k.length!==TH.length){TH.length=0;k.forEach(t=>TH.push(t))}return r}})();
 </script>
 </body>
 </html>
