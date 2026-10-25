@@ -2527,5 +2527,42 @@ document.head.insertAdjacentHTML('beforeend','<link rel="stylesheet" href="https
 '</style>');
 (function(){try{const d=document.documentElement;if(d.dataset.theme==='slate')d.dataset.mode='dark'}catch(e){}})();
 </script>
+<script>
+/* ===== v86: жидкое стекло для «Сланца» ===== */
+(function(){
+document.head.insertAdjacentHTML('beforeend','<style id="glass86">'+
+'#gbg86{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;display:none}'+
+'html[data-theme=slate] #gbg86{display:block}'+
+'#gbg86 i{position:absolute;border-radius:50%;filter:blur(40px);opacity:.6;will-change:transform}'+
+'html[data-theme=slate] :is(.card,nav,header){text-shadow:0 1px 2px rgba(30,45,47,.3)}html[data-theme=slate] .btn:not(.ghost),html[data-theme=slate] #toast{text-shadow:none}'+
+'#gbg86 i:nth-child(1){width:60vmax;height:60vmax;left:-20vmax;top:-18vmax;background:#a9c7c4;animation:gb1 22s ease-in-out infinite alternate}'+
+'#gbg86 i:nth-child(2){width:50vmax;height:50vmax;right:-18vmax;top:30vh;background:#b8b2d6;animation:gb2 26s ease-in-out infinite alternate}'+
+'#gbg86 i:nth-child(3){width:44vmax;height:44vmax;left:10vw;bottom:-20vmax;background:#e7efe9;opacity:.55;animation:gb3 30s ease-in-out infinite alternate}'+
+'@keyframes gb1{to{transform:translate(18vw,22vh) scale(1.15)}}@keyframes gb2{to{transform:translate(-22vw,-14vh) scale(.9)}}@keyframes gb3{to{transform:translate(16vw,-18vh) scale(1.1)}}'+
+'html[data-theme=slate] body{background:#5f7273!important}'+
+'html[data-theme=slate] .card{background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 55%,rgba(255,255,255,.1))!important;backdrop-filter:blur(22px) saturate(170%)!important;-webkit-backdrop-filter:blur(22px) saturate(170%)!important;border:1px solid rgba(255,255,255,.3)!important;border-radius:26px!important;box-shadow:inset 1.5px 1.5px 0 rgba(255,255,255,.55),inset -1px -1px 0 rgba(255,255,255,.14),inset 0 0 22px rgba(255,255,255,.08),0 24px 44px -22px rgba(18,30,32,.55)!important;overflow:hidden}'+
+'html[data-theme=slate] .card:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(220px circle at var(--mx,20%) var(--my,0%),rgba(255,255,255,.28),transparent 60%);opacity:.9;transition:opacity .3s;z-index:0}'+
+'html[data-theme=slate] .card>*{position:relative;z-index:1}'+
+'html[data-theme=slate] .card:after{z-index:2}'+
+'html[data-theme=slate] :is(.stats div,.tile,.chip2,.hb,.qo,.res,.lf li,.tabs2,.mood button,.ndg){background:linear-gradient(160deg,rgba(255,255,255,.18),rgba(255,255,255,.04))!important;backdrop-filter:blur(14px) saturate(160%)!important;-webkit-backdrop-filter:blur(14px) saturate(160%)!important;border:1px solid rgba(255,255,255,.28)!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.5),inset -1px -1px 0 rgba(255,255,255,.1)!important;border-radius:18px!important}'+
+'html[data-theme=slate] :is(input,select,textarea){background:rgba(30,45,47,.18)!important;border:1px solid rgba(255,255,255,.26)!important;box-shadow:inset 0 2px 6px rgba(0,0,0,.12),inset 0 -1px 0 rgba(255,255,255,.18)!important;border-radius:16px!important}'+
+'html[data-theme=slate] .btn:not(.ghost){background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(236,242,241,.82))!important;box-shadow:inset 0 1px 0 #fff,0 10px 24px -10px rgba(18,30,32,.5)!important;border-radius:999px!important}'+
+'html[data-theme=slate] .btn.ghost{background:rgba(255,255,255,.1)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;border-radius:999px!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.45)!important}'+
+'html[data-theme=slate] header{background:rgba(95,114,115,.35)!important;backdrop-filter:blur(24px) saturate(180%)!important;-webkit-backdrop-filter:blur(24px) saturate(180%)!important;border-bottom:1px solid rgba(255,255,255,.22)!important}'+
+'html[data-theme=slate] nav{left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;padding:8px 0!important;border-radius:30px!important;background:linear-gradient(135deg,rgba(255,255,255,.24),rgba(255,255,255,.08))!important;backdrop-filter:blur(26px) saturate(190%)!important;-webkit-backdrop-filter:blur(26px) saturate(190%)!important;border:1px solid rgba(255,255,255,.34)!important;box-shadow:inset 1.5px 1.5px 0 rgba(255,255,255,.6),inset -1px -1px 0 rgba(255,255,255,.15),0 18px 36px -14px rgba(18,30,32,.6)!important}'+
+'html[data-theme=slate] nav button.on{background:rgba(255,255,255,.2)!important;border-radius:22px;box-shadow:inset 1px 1px 0 rgba(255,255,255,.55)}'+
+'html[data-theme=slate] nav .fab{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),rgba(255,255,255,.12) 60%)!important;backdrop-filter:blur(18px) saturate(180%)!important;-webkit-backdrop-filter:blur(18px) saturate(180%)!important;border:1px solid rgba(255,255,255,.6)!important;box-shadow:inset 0 1px 0 #fff,0 14px 28px -10px rgba(18,30,32,.6)!important}'+
+'html[data-theme=slate] #toast{background:rgba(255,255,255,.75)!important;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);box-shadow:inset 0 1px 0 #fff,0 12px 28px -12px rgba(18,30,32,.6)}'+
+'html[data-theme=slate] .card.sheen:before{animation:sh86 1.4s ease-out}'+
+'@keyframes sh86{from{background-position:0 0;opacity:0}30%{opacity:1}}'+
+'@media (prefers-reduced-motion:reduce){#gbg86 i{animation:none}}'+
+'@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){html[data-theme=slate] .card{background:rgba(120,140,141,.92)!important}}'+
+'</style>');
+const bg=document.createElement('div');bg.id='gbg86';bg.innerHTML='<i></i><i></i><i></i>';document.body.prepend(bg);
+function light(e){const t=e.touches?e.touches[0]:e;const c=t&&document.elementFromPoint(t.clientX,t.clientY);const card=c&&c.closest&&c.closest('.card');if(!card)return;const r=card.getBoundingClientRect();card.style.setProperty('--mx',(t.clientX-r.left)+'px');card.style.setProperty('--my',(t.clientY-r.top)+'px')}
+addEventListener('pointermove',light,{passive:true});addEventListener('touchmove',light,{passive:true});addEventListener('pointerdown',light,{passive:true});
+let raf=0;addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(document.documentElement.dataset.theme!=='slate')return;document.querySelectorAll('.tab.on>.card').forEach(c=>{const r=c.getBoundingClientRect();const k=Math.max(0,Math.min(1,r.top/innerHeight));c.style.setProperty('--mx',(20+60*k)+'%');c.style.setProperty('--my',(k*40)+'%')})})},{passive:true});
+})();
+</script>
 </body>
 </html>
