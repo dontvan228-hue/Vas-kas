@@ -18,10 +18,16 @@
  const _qb94=qBack;qBack=function(){try{if(jumpFrom!=null&&qi>=QZ.length){qi=jumpFrom;jumpFrom=null;qRender();return}}catch(e){}return _qb94.apply(this,arguments)};
  const _sq94=startQuiz;startQuiz=function(){jumpFrom=null;return _sq94.apply(this,arguments)};
  const _qr94=qRender;qRender=function(){const r=_qr94.apply(this,arguments);try{
-  if(qi<0||qi>=QZ.length)return r;const key=QZ[qi][0];if(!(key in OPT))return r;
+  if(qi<0||qi>=QZ.length)return r;
+  /* нумерация «из N» не растёт по ходу анкеты: пока ответа нет, считаем ветку показанной */
+  {const may=i=>{const k=QZ[i][0];if(k==='life')return !qa.sex||qa.sex==='f';if(k==='gwhy'||k==='ghow')return !qa.goal||qa.goal==='gain';return true};
+   const opt=(QZ[qi][0] in OPT),v=[];for(let i=0;i<QZ.length;i++)if((i===qi||may(i))&&((QZ[i][0] in OPT)===opt))v.push(i);
+   const k=v.indexOf(qi),pm=$q('#qBody>p.m');
+   if(k>-1&&pm&&/^Вопрос \d+ из \d+$/.test(pm.textContent)){pm.textContent=opt?`Дополнительно: ${k+1} из ${v.length}`:`Вопрос ${k+1} из ${v.length}`;const bar=$q('#qBar');if(bar)bar.style.width=(opt?75+20*(k+1)/v.length:75*(k+1)/v.length)+'%'}}
+  const key=QZ[qi][0];if(!(key in OPT))return r;
   const b=$q('#qBody');if(!b||b.querySelector('.q94skip'))return r;
   let left=0;for(let i=qi;i<QZ.length;i++)if(QZ[i][0] in OPT&&!hidden(i))left++;
-  const p=b.querySelector('p.m');if(p&&/^Вопрос \d+ из \d+$/.test(p.textContent))p.textContent+=' · можно пропустить';
+  const p=b.querySelector('p.m');if(p&&/^Дополнительно: \d+ из \d+$/.test(p.textContent))p.textContent+=' · можно пропустить';
   b.insertAdjacentHTML('beforeend',`<button type="button" class="btn ghost q94skip" style="margin-top:12px" onclick="qLater()">Пропустить, заполню потом</button><p class="m q94note" style="text-align:center;font-size:13px;margin-top:6px">${left>1?'Осталось '+left+' необязательных вопросов: их можно заполнить позже в «Профиле».':'Это необязательный вопрос.'}</p>`)}catch(e){}return r};
  /* если в анкете что-то пропущено, сводка не должна показывать «undefined» */
  const _qs94=qSummary;qSummary=function(){try{for(const k in OPT)if(qa[k]==null){qa[k]=OPT[k];(qa.later||(qa.later=[])).push(k)}}catch(e){}return _qs94.apply(this,arguments)};
@@ -75,6 +81,7 @@
   if(q.health==='preg'&&q.goal!=='gain'){[...pc.options].forEach(o=>{if(o.value!=='.25'&&o.value!=='0')o.remove()});pc.value=q.goal==='keep'?'0':'.25'}
   else if((q.goal==='keep'||q.goal==='aware')&&q.goal!=='gain'&&[...pc.options].some(o=>o.value==='0'))pc.value='0';
   if(q.goal==='keep'||q.goal==='aware')$q('#oT').value=$q('#oW').value;
+  else if(q.goal==='gain'){const w=+$q('#oW').value||60;if(!(+$q('#oT').value>w))$q('#oT').value=Math.round(w+3)}
   if(!$q('#oCare'))pc.insertAdjacentHTML('afterend','<p class="m" id="oCare" style="margin-top:8px">Цель и темп можно изменить позже. Это ориентир, а не медицинская рекомендация.</p>');
  }
  function onShow(){try{layout();const u=U(),q=(u&&u.quiz)||{},fresh=u&&!u.p;
@@ -86,6 +93,7 @@
  /* qFinish заполняет поля после show('onb'): обновим подсказки ещё раз */
  const _qf94=qFinish;qFinish=function(){const r=_qf94.apply(this,arguments);try{const u=U();ageMid=qa.age&&AMID[qa.age]?{k:qa.age,v:AMID[qa.age]}:null;whoUpd();goalUpd()}catch(e){}return r};
  /* точный возраст обновляет диапазон в анкете, чтобы подростковые подсказки совпадали */
- const _sp94=saveProfile;saveProfile=function(){try{const u=U(),a=+$q('#oAge').value;if(u&&u.quiz&&a>0)u.quiz.age=AGEK(a);const gs=$q('#oGoalSel');if(gs&&gs.value==='keep')$q('#oT').value=$q('#oW').value}catch(e){}return _sp94.apply(this,arguments)};
+ const _sp94=saveProfile;saveProfile=function(){try{const u=U(),a=+$q('#oAge').value;if(u&&u.quiz&&a>0)u.quiz.age=AGEK(a);const gs=$q('#oGoalSel');if(gs&&gs.value==='keep')$q('#oT').value=$q('#oW').value;
+  if(gs&&gs.value==='lose'&&+$q('#oT').value>+$q('#oW').value){const e=$q('#oErr');if(e)e.textContent='Для снижения веса желаемый вес должен быть меньше текущего. Если хотите просто держать вес, выберите «Удержать вес».';return}}catch(e){}return _sp94.apply(this,arguments)};
  try{const o=$q('#onb');if(o&&!o.hidden)onShow()}catch(e){}
 })();

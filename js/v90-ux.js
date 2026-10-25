@@ -30,7 +30,11 @@ function wrapDays(u){if(!u||!u.days||u.days[RAW])return;const raw=u.days;
 function unwrapDays(u){if(u&&u.days&&u.days[RAW])u.days=u.days[RAW]}
 function cdEnsure(){try{const u=U();if(!u)return;if(curDay&&curDay!==today())wrapDays(u);else{curDay=null;unwrapDays(u)}}catch(e){}}
 function cdOpen(ds){try{if(!okUser())return;const t=today();if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)||ds>t)return toast('Будущие дни открыть нельзя');
- curDay=ds===t?null:ds;cdEnsure();render();if(curDay)toast('Открыт '+fmtDay(ds)+'. Можно добавить или удалить еду и воду')}catch(e){}}
+ curDay=ds===t?null:ds;cdEnsure();
+ if(curDay){/* самопроверка: если подмена в этом браузере не сработала, не показываем чужой день под видом сегодняшнего */
+  let ok=false;try{const u=U(),raw=u.days[RAW]||u.days;if(!raw[curDay])raw[curDay]={food:[],water:0};ok=day()===raw[curDay]}catch(e){}
+  if(!ok){curDay=null;cdEnsure();toast('Просмотр прошлых дней не поддерживается в этом браузере')}}
+ render()}catch(e){}}
 function cdBack(){curDay=null;cdEnsure();try{render()}catch(e){}}
 window.cd90Open=cdOpen;window.cd90Back=cdBack;
 window.cd90Day=()=>curDay;
@@ -74,7 +78,7 @@ function qaDraw(){const B=document.getElementById('qa90B');if(!B||!okUser())retu
   if(fv.length){h+='<p class="qa90s">Избранное</p>'+fv.map(x=>{qaList.push({t:'e',o:x});return row('l',qaList.length-1,x.n,x.k+' ккал','＋')}).join('')}
   if(!rc.length&&!fv.length)h+='<p class="m qa90e">Начните вводить название. Нажмите «＋», чтобы сразу записать обычную порцию, или на название, чтобы выбрать граммы.</p>'}
  else{let res=[];try{res=srch(q).slice(0,30)}catch(e){}
-  h+=res.length?'<p class="qa90s">Найдено</p>'+res.map(r=>{qaList.push({t:'r',o:r});const d=defG(r);return row('l',qaList.length-1,(r.my?'⭐ ':'')+r.n,`${Math.round(r.k)} ккал на 100 г`+(d.l?` · ＋ = ${esc(d.l)}, ${d.g} г`:` · ＋ = ${d.g} г`),'＋')}).join('')
+  h+=res.length?'<p class="qa90s">Найдено</p>'+res.map(r=>{qaList.push({t:'r',o:r});const d=defG(r);return row('l',qaList.length-1,(r.my?'⭐ ':'')+r.n,`${Math.round(r.k)} ккал/100 г · ＋ ${d.l&&d.l!=='порция'?esc(d.l)+', ':''}${d.g} г`,'＋')}).join('')
    :`<p class="m qa90e">Ничего не нашлось. Попробуйте другое слово или <button type="button" class="qa90lnk" onclick="qa90Close();go('carb',document.querySelector('nav button:nth-child(2)'))">добавьте свой продукт</button>.</p>`}
  B.innerHTML=h}
 function addEntry(o){const c=Object.assign({},o);c.m=qaMeal;delete c.t;addMacroFood(c)}
@@ -85,12 +89,12 @@ window.qa90Pick=(kind,i)=>{try{const it=qaList[i];if(!it)return;if(it.t==='e'){a
  RES=[Object.assign({},it.o)];openSheet(0);shM=qaMeal;drawMeals()}catch(e){toast('Не получилось открыть продукт')}};
 function vvFit(){const p=document.getElementById('qa90');if(!p||!qaOpenF)return;const vv=window.visualViewport;
  const ih=window.innerHeight,vh=vv?vv.height:ih,top=vv?vv.offsetTop:0,kb=Math.max(0,ih-(vh+top));
- p.style.bottom=kb+'px';p.style.maxHeight=Math.max(240,vh-Math.max(12,top>0?8:24))+'px'}
+ const H=Math.max(240,Math.min(640,vh-24));p.style.bottom=kb+'px';p.style.maxHeight=H+'px';p.style.height=H+'px'}
 function qaOpen(){if(!okUser())return;const p=qaEl();qaMeal=mealNow();document.getElementById('qa90Q').value='';qaOpenF=true;qaDraw();vvFit();
  document.getElementById('qa90bk').classList.add('on');p.classList.add('on');document.documentElement.classList.add('qa90lock');
  try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}
  const q=document.getElementById('qa90Q');try{q.focus({preventScroll:true})}catch(e){q.focus()}}
-function qaClose(){qaOpenF=false;const p=document.getElementById('qa90');if(p){p.classList.remove('on');p.style.bottom='';}const b=document.getElementById('qa90bk');if(b)b.classList.remove('on');
+function qaClose(){qaOpenF=false;const p=document.getElementById('qa90');if(p){p.classList.remove('on');p.style.bottom='';p.style.height=''}const b=document.getElementById('qa90bk');if(b)b.classList.remove('on');
  document.documentElement.classList.remove('qa90lock');const q=document.getElementById('qa90Q');if(q)q.blur()}
 window.qa90Open=qaOpen;window.qa90Close=qaClose;
 if(window.visualViewport){visualViewport.addEventListener('resize',vvFit);visualViewport.addEventListener('scroll',vvFit)}
@@ -108,7 +112,7 @@ const lit=n=>String(Math.round(n*25)/100).replace('.',',');
 function waterCard(){const c=document.getElementById('tdWater');if(!c||!okUser())return;const d=day(),w=+d.water||0;
  const h=c.querySelector('h2');if(h)h.textContent='Вода';
  let s=document.getElementById('wt90');if(!s){s=document.createElement('div');s.id='wt90';const g=document.getElementById('glasses');g.parentNode.insertBefore(s,g)}
- s.innerHTML=`<span><b>${w}</b> из 8 стаканов · ${lit(w)} л</span><span class="wt90b"><button type="button" aria-label="Минус стакан" ${w?'':'disabled'} onclick="setWater(${w})">−</button><button type="button" aria-label="Плюс стакан" onclick="setWater(${w+1})">＋</button></span>`;
+ s.innerHTML=`<span><b>${w}</b> из 8 стаканов<br><small>${lit(w)} л из 2 л</small></span><span class="wt90b"><button type="button" aria-label="Минус стакан" ${w?'':'disabled'} onclick="setWater(${w})">−</button><button type="button" aria-label="Плюс стакан" onclick="setWater(${w+1})">＋</button></span>`;
  /* «−»: setWater(n) при n===water ставит n-1, поэтому передаём текущее значение */
  const sw=document.getElementById('sW');if(sw){sw.textContent=w+'/8';const box=sw.parentNode;if(box&&!box.dataset.wt90){box.dataset.wt90=1;box.style.cursor='pointer';box.setAttribute('role','button');box.setAttribute('aria-label','Перейти к воде');box.addEventListener('click',()=>{const t=document.getElementById('tdWater');if(t)t.scrollIntoView({behavior:'smooth',block:'center'})})}}
  const slider=document.getElementById('nwt87');if(slider)slider.hidden=true}
@@ -140,8 +144,8 @@ document.head.insertAdjacentHTML('beforeend','<style id="v90ux">'+
  '.qa90p{flex:none;align-self:stretch;min-width:52px;border:0;border-left:1px solid var(--line);background:rgba(var(--acc),.16);color:var(--txt);font-size:22px;border-radius:0 14px 14px 0;cursor:pointer}'+
  '.qa90e{margin-top:12px}.qa90lnk{background:none;border:0;padding:0;color:rgb(var(--acc));font:inherit;text-decoration:underline;cursor:pointer}'+
  'html.qa90lock,html.qa90lock body{overflow:hidden}'+
- '#cd90{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:10px 14px;border-radius:16px;background:rgb(var(--acc));color:var(--on,#111);font-size:14px;box-shadow:0 8px 20px rgba(0,0,0,.25)}#cd90[hidden]{display:none}'+
- '#cd90 button{background:rgba(0,0,0,.18);color:inherit;border:0;border-radius:12px;padding:8px 12px;min-height:40px;font:inherit;font-weight:700;cursor:pointer}'+
+ '#cd90{position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;box-sizing:border-box;padding:10px 14px;border-radius:16px;background:rgb(var(--acc));color:var(--on,#111);font-size:14px;box-shadow:0 8px 20px rgba(0,0,0,.25)}#cd90[hidden]{display:none}'+
+ '.tab.on{scroll-padding-bottom:160px}#cd90 button{background:rgba(0,0,0,.18);color:inherit;border:0;border-radius:12px;padding:8px 12px;min-height:40px;font:inherit;font-weight:700;cursor:pointer}'+
  '#wk>div{cursor:pointer;-webkit-tap-highlight-color:transparent}#wk>div.sel90{outline:2px solid rgb(var(--acc));outline-offset:2px;border-radius:12px}'+
  '#wt90{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;font-size:14px}#wt90 b{font-size:20px}'+
  '.wt90b{display:flex;gap:8px}.wt90b button{min-width:44px;min-height:44px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);font-size:20px;cursor:pointer}.wt90b button:disabled{opacity:.4}'+
