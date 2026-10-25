@@ -268,17 +268,17 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
 <noscript><main style="padding:24px;font:16px/1.5 sans-serif"><h1>VASSKASS • FLOW — счётчик калорий и трекер питания</h1><p>Бесплатное приложение для питания и привычек: подсчёт калорий и БЖУ, дневник питания, трекер воды и веса, интервальное голодание, расчёт нормы калорий и виртуальная героиня, которая мотивирует не срываться. Работает в браузере и устанавливается на экран телефона, без VPN. Включите JavaScript, чтобы открыть приложение.</p></main></noscript>
 
 
-<div id="splash"><div class="lg">VASSKASS</div><div class="q">«Ты с каждым днём будешь прекраснее, чем вчера»</div><i></i></div>
+<div id="splash"><div class="lg">VASSKASS</div><div class="q">Каждый день — маленький шаг</div><i></i></div>
 
 <main class="scr" id="auth" hidden><div class="card">
   <div class="brand">VASSKASS • FLOW</div>
-  <h1 class="lh">Счётчик калорий и трекер питания бесплатно</h1>
+  <h1 class="lh">Бесплатный счётчик калорий и трекер питания</h1>
   <p class="m" style="text-align:center;margin-top:6px">Помощник для спокойного похудения, набора веса или просто для себя</p>
   <ul class="lf">
-    <li><b>Калории и БЖУ.</b> Выбираешь продукт, вводишь вес, остальное приложение считает само.</li>
+    <li><b>Калории и БЖУ.</b> Выберите продукт и вес, остальное приложение посчитает само.</li>
     <li><b>Всё в одном месте.</b> Вода, вес, сон и интервальное голодание.</li>
     <li><b>Мягкий темп.</b> От 0,25 кг в неделю или поддержание без дефицита.</li>
-    <li><b>Без рекламы и VPN.</b> Работает в браузере и ставится на экран телефона.</li>
+    <li><b>Без рекламы и подписок.</b> Работает в браузере, можно добавить на экран телефона.</li>
   </ul>
   <div class="tabs2"><button id="tLogin" class="on" onclick="authMode('login')">Вход</button><button id="tReg" onclick="authMode('reg')">Регистрация</button></div>
   <div id="fName" hidden><label>Имя</label><input id="aName" autocomplete="given-name"></div>
@@ -329,7 +329,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
     <input id="fN" placeholder="Найти: гречка, борщ, банан…" oninput="homeSearch()" autocomplete="off">
     <datalist id="fl"></datalist><div id="fRes"></div>
     <div class="row"><div><label>Или своё блюдо: всего ккал</label><input id="fK" type="number" inputmode="numeric" placeholder="например, 350"></div><button class="btn sm" onclick="addFood()">＋</button></div>
-    <p class="m" style="margin-top:8px;font-size:11px">Выбери продукт и укажи вес, приложение посчитает калории, белки, жиры и углеводы. Ещё продукты (можно вписать цифры штрихкода) и свои рецепты — на вкладке «Макро».</p>
+    <p class="m" style="margin-top:8px;font-size:11px">Выберите продукт и укажите вес, приложение посчитает калории, белки, жиры и углеводы. Ещё продукты (можно вписать цифры штрихкода) и свои рецепты — на вкладке «Макро».</p>
   </div>
   <div class="card" id="tdBzu"><h2>БЖУ за сегодня</h2><div id="bzu"></div></div>
   <div class="card" id="tdEaten"><h2>Сегодня съедено</h2><div id="foodList"></div></div>
@@ -345,7 +345,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
   <div class="card"><h2>Достижения</h2><div class="bds" id="badges"></div></div>
   <div class="card"><h2>Динамика веса</h2><div id="chart"></div><div class="stats" style="margin-top:12px"><div>Сейчас<b id="wNow">–</b></div><div>Изменение<b id="wDiff">–</b></div><div>До цели<b id="wLeft">–</b></div></div></div>
   <div class="card"><h2>Записать вес</h2><div class="row"><div><input id="wIn" type="number" step=".1" inputmode="decimal" placeholder="кг"></div><button class="btn sm" onclick="addWeight()">Сохранить</button></div><p class="m" style="margin-top:10px">Лучше взвешиваться утром, раз в 2–3 дня: вес колеблется на 1–2 кг из-за воды и это нормально.</p></div>
-  <div class="card"><h2>Самообучающаяся модель</h2><p class="m" id="aiNote"></p></div>
+  <div class="card"><h2>Точная норма калорий</h2><p class="m" id="aiNote"></p></div>
 </section>
 
 <section class="tab" id="t-photo"><button class="btn ghost" style="margin:0 0 14px" onclick="go('weight',document.querySelector('nav button:nth-child(4)'))">← Прогресс</button><div class="card"><h2>Фото-прогресс</h2><p class="m">Снимайте в одном месте, при одинаковом свете и в одной позе раз в 2–4 недели. Фото хранятся только на вашем устройстве, приложение их не оценивает: сравниваете себя вы сами.</p><label class="btn" style="display:block;text-align:center;font-size:15px;color:var(--on);margin-top:14px">📷 Добавить фото<input type="file" accept="image/*" hidden onchange="addPhoto(this)"></label><div id="phCmp"></div><div class="ph" id="phGrid"></div></div>
@@ -410,7 +410,7 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
  <div class="card"><h2>Вместе к цели</h2><div id="cbJourney"></div></div>
  <div class="card"><h2>Задания дня</h2><p class="m" id="cbCoins"></p><div id="cbQuests"></div></div>
  <div class="card"><h2>Фон сцены</h2><div class="scn" id="cbScn"></div></div>
- <div class="card"><h2>Что героиня съела сегодня</h2><div id="cbEaten"></div></div>
+ <div class="card"><h2>Сегодня в меню героини</h2><div id="cbEaten"></div></div>
  <div class="card"><h2>Настройки</h2><div id="cbSet"></div></div>
 </div>
 </section>
@@ -551,7 +551,7 @@ function renderWeight(p){
     $('#chart').innerHTML=`<svg viewBox="0 0 300 120" width="100%" role="img" aria-label="График веса"><line x1="10" x2="290" y1="${sy(t)}" y2="${sy(t)}" style="stroke:var(--lime)" stroke-dasharray="4 4" opacity=".6"/><polyline fill="none" style="stroke:var(--lime)" stroke-width="2.5" stroke-linejoin="round" points="${ws.map(x=>sx(x.d)+','+sy(x.w)).join(' ')}"/>${ws.map(x=>`<circle cx="${sx(x.d)}" cy="${sy(x.w)}" r="3.5" fill="#fbf3ef"/>`).join('')}</svg><p class="m" style="font-size:11px">Пунктир — ваша цель</p>`;
   }
   const wk=p.left>0&&p.rate>0?Math.ceil(p.left/p.rate):0;
-  let s=u.adapt?`Модель сверила ваши записи еды и веса и уточнила расход энергии: ≈${p.tdee} ккал в день (по формуле было бы ${p.formula}). Лимит пересчитан под вас.`:'Ведите дневник еды и записывайте вес хотя бы 2 недели. Тогда модель научится на ваших данных и подстроит калории под ваш реальный обмен веществ.';
+  let s=u.adapt?`Модель сверила ваши записи еды и веса и уточнила расход энергии: ≈${p.tdee} ккал в день (по формуле было бы ${p.formula}). Лимит пересчитан под вас.`:'Записывайте еду и вес хотя бы 2 недели. Тогда приложение пересчитает норму калорий по вашим реальным данным.';
   s+=wk?`\n\nПрогноз при текущем темпе: цель примерно через ${wk} нед.`:p.left===0?'\n\nЦель достигнута. Поздравляем! Дальше важно удерживать вес.':'';
   $('#aiNote').style.whiteSpace='pre-line';$('#aiNote').textContent=s;
 }
@@ -745,11 +745,11 @@ function qPick(i){if(qLock)return;qLock=1;const q=QZ[qi];qa[q[0]]=q[2][i][2];hap
 function qNext(){qi++;qRender();window.scrollTo(0,0)}
 function qBack(){if(qi>-1){qi--;qRender()}}
 const GN={gain:'Набрать вес',lose:'Снизить вес',keep:'Удержать вес',tone:'Подтянуть фигуру',aware:'Осознанное питание'},HT={sweet:'Тягу к сладкому гасим белком и кнопкой «Тяга — SOS».',night:'Вечерний голод: оставьте часть калорий на ужин и держите под рукой «Что съесть?».',guilt:'Срывы — часть пути. Приложение не стыдит: просто возвращаемся к плану.',time:'Нет времени: «Избранное» и «Повторить вчерашний день» записывают еду за секунды.',choice:'Не знаете, что выбрать: «Что съесть?» подскажет под ваш остаток.'};
-function qSummary(){const a=qa,care=['preg','ed'].includes(a.health);$('#qBody').innerHTML=`<div class="qt">Ваш профиль готов</div><div class="item"><span>🎯 Цель</span><b>${GN[a.goal]}</b></div><div class="item"><span>🥑 Углеводы</span><b>${a.diet==='lc'?'до 30 г чистых':'до 100 г чистых'}</b></div><div class="item"><span>🔔 Напоминания</span><b>${a.rem==='off'?'выключены':'включены'}</b></div><p class="m" style="margin:12px 0">${HT[a.hard]}</p>${a.water==='0'?'<p class="m">💧 Начнём с малого: плюс один стакан воды в день.</p>':''}${a.sleep==='0'?'<p class="m">😴 Сон меньше 6 часов повышает аппетит — отмечайте его во вкладке «Сегодня».</p>':''}${care?'<p class="m" style="color:var(--warn);margin-top:8px">Беременность, кормление или расстройство питания в прошлом: темп и цель выбираешь сам, но план снижения веса лучше согласовать с врачом.</p>':a.health==='dia'?'<p class="m" style="color:var(--warn);margin-top:8px">Диабет: питание и лекарства меняйте только вместе с врачом.</p>':''}<button class="btn" onclick="qFinish()">Рассчитать мой план</button>`}
+function qSummary(){const a=qa,care=['preg','ed'].includes(a.health);$('#qBody').innerHTML=`<div class="qt">Ваш профиль готов</div><div class="item"><span>🎯 Цель</span><b>${GN[a.goal]}</b></div><div class="item"><span>🥑 Углеводы</span><b>${a.diet==='lc'?'до 30 г чистых':'до 100 г чистых'}</b></div><div class="item"><span>🔔 Напоминания</span><b>${a.rem==='off'?'выключены':'включены'}</b></div><p class="m" style="margin:12px 0">${HT[a.hard]}</p>${a.water==='0'?'<p class="m">💧 Начнём с малого: плюс один стакан воды в день.</p>':''}${a.sleep==='0'?'<p class="m">😴 Сон меньше 6 часов повышает аппетит — отмечайте его во вкладке «Сегодня».</p>':''}${care?'<p class="m" style="color:var(--warn);margin-top:8px">Беременность, кормление или расстройство питания в прошлом: темп и цель вы выбираете сами, но план снижения веса лучше согласовать с врачом.</p>':a.health==='dia'?'<p class="m" style="color:var(--warn);margin-top:8px">Диабет: питание и лекарства меняйте только вместе с врачом.</p>':''}<button class="btn" onclick="qFinish()">Рассчитать мой план</button>`}
 function qFinish(){const u=U(),a=qa,r=a.rem,n=NT();u.quiz=a;u.mg={net:a.diet==='lc'?30:0,v:1};n.on=r!=='off';n.meals=r==='mv'||r==='meals';n.water=r!=='off';n.weigh=r==='wv'||r==='mv';n.eve=r==='mv';n.fast=a.diet==='if';save();show('onb');
   const pc=$('#oPace'),care=['preg','ed'].includes(a.health);$('#oAct').value=a.act;if(a.goal==='keep'){$('#oT').value=$('#oW').value;pc.value='0'}
   if(a.health==='preg'){[...pc.options].forEach(o=>{if(o.value!=='.25'&&o.value!=='0')o.remove()});pc.value=a.goal==='keep'?'0':'.25'}
-  if(!$('#oCare'))pc.insertAdjacentHTML('afterend','<p class="m" id="oCare" style="margin-top:8px">Цель и темп можно изменить позже. Это ориентир, а не медицинская рекомендация.</p>')}
+  if(!$('#oCare'))pc.insertAdjacentHTML('afterend','<p class="m" id="oCare" style="margin-top:8px">Цель и темп можно изменить позже.</p>')}
 /* notifications */
 const NT=()=>{const u=U();return u.nt||(u.nt={on:false,water:true,meals:true,weigh:true,fast:true,eve:true,b:'08:30',l:'13:00',d:'19:00',we:2,wd:1})};
 const hhmm=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
@@ -783,7 +783,7 @@ function whatToEat(){const p=plan(),d=day(),m=macros(d),remK=p.b-eaten(d),remN=M
   if(remK<80)return openPop('План на сегодня выполнен','<p class="m">Калории на сегодня набраны. Если хочется есть: вода, чай, огурец или листовой салат.</p>');
   const tgt=Math.min(450,Math.max(120,remK*.4));
   WT=LC.filter(x=>x[1]>20).map(x=>{const g=Math.max(30,Math.min(300,Math.round(tgt/x[1]*10)*10)),k=x[1]*g/100,net=Math.max(0,x[2]-x[3])*g/100,pr=x[4]*g/100;return{x,g,k,net,pr,sc:(remP>0?pr*2:0)-net*(remN<10?4:1)}}).filter(r=>r.net<=Math.max(remN,3)&&r.k<=remK).sort((a,b)=>b.sc-a.sc).slice(0,5);
-  openPop('Что съесть сейчас?',`<p class="m">Осталось: ${remK} ккал · углеводы ${n1(remN)} г · белок ${remP} г. Подобрал то, что вписывается в ваш остаток.</p>`+(WT.length?WT.map((r,i)=>`<div class="res" onclick="addWT(${i})"><span>${r.x[0]}, ${r.g} г<br><small>${Math.round(r.k)} ккал · Н ${n1(r.net)} · Б ${n1(r.pr)}</small></span><i>+</i></div>`).join(''):'<p class="m">Под остаток ничего не подошло: попробуйте овощи или воду.</p>'))}
+  openPop('Что съесть сейчас?',`<p class="m">Осталось: ${remK} ккал · углеводы ${n1(remN)} г · белок ${remP} г. Вот что впишется в ваш остаток.</p>`+(WT.length?WT.map((r,i)=>`<div class="res" onclick="addWT(${i})"><span>${r.x[0]}, ${r.g} г<br><small>${Math.round(r.k)} ккал · Н ${n1(r.net)} · Б ${n1(r.pr)}</small></span><i>+</i></div>`).join(''):'<p class="m">Под остаток ничего не подошло: попробуйте овощи или воду.</p>'))}
 function addWT(i){const r=WT[i],x=r.x,f=r.g/100,h=new Date().getHours();closeSheet();addMacroFood({n:`${x[0]}, ${r.g} г`,k:Math.round(r.k),c:n1(x[2]*f),fi:n1(x[3]*f),p:n1(x[4]*f),f:n1(x[5]*f),m:h<11?'Завтрак':h<16?'Обед':h<21?'Ужин':'Перекус'})}
 function sos(){let s=120;openPop('Тяга пройдёт за пару минут','<div class="brw" id="brw">Приготовьтесь</div><p class="m" id="brT" style="text-align:center">Дышите вместе с кругом. Тяга — это волна: она поднимается, достигает пика и спадает.</p><div class="stats" style="margin-top:12px"><div>Осталось<b id="brS">2:00</b></div></div>');
   setTimeout(()=>{const e=$('#brw');if(e){e.textContent='Вдох';e.style.transform='scale(1.35)'}},150);clearInterval(sosT);
@@ -860,7 +860,7 @@ function cbDrinkEv(){const c=CB(),d=day();cbDrink(18);d.wc=d.wc||0;if(d.wc<8){d.
 const _am3=addMacroFood;addMacroFood=function(o){_am3(o);cbEat(o)};
 const _af=addFood;addFood=function(){const n=day().food.length;_af();const d=day();if(d.food.length>n)cbEat(d.food[d.food.length-1])};
 const _sw3=setWater;setWater=function(n){const w=day().water;_sw3(n);if(day().water>w)cbDrinkEv()};
-const _tk=tick;tick=function(){_tk();if(!me||!U()||!U().p||!NT().on)return;const h=new Date().getHours();if(h<8||h>22)return;if(cbSat()<28)fire('cs'+Math.floor(h/3),'Чиби проголодался','Запишите еду: ему тоже нужно подкрепиться');if(cbWat()<28)fire('cw'+Math.floor(h/2),'Чиби хочет пить','Выпейте стакан воды вместе с ним')};
+const _tk=tick;tick=function(){_tk();if(!me||!U()||!U().p||!NT().on)return;const h=new Date().getHours();if(h<8||h>22)return;if(cbSat()<28)fire('cs'+Math.floor(h/3),'🍽 Пора подкрепиться','Запишите приём пищи: герой поест вместе с вами');if(cbWat()<28)fire('cw'+Math.floor(h/2),'💧 Пора попить','Выпейте стакан воды: герой выпьет вместе с вами')};
 setInterval(tick,20000);
 /* tiles */
 function renderTiles(){const e=$('#tiles');if(!e||!U()||!U().p)return;const d=day(),f=U().fast,qd=QS.filter(q=>q[3](d)).length,mins=(d.ex||[]).reduce((a,x)=>a+x.m,0);
@@ -927,14 +927,14 @@ const cbNeed=()=>{const s=cbSat(),w=cbWat();return s<=w?['food',s]:['water',w]};
 cbMood=function(){if(CBA.until>Date.now()&&CBA.m)return CBA.m;const v=cbNeed()[1],h=new Date().getHours();if(v<15)return CB().strict===false?'sad':'angry';if(v<35)return'sad';if(h>=23||h<6)return'sleepy';return'happy'};
 cbSay=function(){if(CBA.until>Date.now()&&CBA.say)return CBA.say;const m=cbMood(),k=cbNeed()[0];return m==='angry'?(k==='food'?'😤 Где еда?!':'😤 Где вода?!'):m==='sad'?(k==='food'?'🍽 Хочу есть':'💧 Хочу пить'):m==='sleepy'?'😴 Zzz':''};
 function cbMsgText(){if(CBA.until>Date.now()&&CBA.msg)return CBA.msg;const m=cbMood(),k=cbNeed()[0],c=CB(),hf=Math.round(awakeH(c.sat.t)),hw=Math.round(awakeH(c.wat.t));
- if(m==='angry')return k==='food'?`😤 Я голодный и очень злой! Ты не кормил меня уже ${hf} ч. Запиши, что съел, и я поем то же самое.`:`😤 Мне нечего пить, и я зол! Ты не поил меня уже ${hw} ч. Выпей воды, и я выпью вместе с тобой.`;
- if(m==='sad')return k==='food'?`😢 Мне грустно: я давно не ел (${hf} ч). Запиши свой приём пищи.`:`😢 Мне грустно: хочется пить (${hw} ч без воды). Налей мне стакан.`;
- if(m==='sleepy')return'😴 Чиби спит. Ночью еда и вода не убывают.';return'💚 Мы одна команда: что ты ешь и пьёшь, то ем и пью я.'}
+ if(m==='angry')return k==='food'?`🍽 Пора подкрепиться: еды не было уже ${hf} ч. Запиши приём пищи, и я поем вместе с тобой.`:`💧 Пора попить: воды не было уже ${hw} ч. Выпей стакан, и я выпью вместе с тобой.`;
+ if(m==='sad')return k==='food'?`🍽 Давно не было еды (${hf} ч). Запишем приём пищи?`:`💧 Хочется пить (${hw} ч без воды). Выпьем по стакану?`;
+ if(m==='sleepy')return`😴 ${c.name==='Чиби'?'Героиня':c.name} спит. Ночью еда и вода не убывают.`;return'💚 Мы одна команда: что ты ешь и пьёшь, то ем и пью я.'}
 function cbPoke(){const m=cbMood();if(m==='eat'||m==='drink')return;const sc=$('#cbStage');sc.classList.remove('cb-jump');void sc.offsetWidth;sc.classList.add('cb-jump');const L=m==='angry'?['Не трогай!','Я СЕРДИТЫЙ!']:m==='sad'?['Мне грустно…','Поедим?']:['Хи-хи!','Щекотно!','Я тут 💚','Мы команда!'];CBA={m:'',until:Date.now()+1500,say:L[Math.floor(Math.random()*L.length)]};renderChibi(false);hap()}
 function cbQuick(){const n=$('#cqN').value.trim(),k=+$('#cqK').value||80;if(!n)return toast('Напишите, что вы съели');const h=new Date().getHours();addMacroFood({n,k,c:0,fi:0,p:0,f:0,m:h<11?'Завтрак':h<16?'Обед':h<21?'Ужин':'Перекус'});$('#cqN').value='';$('#cqK').value=''}
 cbEat=function(o){const c=CB(),d=day(),nm=fn(o),fe=foodEmoji(nm),was=cbNeed()[1]<15,HE=['🥕','🥗','🥦','🥒','🍎','🍅','🥑','🐟','🥚','🍗','🥩','🥜','🫐','🍓','🍊','🍋','🍇','🍌','🥣'],healthy=HE.includes(fe)||((o.p>=8||o.fi>=2)&&!(o.k>=300&&(o.p||0)<6));cbFeed(healthy?38:28);d.cc=d.cc||0;if(healthy&&d.cc<5){d.cc++;c.coins+=2}
- CBA={m:'eat',until:Date.now()+1800,food:fe,say:fe+' Ням!',msg:`${fe} Чиби ест: ${nm||'еду'}. ${was?'Ну наконец-то! Я уже ждал. Прощаю, но не забывай меня.':healthy?'Вкусно и полезно, спасибо!':'Вкусно! Я ем то же, что и ты.'}`};save();renderChibi(false);flyFood(fe);setTimeout(()=>renderChibi(false),1900)}
-cbDrinkEv=function(){const c=CB(),d=day(),was=cbNeed()[0]==='water'&&cbNeed()[1]<15;cbDrink(18);d.wc=d.wc||0;if(d.wc<8){d.wc++;c.coins+=1}CBA={m:'drink',until:Date.now()+1500,food:'🥤',say:'💧 Ух, свежо!',msg:was?'💧 Наконец-то вода! Я уже ждал. Прощаю.':'💧 Ух, свежо! Пьём вместе.'};save();renderChibi(false);flyFood('🥤');setTimeout(()=>renderChibi(false),1600)}
+ CBA={m:'eat',until:Date.now()+1800,food:fe,say:fe+' Ням!',msg:`${fe} ${c.name==='Чиби'?'Героиня':c.name} ест: ${nm||'еду'}. ${was?'Ура, еда! Спасибо, так гораздо лучше.':healthy?'Вкусно и полезно, спасибо!':'Вкусно! Я ем то же, что и ты.'}`};save();renderChibi(false);flyFood(fe);setTimeout(()=>renderChibi(false),1900)}
+cbDrinkEv=function(){const c=CB(),d=day(),was=cbNeed()[0]==='water'&&cbNeed()[1]<15;cbDrink(18);d.wc=d.wc||0;if(d.wc<8){d.wc++;c.coins+=1}CBA={m:'drink',until:Date.now()+1500,food:'🥤',say:'💧 Ух, свежо!',msg:was?'💧 Ура, вода! Спасибо.':'💧 Ух, свежо! Пьём вместе.'};save();renderChibi(false);flyFood('🥤');setTimeout(()=>renderChibi(false),1600)}
 flyFood=function(e){const s=$('#cbScene');if(!s||!$('#t-chibi').classList.contains('on'))return;const x=document.createElement('span');x.className='fly2';x.textContent=e;s.appendChild(x);setTimeout(()=>x.remove(),1000)};
 buyAcc=function(id){const c=CB(),a=ACC2.find(x=>x[0]===id);if(!c.own.includes(id)){if(c.coins<a[2])return toast('Не хватает монет: выполняйте задания дня');c.coins-=a[2];c.own.push(id);snd('ok')}c.acc=id;c.made=1;save();renderChibi(true)};
 /* photo likeness: skin / hair / eye colour + hair length, all on-device */
@@ -949,7 +949,7 @@ cbPhoto=async function(inp){const f=inp.files[0];if(!f)return;const url=URL.crea
  let style=null;if(hair){const side=(xa,xb)=>{const a=coll(xa,xb,box.y0+bh*.45,box.y0+bh*.9,()=>true);return a.length?a.filter(p=>dist(p,hair)<70).length/a.length:0};style=side(box.x0-bw*.28,box.x0-bw*.02)>.55&&side(box.x1+bw*.02,box.x1+bw*.28)>.55?'long':(hairP.length>bw*bh*.04?'bob':'short')}
  URL.revokeObjectURL(url);if(!skin)return toast('Не удалось определить цвет кожи. Попробуйте другое фото');
  const c=CB();c.skin=hx(skin.map(n=>n*.94+14));if(hair){c.hair=hx(hair.map(n=>n*.9));c.style=style}if(eye)c.eye=hx(eye.map(n=>n*1.15+10));c.made=1;save();renderChibi(true);
- openPop('Готово: чиби похож на вас',`<div style="width:180px;margin:0 auto">${chibiSVG(c,{mood:'happy',bw:1.1})}</div><p class="m" style="text-align:center">Определил цвет кожи${eye?', глаз':''}${hair?', волос и длину волос':''}. Если что-то не совпало, поправьте в «Внешности».</p><button class="btn" onclick="closeSheet()">Отлично</button>`)};
+ openPop('Готово: чиби похож на вас',`<div style="width:180px;margin:0 auto">${chibiSVG(c,{mood:'happy',bw:1.1})}</div><p class="m" style="text-align:center">Определены цвет кожи${eye?', глаз':''}${hair?', волос и длина волос':''}. Если что-то не совпало, поправьте в разделе «Внешность».</p><button class="btn" onclick="closeSheet()">Отлично</button>`)};
 renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;cbFix();const c=CB(),m=cbMood(),bw=1.25-.3*prog(),sat=cbSat(),wat=cbWat(),say=cbSay(),P=prog(),idx=Math.round(P*3),d=day(),qc=d.qc||[],done=QS.filter(q=>q[3](d)).length,fd=CBA.until>Date.now()?CBA.food:'';
  if(u.p.w0>u.p.t&&u.weights.length>1)[.25,.5,.75,1].forEach(t=>{if(P>=t&&!(c.ms||(c.ms=[])).includes(t)){c.ms.push(t);c.coins+=10;save();toast(`Чиби прошёл ${Math.round(t*100)}% пути вместе с вами! +10 🪙`)}});
  $('#cbHero').innerHTML=`<div style="width:104px;flex:none">${chibiSVG(c,{mood:m,bw,bubble:say,food:fd})}</div><div style="flex:1;min-width:0"><b class="serif" style="font-size:18px">${esc(c.name)}</b><div class="m" style="margin:2px 0 8px;font-size:12px">${STG[idx]} · ${Math.round(P*100)}% пути</div>${mb('🍽',sat)}${mb('💧',wat)}</div>`;
@@ -959,8 +959,8 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;cbFix();
  $('#cbCoins').textContent=`Монеты: ${c.coins} 🪙 · Дней с записями: ${Object.values(u.days).filter(x=>x.food.length).length}`;
  $('#cbQuests').innerHTML=QS.map((q,i)=>{const ok=q[3](d),got=qc.includes(i);return `<div class="item"><span>${q[1]} ${q[2]}</span>${got?'<span style="color:var(--mut)">✓ получено</span>':ok?`<button class="chip2 on" onclick="claim(${i})">+5 🪙</button>`:'<span style="color:var(--mut);font-size:12px">в процессе</span>'}</div>`}).join('');
  $('#cbShop').innerHTML=ACC2.map(a=>{const own=c.own.includes(a[0]),eq=c.acc===a[0];return `<div class="item"><span>${a[1]}</span>${eq?'<span style="color:var(--lime)">надет</span>':`<button class="chip2 ${own||c.coins>=a[2]?'on':''}" onclick="buyAcc('${a[0]}')">${own?'Надеть':a[2]+' 🪙'}</button>`}</div>`}).join('');
- $('#cbCust').innerHTML=`<label>Имя</label><input value="${esc(c.name)}" maxlength="14" onchange="CB().name=this.value.trim()||'Чиби';CB().made=1;save();renderChibi(true)"><div class="row">${[['skin','Кожа'],['hair','Волосы'],['eye','Глаза'],['outfit','Одежда']].map(x=>`<div><label>${x[1]}</label><input type="color" value="${c[x[0]]}" style="height:44px;padding:4px" oninput="CB().${x[0]}=this.value;CB().made=1;save();renderChibi(false)"></div>`).join('')}</div><label>Причёска</label><div>${HS.map(h=>`<span class="chip2 ${c.style===h[0]?'on':''}" onclick="cbSet('style','${h[0]}')">${h[1]}</span>`).join('')}</div><label>Одежда</label><div>${OS2.map(h=>`<span class="chip2 ${c.ot===h[0]?'on':''}" onclick="cbSet('ot','${h[0]}')">${h[1]}</span>`).join('')}<span class="chip2 ${c.ear?'on':''}" onclick="cbSet('ear',!CB().ear)">Серьги</span></div><div class="item" style="margin-top:12px"><span>Строгий чиби<br><small style="color:var(--mut)">злится, если вы забыли поесть или попить</small></span><input type="checkbox" class="tg" ${c.strict===false?'':'checked'} onchange="CB().strict=this.checked;save();renderChibi(false)"></div>`};
-const _tk2=tick;tick=function(){_tk2();if(!me||!U()||!U().p||!NT().on||CB().strict===false)return;const h=new Date().getHours();if(h<8||h>22)return;const n=cbNeed();if(n[1]<15)fire('ca'+n[0]+Math.floor(h/2),'😤 Чиби злится',n[0]==='food'?'Он давно не ел. Запишите приём пищи':'Он давно не пил. Выпейте воды')};
+ $('#cbCust').innerHTML=`<label>Имя</label><input value="${esc(c.name)}" maxlength="14" onchange="CB().name=this.value.trim()||'Чиби';CB().made=1;save();renderChibi(true)"><div class="row">${[['skin','Кожа'],['hair','Волосы'],['eye','Глаза'],['outfit','Одежда']].map(x=>`<div><label>${x[1]}</label><input type="color" value="${c[x[0]]}" style="height:44px;padding:4px" oninput="CB().${x[0]}=this.value;CB().made=1;save();renderChibi(false)"></div>`).join('')}</div><label>Причёска</label><div>${HS.map(h=>`<span class="chip2 ${c.style===h[0]?'on':''}" onclick="cbSet('style','${h[0]}')">${h[1]}</span>`).join('')}</div><label>Одежда</label><div>${OS2.map(h=>`<span class="chip2 ${c.ot===h[0]?'on':''}" onclick="cbSet('ot','${h[0]}')">${h[1]}</span>`).join('')}<span class="chip2 ${c.ear?'on':''}" onclick="cbSet('ear',!CB().ear)">Серьги</span></div><div class="item" style="margin-top:12px"><span>Строгий чиби<br><small style="color:var(--mut)">настойчивее напоминает, если долго нет еды или воды</small></span><input type="checkbox" class="tg" ${c.strict===false?'':'checked'} onchange="CB().strict=this.checked;save();renderChibi(false)"></div>`};
+const _tk2=tick;tick=function(){_tk2();if(!me||!U()||!U().p||!NT().on||CB().strict===false)return;const h=new Date().getHours();if(h<8||h>22)return;const n=cbNeed();if(n[1]<15)fire('ca'+n[0]+Math.floor(h/2),'⏰ Напоминание',n[0]==='food'?'Давно не было еды. Запишите приём пищи':'Давно не было воды. Выпейте стакан')};
 setInterval(tick,20000);
 
 /* ===== v9: 3D heroine as image sprites ===== */
@@ -996,7 +996,7 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v81`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}%`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
@@ -1007,10 +1007,10 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  $('#cbQuests').innerHTML=QS.map((q,i)=>{const ok=q[3](d),got=qc.includes(i);return `<div class="item"><span>${q[1]} ${q[2]}</span>${got?'<span style="color:var(--mut)">✓ получено</span>':ok?`<button class="chip2 on" onclick="claim(${i})">+5 🪙</button>`:'<span style="color:var(--mut);font-size:12px">в процессе</span>'}</div>`}).join('');
  $('#cbScn').innerHTML=SCN.map(x=>`<button class="${c.scn===x[0]?'on':''}" onclick="cbScene('${x[0]}')"><i style="background:${x[3]}"></i>${x[1]}<br><small style="color:var(--mut)">${c.sown.includes(x[0])?(c.scn===x[0]?'выбран':'открыт'):x[2]+' 🪙'}</small></button>`).join('');
  $('#cbEaten').innerHTML=d.food.length?d.food.map(f=>`<span class="chip2">${foodEmoji(fn(f))} ${esc(fn(f)).slice(0,16)}</span>`).join(''):'<p class="m">Пока ничего. Запишите еду, и героиня съест то же самое.</p>';
- $('#cbSet').innerHTML=`<label>Имя</label><input value="${esc(c.name==='Чиби'?'Героиня':c.name)}" maxlength="14" onchange="CB().name=this.value.trim()||'Героиня';save();renderChibi(true)"><div class="item" style="margin-top:12px"><span>Строгий режим<br><small style="color:var(--mut)">злится, если вы забыли поесть или попить</small></span><input type="checkbox" class="tg" ${c.strict===false?'':'checked'} onchange="CB().strict=this.checked;save();renderChibi(false)"></div>`};
+ $('#cbSet').innerHTML=`<label>Имя</label><input value="${esc(c.name==='Чиби'?'Героиня':c.name)}" maxlength="14" onchange="CB().name=this.value.trim()||'Героиня';save();renderChibi(true)"><div class="item" style="margin-top:12px"><span>Строгий режим<br><small style="color:var(--mut)">настойчивее напоминает, если долго нет еды или воды</small></span><input type="checkbox" class="tg" ${c.strict===false?'':'checked'} onchange="CB().strict=this.checked;save();renderChibi(false)"></div>`};
 function cbScene(id){const c=CB(),x=SCN.find(a=>a[0]===id);if(!c.sown.includes(id)){if(c.coins<x[2])return toast('Не хватает монет: выполняйте задания дня');c.coins-=x[2];c.sown.push(id);snd('ok')}c.scn=id;save();renderChibi(true)}
 cbPoke=function(){const m=cbMood();if(m==='eat'||m==='drink')return;const w=$('#herS');w.classList.remove('hop');void w.offsetWidth;w.classList.add('hop');setTimeout(()=>w.classList.remove('hop'),620);
- const L=m==='angry'?['Не трогай!','Я СЕРДИТАЯ!']:m==='sad'?['Мне грустно…','Поедим?']:['Привет! 💚','Мы команда!','Хи-хи!'];CBA={m:'',until:Date.now()+2000,say:L[Math.floor(Math.random()*L.length)]};if(m!=='angry'&&m!=='sad')HERC={slot:'wave',until:Date.now()+2200};renderChibi(false);hap();setTimeout(()=>renderChibi(false),2300)};
+ const L=m==='angry'?['Не трогай!','Сначала покорми!']:m==='sad'?['Мне грустно…','Поедим?']:['Привет! 💚','Мы команда!','Хи-хи!'];CBA={m:'',until:Date.now()+2000,say:L[Math.floor(Math.random()*L.length)]};if(m!=='angry'&&m!=='sad')HERC={slot:'wave',until:Date.now()+2200};renderChibi(false);hap();setTimeout(()=>renderChibi(false),2300)};
 flyFood=function(e){const s=$('#cbFull');if(!s||!$('#t-chibi').classList.contains('on'))return;const x=document.createElement('span');x.className='fly2';x.textContent=e;s.appendChild(x);setTimeout(()=>x.remove(),1000)};
 function cbFeedPop(){const rec=[],seen={};Object.keys(U().days).sort().reverse().forEach(k=>U().days[k].food.forEach(f=>{const n=fn(f);if(n&&!seen[n]&&rec.length<8){seen[n]=1;rec.push(f)}}));window.__rec=rec;
  openPop('Чем накормим героиню?',`<p class="m">Запишите то, что вы съели: она съест то же самое.</p><div class="row"><input id="cqN" placeholder="например, морковка" style="flex:2"><input id="cqK" type="number" inputmode="numeric" placeholder="ккал" style="flex:1"></div><button class="btn" onclick="cbQuick()">Накормить</button>`+(rec.length?`<label>Недавнее: одно касание</label><div>${rec.map((f,i)=>`<span class="chip2" onclick="cbAgain(${i})">${foodEmoji(fn(f))} ${esc(fn(f)).slice(0,18)}</span>`).join('')}</div>`:'')+`<button class="btn ghost" onclick="closeSheet();whatToEat()">Подсказать, что съесть</button>`)}
@@ -1069,7 +1069,7 @@ function herLoop(now){requestAnimationFrame(herLoop);const S=$('#herS'),H=$('#he
 requestAnimationFrame(herLoop);
 /* taps: shy first, repeated taps → kiss */
 cbPoke=function(){const m=cbMood();if(m==='eat'||m==='drink')return;const n=Date.now();HTAP=(n-(window.__lt||0)<5000)?HTAP+1:1;window.__lt=n;
- if(m==='angry'){CBA={m:'',until:n+2000,say:['Не трогай!','Я СЕРДИТАЯ!'][HTAP%2]};renderChibi(false);setTimeout(()=>renderChibi(false),2100);return hap()}
+ if(m==='angry'){CBA={m:'',until:n+2000,say:['Не трогай!','Сначала покорми!'][HTAP%2]};renderChibi(false);setTimeout(()=>renderChibi(false),2100);return hap()}
  if(HTAP>=4&&Math.random()<.6){HTAP=0;return herKiss()}
  herAct(HTAP%3===0?'dance':'shy')};
 
@@ -1449,7 +1449,7 @@ const AGEMID={t:16,y:24,a:37,m:52,s:65};
 const _qf50=qFinish;
 qFinish=function(){_qf50();try{const u=U(),a=qa;if(a.sex)$('#oSex').value=a.sex;if(a.age&&AGEMID[a.age])$('#oAge').value=AGEMID[a.age];
  u.hl=Object.assign(u.hl||{},{st:a.sex==='m'?'male':(a.life||'none')});
- if(a.age==='t'){const n=$('#oCare');if(n)n.textContent='Цель и темп выбираешь сам. Тело в этом возрасте ещё растёт, поэтому план лучше обсудить с врачом.'}
+ if(a.age==='t'){const n=$('#oCare');if(n)n.textContent='Цель и темп вы выбираете сами. Тело в этом возрасте ещё растёт, поэтому план лучше обсудить с врачом.'}
  save()}catch(e){}};
 const isF=u=>((u.p&&u.p.sex)||(u.quiz&&u.quiz.sex)||'f')!=='m';
 const HL=u=>u.hl||(u.hl={st:isF(u)?'':'male'});
@@ -1915,7 +1915,7 @@ document.head.insertAdjacentHTML('beforeend','<style>.wh{position:relative;heigh
 function fcFace(m,cur){return modeCard(m,cur).replace('class="mcd ','class="mcd fcf ').replace(/ onclick="mcTap\('[a-z0-9]+'\)"/,'')}
 function mcInit(id){const host=document.getElementById(id);if(!host)return;const n=MODES.length,cur=curMode();let idx=Math.max(0,MODES.findIndex(m=>m.id===cur));
  const old=WH[id];if(old&&old.raf)cancelAnimationFrame(old.raf);
- host.innerHTML=`<div class="fc"><div class="fcs fcl"></div><div class="fcs fcr"></div><div class="fcm"></div><div class="fcov"></div><button class="fcn fcprev" aria-label="Назад">‹</button><button class="fcn fcnext" aria-label="Вперёд">›</button></div><div class="whnm"></div><div class="whd">${MODES.map(()=>'<i></i>').join('')}</div><button class="btn whbtn">Включить</button><p class="m" style="text-align:center;font-size:12px;margin:6px 0 0">Проведи по карточке пальцем или мышкой, она перевернётся</p>`;
+ host.innerHTML=`<div class="fc"><div class="fcs fcl"></div><div class="fcs fcr"></div><div class="fcm"></div><div class="fcov"></div><button class="fcn fcprev" aria-label="Назад">‹</button><button class="fcn fcnext" aria-label="Вперёд">›</button></div><div class="whnm"></div><div class="whd">${MODES.map(()=>'<i></i>').join('')}</div><button class="btn whbtn">Включить</button><p class="m" style="text-align:center;font-size:12px;margin:6px 0 0">Проведите по карточке пальцем или мышкой, чтобы её перевернуть</p>`;
  const st=host.querySelector('.fc'),ov=host.querySelector('.fcov'),mid=host.querySelector('.fcm'),L=host.querySelector('.fcl'),R=host.querySelector('.fcr'),btn=host.querySelector('.whbtn');
  const w=WH[id]={host,idx,ang:0,raf:0};let shown=-1,shownSide=-1;
  const mod=k=>((k%n)+n)%n;
@@ -1971,11 +1971,11 @@ const _sq63=startQuiz;startQuiz=function(){qaChar=false;qcSel='';try{hsI=0}catch
 const _qr63=qRender;
 qRender=function(){if(qi>=QZ.length&&!qaChar){qcShow();return}_qr63()};
 function qcShow(){const b=$('#qBody');$('#qBar').style.width='96%';$('#qBack').hidden=false;
- b.innerHTML=`<div class="qt">Выбери своего героя</div><p class="m">Он будет рядом в приложении, радоваться твоим победам и подбадривать. Нажми на героя, чтобы рассмотреть. Имя можно поменять.</p><div class="qcg">${QCH.map(k=>`<button type="button" class="qcc ${qcSel===k?'on':''}" onclick="qcTap('${k}')"><span class="qci"><img src="${chFace(k)}" alt=""></span><b>${CHARS[k].name}</b></button>`).join('')}</div><div id="qcDet"></div>`;
+ b.innerHTML=`<div class="qt">Выберите героя</div><p class="m">Герой будет рядом в приложении, радоваться вашим успехам и подбадривать. Нажмите на героя, чтобы рассмотреть. Имя можно поменять.</p><div class="qcg">${QCH.map(k=>`<button type="button" class="qcc ${qcSel===k?'on':''}" onclick="qcTap('${k}')"><span class="qci"><img src="${chFace(k)}" alt=""></span><b>${CHARS[k].name}</b></button>`).join('')}</div><div id="qcDet"></div>`;
  if(qcSel)qcDet()}
 function qcTap(k){if(qcSel===k)return;qcSel=k;hap();snd('tick');qcShow()}
 function qcDet(){const k=qcSel,C=CHARS[k],d=document.getElementById('qcDet');if(!d)return;
- d.innerHTML=`<div class="qcd"><img class="qcp" src="${chSrc(k,'idle')}" alt=""><div style="flex:1;min-width:0"><label>Имя героя</label><input id="qcName" value="${esc(C.name)}" maxlength="14"><button type="button" class="btn qcb" id="qcBtn" disabled onclick="qcOk()"><i></i><span>Выбрать героя</span></button><p class="m" style="font-size:12px;margin-top:6px">Кнопка станет активной через секунду, чтобы не выбрать случайно. Героя и имя можно поменять потом в настройках.</p></div></div>`;
+ d.innerHTML=`<div class="qcd"><img class="qcp" src="${chSrc(k,'idle')}" alt=""><div style="flex:1;min-width:0"><label>Имя героя</label><input id="qcName" value="${esc(C.name)}" maxlength="14"><button type="button" class="btn qcb" id="qcBtn" disabled onclick="qcOk()"><i></i><span>Выбрать героя</span></button><p class="m" style="font-size:12px;margin-top:6px">Кнопка станет активной через секунду, чтобы не выбрать случайно. Героя и имя можно поменять потом на экране героя.</p></div></div>`;
  const btn=document.getElementById('qcBtn');btn.classList.add('wait');clearTimeout(qcT);qcT=setTimeout(()=>{const b=document.getElementById('qcBtn');if(b&&qcSel===k){b.disabled=false;b.classList.remove('wait')}},1100);
  const dd=document.querySelector('.qcd');if(dd)dd.scrollIntoView({behavior:'smooth',block:'nearest'})}
 function qcOk(){const k=qcSel;if(!k)return;const nm=($('#qcName').value||'').trim()||CHARS[k].name;const c=CB();c.her=k;c.name=nm;c.made=1;chPre(k);HERDEF.face=chFace(k);save();qaChar=true;hap();snd('ok');qRender();window.scrollTo(0,0)}
@@ -2017,7 +2017,7 @@ function modeCards(){const r=document.documentElement.dataset.ui||'',t=document.
  /* ---- беременные ---- */
  if(r==='preg'){const h=HL(u),w=h.due?pregWeek(u):0,left=h.due?dd0(u):0;
   let hero;
-  if(!w){hero=`<h2 style="text-align:center">Беременность</h2><p class="m" style="text-align:center">Укажи предполагаемую дату родов, и здесь появятся неделя, малыш и советы.</p><input type="date" id="pgDue" onchange="pgSetDue(this.value)">${dueBox()}<p class="m" style="text-align:center;font-size:12px;margin-top:8px">Дату можно взять из заключения врача. Её можно изменить в «Здоровье».</p>`}
+  if(!w){hero=`<h2 style="text-align:center">Беременность</h2><p class="m" style="text-align:center">Укажи предполагаемую дату родов, и здесь появятся неделя, малыш и советы.</p><input type="date" id="pgDue" onchange="pgSetDue(this.value)">${dueBox()}<p class="m" style="text-align:center;font-size:12px;margin-top:8px">Дату можно взять из заключения врача. Её можно изменить в «Моём здоровье».</p>`}
   else{const p=Math.min(1,w/40),C=2*Math.PI*105,tri=w<14?'1 триместр':w<28?'2 триместр':'3 триместр';
    hero=`<div class="pgr"><svg viewBox="0 0 250 250"><circle cx="125" cy="125" r="105" class="pb"/><circle cx="125" cy="125" r="105" class="pf" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-p)).toFixed(1)}"/></svg><div class="pgc"><small>${tri}</small><b>${w}</b><span>неделя</span><em>размер малыша как ${babyOf(w)}</em></div></div><p class="pgl">${left>0?`До родов примерно ${left} дн.`:'Срок родов наступил, скоро встреча!'}</p>`}
   put('pgHero',hero);
@@ -2094,7 +2094,7 @@ const HSC={alice:['#ff5a3c','#ff9a5c','Огонь и забота'],zhenya:['#2f
 let hsI=0,hsBusy=false;
 function qcShow(){const b=$('#qBody');$('#qBar').style.width='96%';$('#qBack').hidden=false;
  if(!qcSel)qcSel=QCH[hsI]; else hsI=Math.max(0,QCH.indexOf(qcSel));QCH.forEach(chPre);
- b.innerHTML=`<div class="qt">Выбери своего героя</div><p class="m">Листай пальцем влево и вправо. Имя героя можно поменять.</p><div class="hs" id="hs"><div class="hsl" id="hsl"></div><div class="hsa hsp" onclick="hsGo(-1)">‹</div><div class="hsa hsn" onclick="hsGo(1)">›</div><div class="hsd" id="hsd">${QCH.map((k,i)=>`<i data-i="${i}"></i>`).join('')}</div></div><div id="qcDet"></div>`;
+ b.innerHTML=`<div class="qt">Выберите героя</div><p class="m">Листайте влево и вправо. Имя героя можно поменять.</p><div class="hs" id="hs"><div class="hsl" id="hsl"></div><div class="hsa hsp" onclick="hsGo(-1)">‹</div><div class="hsa hsn" onclick="hsGo(1)">›</div><div class="hsd" id="hsd">${QCH.map((k,i)=>`<i data-i="${i}"></i>`).join('')}</div></div><div id="qcDet"></div>`;
  hsDraw(hsI);hsBind();qcDet()}
 function hsLayer(i){const k=QCH[i],c=HSC[k];return `<div class="hsw" style="background:linear-gradient(170deg,${c[1]} -20%,${c[0]} 55%)"><div class="hst"><b>${CHARS[k].name.toUpperCase()}</b><small>${c[2]}</small></div><img class="hsc" src="${chSrc(k,'idle')}" alt=""><div class="hsb"><span>${CHARS[k].name}</span><button type="button" class="hsplus" onclick="hsPick()">+</button></div></div>`}
 function hsDraw(i){const h=$('#hsl');h.innerHTML=hsLayer(i);const st=$('#hs');st.style.background=HSC[QCH[i]][0];document.querySelectorAll('#hsd i').forEach((e,j)=>e.classList.toggle('on',j===i))}
@@ -2122,7 +2122,7 @@ function hsBind(){const st=$('#hs');if(!st||st._b)return;st._b=1;let x0=0,y0=0,d
  if(!('ontouchstart' in window)){st.addEventListener('mousedown',e=>down(e.clientX,e.clientY));window.addEventListener('mousemove',e=>move(e.clientX,e.clientY,e));window.addEventListener('mouseup',e=>up(e.clientX,e.clientY))}
  st.querySelectorAll('#hsd i').forEach(e=>e.onclick=()=>{const j=+e.dataset.i;if(j!==hsI)hsGo(j>hsI?1:-1)})}
 function qcDet(){const k=qcSel,C=CHARS[k],d=document.getElementById('qcDet');if(!d)return;
- d.innerHTML=`<div class="qcd2"><label>Имя героя</label><input id="qcName" value="${esc(C.name)}" maxlength="14"><button type="button" class="btn qcb" id="qcBtn" disabled onclick="qcOk()"><i></i><span>Выбрать: ${esc(C.name)}</span></button><p class="m" style="font-size:12px;margin-top:6px">Кнопка станет активной через секунду, чтобы не выбрать случайно. Героя и имя можно поменять потом в настройках.</p></div>`;
+ d.innerHTML=`<div class="qcd2"><label>Имя героя</label><input id="qcName" value="${esc(C.name)}" maxlength="14"><button type="button" class="btn qcb" id="qcBtn" disabled onclick="qcOk()"><i></i><span>Выбрать: ${esc(C.name)}</span></button><p class="m" style="font-size:12px;margin-top:6px">Кнопка станет активной через секунду, чтобы не выбрать случайно. Героя и имя можно поменять потом на экране героя.</p></div>`;
  const btn=document.getElementById('qcBtn');btn.classList.add('wait');clearTimeout(qcT);qcT=setTimeout(()=>{const b=document.getElementById('qcBtn');if(b&&qcSel===k){b.disabled=false;b.classList.remove('wait')}},1100)}
 document.head.insertAdjacentHTML('beforeend','<style>.hs{position:relative;height:min(62vh,500px);min-height:380px;border-radius:38px;overflow:hidden;margin:14px 0;touch-action:pan-y;user-select:none;-webkit-user-select:none;box-shadow:0 18px 44px rgba(0,0,0,.35)}.hsl{position:absolute;inset:0}.hsnew{z-index:2}.hsw{position:absolute;inset:0;overflow:hidden;color:#fff}.hst{position:absolute;left:0;right:0;top:11%;text-align:center;z-index:1;pointer-events:none}.hst b{display:block;font-size:clamp(44px,15vw,72px);font-weight:900;letter-spacing:.02em;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,.12)}.hst small{display:block;margin-top:6px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.85}.hsc{position:absolute;left:50%;bottom:62px;height:68%;width:auto;max-width:88%;object-fit:contain;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 18px 24px rgba(0,0,0,.35));will-change:transform}.hsb{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:17px}.hsb span{text-shadow:0 2px 6px rgba(0,0,0,.25);position:absolute;left:20px;bottom:6px}.hsplus{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.28);backdrop-filter:blur(8px);color:#fff;font-size:28px;line-height:1;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}.hsa{position:absolute;top:50%;z-index:5;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:rgba(255,255,255,.22);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer}.hsp{left:10px}.hsn{right:10px}.hsd{position:absolute;left:0;right:0;top:12px;display:flex;justify-content:center;gap:6px;z-index:6;pointer-events:auto}.hsd i{width:7px;height:7px;border-radius:4px;background:rgba(255,255,255,.5);transition:width .3s,background .3s;cursor:pointer}.hsd i.on{width:22px;background:#fff}.qcd2{margin-top:4px;animation:tabin .4s both}.qcd2 .qcb{width:100%}</style>');
 
@@ -2196,7 +2196,7 @@ function medDel(id){const u=U();u.medl=tlA('medl').filter(m=>m.id!==id);save();o
 function medTick(id,v){const l=tlO('medlog');(l[today()]||(l[today()]={}))[id]=v?1:0;save();if(v)toast('Отмечено ✔')}
 function medIcs(){const L=tlA('medl'),d0=today().replace(/-/g,''),ev=L.map((m,i)=>['BEGIN:VEVENT','UID:med'+m.id+'@vasskass','DTSTAMP:'+d0+'T000000Z','DTSTART:'+d0+'T'+(m.t||'09:00').replace(':','')+'00','DURATION:PT10M','RRULE:FREQ=DAILY','SUMMARY:Лекарство: '+m.n+(m.dose?' ('+m.dose+')':''),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+m.n,'TRIGGER:PT0M','END:VALARM','END:VEVENT'].join('\r\n'));
  const b=new Blob(['BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//VASSKASS FLOW//RU\r\n'+ev.join('\r\n')+'\r\nEND:VCALENDAR'],{type:'text/calendar'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='flow-meds.ics';a.click();toast('Открой файл и добавь события в календарь')}
-(function(){setInterval(()=>{try{if(!me||!U()||!U().p)return;const t=hhmm(),lg=(tlO('medlog')[today()]||{});tlA('medl').forEach(m=>{if(m.t===t&&!lg[m.id])fire('m'+m.id,'Пора принять: '+m.n,m.dose||'Отметь в разделе «Лекарства»')})}catch(e){}},20000)})();
+(function(){setInterval(()=>{try{if(!me||!U()||!U().p)return;const t=hhmm(),lg=(tlO('medlog')[today()]||{});tlA('medl').forEach(m=>{if(m.t===t&&!lg[m.id])fire('m'+m.id,'Пора принять: '+m.n,m.dose||'Отметьте приём в «Ещё → Лекарства»')})}catch(e){}},20000)})();
 /* --- мои блюда --- */
 function tlDish(){const L=tlA('dish');
  return `<h3>Мои блюда</h3><p class="m">Собери блюдо из продуктов один раз, потом добавляй в дневник одним нажатием.</p>`+
@@ -2370,7 +2370,7 @@ qRender=function(){const b=$('#qBody');
  if(qi<0){_qr74.apply(this,arguments);const w=$('#qSw');if(w){const p=w.previousElementSibling;if(p&&p.tagName==='P')p.textContent='Несколько коротких вопросов, и план станет вашим. Сначала ответьте, кто вы, чтобы показать подходящие оформления.';w.remove()}return}
  if(qi<QZ.length&&QZ[qi][0]==='look'){const man=qa.sex==='m';$('#qBar').style.width=((qi+1)/(QZ.length+1)*100)+'%';$('#qBack').hidden=false;
   fitModes();try{const id=curMode();if(!MODES.some(m=>m.id===id))applyMode(man?'mstd':'modern')}catch(e){}
-  b.innerHTML=`<p class="m">Вопрос ${qi+1} из ${QZ.length}</p><div class="qt">Выбери оформление</div><p class="m">Листай карточки пальцем. ${man?'Эти оформления подобраны для мужчин.':'Эти оформления подобраны для женщин.'} Потом можно сменить в «Профиле».</p><div class="sw" id="qSw" style="margin:14px 0"></div><button class="btn" onclick="qNext()">Дальше</button>`;
+  b.innerHTML=`<p class="m">Вопрос ${qi+1} из ${QZ.length}</p><div class="qt">Выберите оформление</div><p class="m">Листайте карточки. ${man?'Эти оформления подобраны для мужчин.':'Эти оформления подобраны для женщин.'} Потом можно сменить в «Профиле».</p><div class="sw" id="qSw" style="margin:14px 0"></div><button class="btn" onclick="qNext()">Дальше</button>`;
   try{renderTheme()}catch(e){}return}
  _qr74.apply(this,arguments)};
 
@@ -2632,5 +2632,6 @@ document.head.insertAdjacentHTML('beforeend','<style>.row>.btn.sm{flex:0 0 auto;
 <script src="js/portions-data.js"></script>
 <script src="js/v89-safety.js"></script>
 <script src="js/v90-ux.js"></script>
+<script src="js/v94-onboard.js"></script>
 </body>
 </html>
