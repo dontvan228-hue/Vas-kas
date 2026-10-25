@@ -458,13 +458,13 @@ const lastW=()=>{const w=U().weights,p=U().p||{};return w.length?w[w.length-1].w
 function saveProfile(){
   let sex=$('#oSex').value,age=+$('#oAge').value,h=+$('#oH').value,w=+$('#oW').value,t=+$('#oT').value;const e=$('#oErr');
   if(!(age>0&&h>0&&w>0&&t>0))return e.textContent='Заполните все поля числами';
-  if(age<14)return e.textContent='Приложение рассчитано на возраст от 14 лет.';if(age<18&&!isGain())t=w;
+  if(age<14)return e.textContent='Приложение рассчитано на возраст от 14 лет.';
   if(age>80||h<120||h>220||w<35||w>250)return e.textContent='Проверьте возраст, рост и вес — значения выглядят нереалистично';
   const minT=Math.ceil(18.5*(h/100)**2);
-  if(t<minT&&age>=18)return e.textContent=`Цель ниже здорового ИМТ. Минимальная безопасная цель для вашего роста — около ${minT} кг.`;
-  if(isGain()){if(!(t>w))return e.textContent='Для набора веса цель должна быть больше текущего веса.';if(t>Math.round(25*(h/100)**2)&&age>=18)return e.textContent='Цель выше здорового ИМТ. Для вашего роста безопасная цель — не больше '+Math.round(25*(h/100)**2)+' кг.'}
+  if(t<minT)return e.textContent=`Цель ниже здорового ИМТ. Минимальная безопасная цель для вашего роста — около ${minT} кг.`;
+  if(isGain()){if(!(t>w))return e.textContent='Для набора веса цель должна быть больше текущего веса.';if(t>Math.round(25*(h/100)**2))return e.textContent='Цель выше здорового ИМТ. Для вашего роста безопасная цель — не больше '+Math.round(25*(h/100)**2)+' кг.'}
   const u=U(),first=!u.p;
-  u.p={sex,age,h,t,act:+$('#oAct').value,pace:age<18&&!isGain()?0:+$('#oPace').value,w0:first?w:u.p.w0};
+  u.p={sex,age,h,t,act:+$('#oAct').value,pace:+$('#oPace').value,w0:first?w:u.p.w0};
   const ds=today(),ex=u.weights.find(x=>x.d===ds);
   if(ex)ex.w=w;else u.weights.push({d:ds,w});
   u.adapt=null;e.textContent='';save();show('app');render();initChat();toast('План готов');
@@ -473,7 +473,7 @@ function plan(){
   const u=U(),p=u.p,w=lastW();
   const bmr=10*w+6.25*p.h-5*p.age+(p.sex==='m'?5:-161);
   const formula=bmr*p.act,tdee=u.adapt?u.adapt.t:formula;
-  const noDef=p.age<18||(typeof lifeNoDef==='function'&&lifeNoDef(u)),wantDef=(noDef?0:p.pace)*1100,def=Math.min(wantDef,tdee*.2);
+  const noDef=(typeof lifeNoDef==='function'&&lifeNoDef(u)),wantDef=(noDef?0:p.pace)*1100,def=Math.min(wantDef,tdee*.2);
   const floor=p.sex==='m'?1500:1200;
   let b=Math.round((tdee-def)/10)*10,capped=false;
   if(b<floor){b=floor;capped=true}
@@ -1438,8 +1438,7 @@ const AGEMID={t:16,y:24,a:37,m:52,s:65};
 const _qf50=qFinish;
 qFinish=function(){_qf50();try{const u=U(),a=qa;if(a.sex)$('#oSex').value=a.sex;if(a.age&&AGEMID[a.age])$('#oAge').value=AGEMID[a.age];
  u.hl=Object.assign(u.hl||{},{st:a.sex==='m'?'male':(a.life||'none')});
- if(a.age==='t'){const pc=$('#oPace');$('#oT').value=$('#oW').value;[...pc.options].forEach(o=>{if(o.value!=='0')o.remove()});pc.value='0';
-  const n=$('#oCare');if(n)n.textContent='Вам меньше 18, поэтому без похудения: ты растёшь, и телу нужна энергия. Мы будем следить за привычками: вода, регулярная еда, сон.'}
+ if(a.age==='t'){const n=$('#oCare');if(n)n.textContent='Цель и темп выбираешь сам. Тело в этом возрасте ещё растёт, поэтому план лучше обсудить с врачом.'}
  save()}catch(e){}};
 const isF=u=>((u.p&&u.p.sex)||(u.quiz&&u.quiz.sex)||'f')!=='m';
 const HL=u=>u.hl||(u.hl={st:isF(u)?'':'male'});
