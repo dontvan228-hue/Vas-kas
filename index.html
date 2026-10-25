@@ -235,7 +235,7 @@ body:has(#t-chibi.on){overflow:hidden}
 .cbdock{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:4;padding:12px 12px 10px;border-radius:26px;background:rgba(var(--bgd),.78);border:1px solid rgba(var(--acc),.26);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);box-shadow:0 14px 34px rgba(0,0,0,.28)}
 .cbmsg{font-size:12.5px;line-height:1.35;min-height:34px;margin-bottom:8px;color:var(--txt)}
 .cbbars{display:flex;gap:10px;margin-bottom:10px}.cbbars>div{flex:1;display:flex;align-items:center;gap:6px;font-size:13px}.cbbars i{flex:1;height:6px;border-radius:3px;background:var(--trk);overflow:hidden}.cbbars u{display:block;height:100%;border-radius:3px;background:var(--lime);transition:width .6s;text-decoration:none}.cbbars>div:nth-child(2) u{background:#8ccfff}.cbbars>div:nth-child(3) u{background:#ffcf8a}
-.cbbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cbbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .cbbtns button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 2px 8px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--txt);font-size:11px;font-weight:600;cursor:pointer;transition:transform .15s;font-family:inherit}.cbbtns button:first-child{background:var(--lime);color:var(--on);border-color:transparent}.cbbtns button:active{transform:scale(.95)}
 .cbbtns svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .cbsbk{position:absolute;inset:0;z-index:5;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s}.cbsbk.on{opacity:1;pointer-events:auto}
@@ -393,12 +393,12 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
  <div class="cbside"><button aria-label="Поцелуй" onclick="herKiss()">😘</button><button aria-label="Смутить" onclick="herAct('shy')">🙈</button></div><div class="cbbub" id="cbBub" style="display:none"></div>
  <div class="cbdock"><div class="cbmsg" id="cbMsg"></div>
   <div class="cbbars"><div>🍽<i><u id="cbB1"></u></i></div><div>💧<i><u id="cbB2"></u></i></div><div>🙂<i><u id="cbB3"></u></i></div></div>
-  <div class="cbbtns"><button onclick="cbFeedPop()"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5M9 3v5M17 3c-2 2-3 5-3 8h3v10"/></svg>Накормить</button><button onclick="setWater(day().water+1)"><svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>Напоить</button><button onclick="cbSheetT(1,'cbUpC')"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4 16l5-4 4 3 3-2 4 3"/></svg>Картинки</button><button onclick="cbSheetT(1)"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Ещё</button></div>
+  <div class="cbbtns"><button onclick="cbFeedPop()"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5M9 3v5M17 3c-2 2-3 5-3 8h3v10"/></svg>Накормить</button><button onclick="setWater(day().water+1)"><svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>Напоить</button><button onclick="cbSheetT(1)"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Ещё</button></div>
  </div>
 </div>
 <div class="cbsbk" id="cbSbk" onclick="cbSheetT(0)"></div>
 <div class="cbsheet" id="cbSheet"><div class="cbgrab" onclick="cbSheetT(0)"></div>
- <div class="card" id="cbUpC"><h2>Картинки героини</h2><div id="cbUp"></div></div>
+ 
  <div class="card"><h2>Вместе к цели</h2><div id="cbJourney"></div></div>
  <div class="card"><h2>Задания дня</h2><p class="m" id="cbCoins"></p><div id="cbQuests"></div></div>
  <div class="card"><h2>Фон сцены</h2><div class="scn" id="cbScn"></div></div>
@@ -735,10 +735,10 @@ function qPick(i){if(qLock)return;qLock=1;const q=QZ[qi];qa[q[0]]=q[2][i][2];hap
 function qNext(){qi++;qRender();window.scrollTo(0,0)}
 function qBack(){if(qi>-1){qi--;qRender()}}
 const GN={gain:'Набрать вес',lose:'Снизить вес',keep:'Удержать вес',tone:'Подтянуть фигуру',aware:'Осознанное питание'},HT={sweet:'Тягу к сладкому гасим белком и кнопкой «Тяга — SOS».',night:'Вечерний голод: оставьте часть калорий на ужин и держите под рукой «Что съесть?».',guilt:'Срывы — часть пути. Приложение не стыдит: просто возвращаемся к плану.',time:'Нет времени: «Избранное» и «Повторить вчерашний день» записывают еду за секунды.',choice:'Не знаете, что выбрать: «Что съесть?» подскажет под ваш остаток.'};
-function qSummary(){const a=qa,care=['preg','ed'].includes(a.health);$('#qBody').innerHTML=`<div class="qt">Ваш профиль готов</div><div class="item"><span>🎯 Цель</span><b>${GN[a.goal]}</b></div><div class="item"><span>🥑 Углеводы</span><b>${a.diet==='lc'?'до 30 г чистых':'до 100 г чистых'}</b></div><div class="item"><span>🔔 Напоминания</span><b>${a.rem==='off'?'выключены':'включены'}</b></div><p class="m" style="margin:12px 0">${HT[a.hard]}</p>${a.water==='0'?'<p class="m">💧 Начнём с малого: плюс один стакан воды в день.</p>':''}${a.sleep==='0'?'<p class="m">😴 Сон меньше 6 часов повышает аппетит — отмечайте его во вкладке «Сегодня».</p>':''}${care?'<p class="m" style="color:var(--warn);margin-top:8px">Беременность, кормление или расстройство питания в прошлом: план снижения веса нужно согласовать с врачом. Мы поставим самый мягкий темп.</p>':a.health==='dia'?'<p class="m" style="color:var(--warn);margin-top:8px">Диабет: питание и лекарства меняйте только вместе с врачом.</p>':''}<button class="btn" onclick="qFinish()">Рассчитать мой план</button>`}
+function qSummary(){const a=qa,care=['preg','ed'].includes(a.health);$('#qBody').innerHTML=`<div class="qt">Ваш профиль готов</div><div class="item"><span>🎯 Цель</span><b>${GN[a.goal]}</b></div><div class="item"><span>🥑 Углеводы</span><b>${a.diet==='lc'?'до 30 г чистых':'до 100 г чистых'}</b></div><div class="item"><span>🔔 Напоминания</span><b>${a.rem==='off'?'выключены':'включены'}</b></div><p class="m" style="margin:12px 0">${HT[a.hard]}</p>${a.water==='0'?'<p class="m">💧 Начнём с малого: плюс один стакан воды в день.</p>':''}${a.sleep==='0'?'<p class="m">😴 Сон меньше 6 часов повышает аппетит — отмечайте его во вкладке «Сегодня».</p>':''}${care?'<p class="m" style="color:var(--warn);margin-top:8px">Беременность, кормление или расстройство питания в прошлом: приложение не ставит дефицит калорий: норма рассчитана на поддержание веса и регулярное питание. Снижать вес в этой ситуации стоит только вместе с врачом.</p>':a.health==='dia'?'<p class="m" style="color:var(--warn);margin-top:8px">Диабет: питание и лекарства меняйте только вместе с врачом.</p>':''}<button class="btn" onclick="qFinish()">Рассчитать мой план</button>`}
 function qFinish(){const u=U(),a=qa,r=a.rem,n=NT();u.quiz=a;u.mg={net:a.diet==='lc'?30:100};n.on=r!=='off';n.meals=r==='mv'||r==='meals';n.water=r!=='off';n.weigh=r==='wv'||r==='mv';n.eve=r==='mv';n.fast=a.diet==='if';save();show('onb');
   const pc=$('#oPace'),care=['preg','ed'].includes(a.health);$('#oAct').value=a.act;if(a.goal==='keep'){$('#oT').value=$('#oW').value;pc.value='0'}
-  if(care){[...pc.options].forEach(o=>{if(o.value!=='.25'&&o.value!=='0')o.remove()});pc.value=a.goal==='keep'?'0':'.25'}
+  if(care){[...pc.options].forEach(o=>{if(o.value!=='0')o.remove()});pc.value='0'}
   if(!$('#oCare'))pc.insertAdjacentHTML('afterend','<p class="m" id="oCare" style="margin-top:8px">Цель и темп можно изменить позже. Это ориентир, а не медицинская рекомендация.</p>')}
 /* notifications */
 const NT=()=>{const u=U();return u.nt||(u.nt={on:false,water:true,meals:true,weigh:true,fast:true,eve:true,b:'08:30',l:'13:00',d:'19:00',we:2,wd:1})};
@@ -956,7 +956,7 @@ const _tk2=tick;tick=function(){_tk2();if(!me||!U()||!U().p||!NT().on||CB().stri
 setInterval(tick,20000);
 
 /* ===== v9: 3D heroine as image sprites ===== */
-const HERDEF={wave:'',bq:'',face:'her/face.webp'};
+const HERDEF={wave:'',bq:'',face:'mira/face.webp?v=48'};
 const SLOTS=[['idle','Спокойно стоит'],['happy','Радуется'],['angry','Злится'],['sad','Грустит'],['eat','Ест'],['drink','Пьёт'],['sleepy','Сонная'],['blink','Глаза закрыты'],['wave','Машет рукой'],['celebrate','Празднует'],['mid','Чуть стройнее'],['goal','Стройная, цель']];
 const SLK=[['celebrate',/celebr|bouquet|flower|party|празд|цвет|букет/i],['blink',/blink|closed|закрыт|морг/i],['sleepy',/sleep|sleepy|yawn|сон|спит|сонн/i],['angry',/angry|mad|злит|зл[оа]/i],['sad',/sad|upset|cry|груст/i],['eat',/eat|food|bite|ест|еда/i],['drink',/drink|water|sip|пьёт|пьет|пит|вода/i],['wave',/wave|hello|hi\b|привет|машет/i],['happy',/happy|joy|smile|рад|улыб/i],['goal',/goal|slim|final|цель|стройн/i],['mid',/mid|medium|серед/i],['idle',/idle|neutral|calm|stand|спок|стоит/i]];
 const SCN=[['studio','Студия',0,'linear-gradient(180deg,#bfab8e,#d0bc9f 50%,#ddcbae)'],['mint','Мята',20,'linear-gradient(180deg,#bfe3d4,#e2f3ea 60%,#f3e9dd)'],['sunset','Закат',20,'linear-gradient(180deg,#f7c9a8,#f3a6a0 55%,#c98fb0)'],['garden','Сад',30,'linear-gradient(180deg,#d9e8c4,#b9d6a0 60%,#93bb7c)'],['night','Ночь',30,'linear-gradient(180deg,#1b2540,#2c3a64 60%,#4a5a8c)']];
@@ -988,11 +988,11 @@ renderChibi=function(all){const u=U();if(!u||!u.p||!$('#cbHero'))return;herEnsur
  const slot=herSlot(),r=herSrc(slot);herShow(r.src,r.vid);st.dataset.st=m==='angry'||m==='sad'||m==='eat'||m==='drink'?m:'';st.dataset.fx=r.exact?'':(slot==='angry'||slot==='sad'||slot==='sleepy'?slot:'');herFx(slot,r.exact);
  const sc=SCN.find(x=>x[0]===c.scn)||SCN[0];$('#t-chibi').style.background=sc[3];
  const bb=$('#cbBub');bb.textContent=say;bb.style.display=say?'block':'none';$('#cbMsg').textContent=cbMsgText();
- $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v76`;$('#cbCoin').textContent='🪙 '+c.coins;
+ $('#cbName').textContent=c.name==='Чиби'?'Героиня':c.name;$('#cbStg').textContent=`${STG[idx]} · ${Math.round(P*100)}% пути · v78`;$('#cbCoin').textContent='🪙 '+c.coins;
  $('#cbB1').style.width=sat+'%';$('#cbB2').style.width=wat+'%';$('#cbB3').style.width=(m==='angry'?8:m==='sad'?30:Math.min(100,(sat+wat)/2*.7+done/QS.length*30))+'%';
  if(!all||!$('#cbSheet').classList.contains('on'))return;
  const nm=SLOTS.length,have=SLOTS.filter(x=>HERU[x[0]]).length;
- $('#cbUp').innerHTML=`<p class="m" style="font-size:12px">Сейчас показана героиня из вашего листа. Чтобы она ожила, загрузите по одной картинке на каждое состояние (${have} из ${nm}). Можно выбрать все файлы сразу: состояние определится по имени файла (idle, happy, angry, sad, eat, drink, sleepy, blink, wave, celebrate, mid, goal, kiss, shy). Подойдут и короткие видео-циклы (mp4, webm): они будут повторяться.</p><label class="btn" style="display:block;text-align:center">Выбрать все файлы<input type="file" accept="image/*,video/*" multiple hidden onchange="herFiles(this.files);this.value=''"></label><div class="hrg">${SLOTS.map(x=>`<div class="hrt"><div class="hrp">${HERU[x[0]]?(isVid(HERU[x[0]])?`<video src="${herUrl(HERU[x[0]])}" muted playsinline></video>`:`<img src="${HERU[x[0]]}" alt="">`):'<span>нет</span>'}</div><b>${x[1]}</b><div class="hrb"><label class="chip2 on">${HERU[x[0]]?'Заменить':'Загрузить'}<input type="file" accept="image/*,video/*" hidden onchange="herFiles(this.files,'${x[0]}');this.value=''"></label>${HERU[x[0]]?`<span class="chip2" onclick="herDel('${x[0]}')">×</span>`:''}</div></div>`).join('')}</div>`;
+ if($('#cbUp'))$('#cbUp').innerHTML=`<p class="m" style="font-size:12px">Сейчас показана героиня из вашего листа. Чтобы она ожила, загрузите по одной картинке на каждое состояние (${have} из ${nm}). Можно выбрать все файлы сразу: состояние определится по имени файла (idle, happy, angry, sad, eat, drink, sleepy, blink, wave, celebrate, mid, goal, kiss, shy). Подойдут и короткие видео-циклы (mp4, webm): они будут повторяться.</p><label class="btn" style="display:block;text-align:center">Выбрать все файлы<input type="file" accept="image/*,video/*" multiple hidden onchange="herFiles(this.files);this.value=''"></label><div class="hrg">${SLOTS.map(x=>`<div class="hrt"><div class="hrp">${HERU[x[0]]?(isVid(HERU[x[0]])?`<video src="${herUrl(HERU[x[0]])}" muted playsinline></video>`:`<img src="${HERU[x[0]]}" alt="">`):'<span>нет</span>'}</div><b>${x[1]}</b><div class="hrb"><label class="chip2 on">${HERU[x[0]]?'Заменить':'Загрузить'}<input type="file" accept="image/*,video/*" hidden onchange="herFiles(this.files,'${x[0]}');this.value=''"></label>${HERU[x[0]]?`<span class="chip2" onclick="herDel('${x[0]}')">×</span>`:''}</div></div>`).join('')}</div>`;
  const jt=(k,l)=>{const o=herSrc(k);return `<div><div class="im" style="${HERU[k]||k==='idle'?'':'opacity:.55;border:1px dashed var(--line)'}">${o.vid?`<video src="${o.src}" muted playsinline></video>`:`<img src="${o.src}" alt="">`}</div>${l}${HERU[k]||k==='idle'?'':'<br>нет картинки'}</div>`};
  $('#cbJourney').innerHTML=`<div class="jr">${jt('idle','Начало')}${jt('mid','Середина')}${jt('goal','Цель')}</div><p class="m" style="margin-top:10px">Вы прошли ${Math.round(P*100)}% пути к цели${u.p.w0>lastW()?` (минус ${n1(u.p.w0-lastW())} кг)`:''}. Героиня меняется вместе с вами: на отметках пути показывается картинка стройнее.</p>`;
  $('#cbCoins').textContent=`Монеты: ${c.coins} 🪙 · Дней с записями: ${Object.values(u.days).filter(x=>x.food.length).length}`;
@@ -1065,34 +1065,7 @@ cbPoke=function(){const m=cbMood();if(m==='eat'||m==='drink')return;const n=Date
  if(HTAP>=4&&Math.random()<.6){HTAP=0;return herKiss()}
  herAct(HTAP%3===0?'dance':'shy')};
 
-/* ===== v11: default idle video ===== */
-const HERVID_B64="";
-const HERVID_WEBM="";
-let HERVID_URL='';function herDefVid(){if(!HERVID_URL){try{const v=document.createElement('video'),okMp4=v.canPlayType('video/mp4; codecs="avc1.42E01E"'),src=okMp4?HERVID_B64:HERVID_WEBM,mime=okMp4?'video/mp4':'video/webm';const bin=atob(src),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);HERVID_URL=URL.createObjectURL(new Blob([a],{type:mime}))}catch(e){}}return HERVID_URL}
-const _hs11=herSrc;herSrc=function(slot){const r=_hs11(slot);if(false){const u=herDefVid();if(u)return{src:u,vid:true,exact:slot==='idle'||slot==='mid'||slot==='goal'||slot==='happy'||slot==='wave'||slot==='shy'||slot==='kiss'}}return r};
 SCN[0][3]='linear-gradient(180deg,#b4a18a 0%,#bba88f 45%,#d1c2ac 100%)';
-
-/* ===== v12: iOS-safe video playback + still fallback ===== */
-const HERPOSTER="data:image/gif;base64,R0lGODlhAQABAAAAACw=";let HERVFAIL=false;
-const _hs12=herSrc;herSrc=function(slot){const r=_hs12(slot);if(HERVFAIL&&r.vid&&r.src===HERVID_URL)return{src:HERPOSTER,vid:false,exact:r.exact};return r};
-function herVidSetup(){const v=document.getElementById('herV');if(!v||v.__s)return;v.__s=1;v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');v.poster=HERPOSTER;
- const play=()=>{const q=v.play&&v.play();if(q&&q.catch)q.catch(()=>{})};
- v.addEventListener('canplay',play);v.addEventListener('loadeddata',play);
- v.addEventListener('error',()=>{HERVFAIL=true;HERCUR='';renderChibi(false)});
- ['pointerdown','touchstart','click'].forEach(e=>document.addEventListener(e,()=>{if(v.classList.contains('on')&&v.paused)play()},{passive:true}));
- setInterval(()=>{if(!$('#t-chibi').classList.contains('on'))return;if(v.classList.contains('on')&&!HERVFAIL){if(v.paused)play();if(v.readyState<2||v.currentTime===0){v.__w=(v.__w||0)+1;if(v.__w>4){HERVFAIL=true;HERCUR='';renderChibi(false)}}else v.__w=0}},1000)}
-const _rc12=renderChibi;renderChibi=function(a){herVidSetup();return _rc12(a)};
-
-/* ===== v13: default stills from the user's own renders ===== */
-const HERST={idle:"data:image/gif;base64,R0lGODlhAQABAAAAACw=",angry:"data:image/gif;base64,R0lGODlhAQABAAAAACw=",celebrate:"data:image/gif;base64,R0lGODlhAQABAAAAACw=",shy:"data:image/gif;base64,R0lGODlhAQABAAAAACw="};
-const _hs13=herSrc;herSrc=function(slot){const r=_hs13(slot);if(!r.def)return r;const m={angry:'angry',shy:'shy',kiss:'kiss',celebrate:'celebrate'}[slot];if(m)return{src:HERST[m],vid:false,exact:true,def:true};return{src:HERST.idle,vid:false,exact:slot==='idle'||slot==='mid'||slot==='goal'||slot==='happy'||slot==='wave',def:true}};
-
-/* ===== v14: eat/drink stills + dance video ===== */
-HERST.eat="data:image/gif;base64,R0lGODlhAQABAAAAACw=";HERST.drink="data:image/gif;base64,R0lGODlhAQABAAAAACw=";
-const DANCE_MP4="",DANCE_WEBM="";let DANCE_URL='';
-function herDance(){if(!DANCE_URL){try{const v=document.createElement('video'),ok=v.canPlayType('video/mp4; codecs="avc1.42E01E"'),src=ok?DANCE_MP4:DANCE_WEBM,bin=atob(src),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);DANCE_URL=URL.createObjectURL(new Blob([a],{type:ok?'video/mp4':'video/webm'}))}catch(e){}}return DANCE_URL}
-const _hs14=herSrc;herSrc=function(slot){if(slot==='dance'&&!HERU.dance&&!HERVFAIL){const u=herDance();if(u)return{src:u,vid:true,exact:true}}const r=_hs14(slot);if(r.def&&(slot==='eat'||slot==='drink'))return{src:HERST[slot],vid:false,exact:true,def:true};if(slot==='dance'&&HERU.dance)return{src:herUrl(HERU.dance),vid:isVid(HERU.dance),exact:true};return r};
-ACTD.dance=8000;
 
 /* ===== v15: frame-sequence dance (works where <video> is blocked) ===== */
 const DANCE_FR=[];let DFI=null,DFS=0,DFT=0;
@@ -1106,8 +1079,6 @@ const _hsh15=herShow;herShow=function(src,vid){const c=document.getElementById('
  return _hsh15(src,vid)};
 const _hs15=herSrc;herSrc=function(slot){if(slot==='dance'&&!HERU.dance)return{src:'frames:dance',vid:false,exact:true};return _hs15(slot)};
 
-/* ===== v16: background-free cutouts ===== */
-HERST.idle="her/idle.webp";HERST.angry="her/angry.webp";HERST.celebrate="her/celebrate.webp";HERST.shy="her/shy.webp";HERST.eat="her/eat.webp";HERST.drink="her/drink.webp";HERST.kiss="her/kiss.webp";
 </script>
 
 <script>
@@ -1232,8 +1203,6 @@ scan=async function(){
 let zxRot=null;const _stop21=stopScan;stopScan=function(){if(zxRot){clearInterval(zxRot);zxRot=null}try{zxReader&&zxReader.reset()}catch(e){}zxReader=null;_stop21()};
 </script>
 
-<script>
-</script>
 <script>
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js').then(r=>{r.update&&r.update()}).catch(()=>{})}catch(e){}})}
 </script>
@@ -1361,7 +1330,7 @@ document.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-_tx)>
 
 
 /* v43: выбор героя: Героиня, Алиса, Женя */
-const CH_V='48',MIRA_FACE=HERDEF.face;
+const CH_V='48';
 const CHARS={
  mira:{name:'Карина',dir:'mira',male:false,files:['idle','happy','angry','shy','eat','drink']},
  alice:{name:'Алиса',dir:'alice',male:false,files:['idle','happy','angry','shy','eat','drink']},
@@ -1476,7 +1445,7 @@ const isF=u=>((u.p&&u.p.sex)||(u.quiz&&u.quiz.sex)||'f')!=='m';
 const HL=u=>u.hl||(u.hl={st:isF(u)?'':'male'});
 const dDiff=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/864e5);
 function pregWeek(u){const h=HL(u);if(!h.due)return 0;const left=dDiff(today(),h.due);return Math.max(1,Math.min(42,40-Math.ceil(left/7)))}
-function lifeNoDef(u){const s=HL(u).st;return s==='preg'||s==='feed'}
+function lifeNoDef(u){const s=HL(u).st,h=u&&u.quiz&&u.quiz.health;return s==='preg'||s==='feed'||h==='preg'||h==='ed'}
 function lifeExtra(u){const h=HL(u);if(h.noex)return 0;if(h.st==='preg'){const w=pregWeek(u);return w>=28?450:w>=14?340:0}return h.st==='feed'?330:0}
 function cycInfo(u){const h=HL(u);if(!h.last)return null;const len=+h.len||28,per=+h.per||5;let d=dDiff(h.last,today());if(d<0)return null;const n=d%len+1,ov=len-14;
  let ph,cl;
@@ -2151,7 +2120,7 @@ QZ.splice(gi+1,0,['gwhy','Для чего вы хотите набрать ве�
 const GQ=['gwhy','ghow'];
 qNext=function(){qi++;while(qi<QZ.length&&GQ.includes(QZ[qi][0])&&qa.goal!=='gain')qi++;qRender();window.scrollTo(0,0)};
 qBack=function(){if(qi>-1){qi--;while(qi>=0&&GQ.includes(QZ[qi][0])&&qa.goal!=='gain')qi--;qRender()}};
-const _qf69=qFinish;qFinish=function(){if(qa.goal==='gain'&&qa.gwhy==='rec'&&qa.health==='ok')qa.health='ed';_qf69();paceOpts();if(['preg','ed'].includes(qa.health)){const pc=$('#oPace');[...pc.options].forEach(o=>{if(o.value!=='.25'&&o.value!=='0')o.remove()});pc.value='.25'}if(isGain()){const w=+$('#oW').value||60;$('#oT').value=Math.round(w+3)}};
+const _qf69=qFinish;qFinish=function(){if(qa.goal==='gain'&&qa.gwhy==='rec'&&qa.health==='ok')qa.health='ed';_qf69();paceOpts();if(['preg','ed'].includes(qa.health)){const pc=$('#oPace');if(isGain()){[...pc.options].forEach(o=>{if(o.value!=='.25')o.remove()});pc.value='.25'}else{[...pc.options].forEach(o=>{if(o.value!=='0')o.remove()});pc.value='0'}}else if(qa.goal==='keep'&&!isGain()){const pc=$('#oPace');if([...pc.options].some(o=>o.value==='0'))pc.value='0'}if(isGain()){const w=+$('#oW').value||60;$('#oT').value=Math.round(w+3)}};
 const STDP=($('#oPace')||{}).innerHTML;
 function paceOpts(){const pc=$('#oPace');if(!pc)return;const p=U()&&U().p,cur=p&&p.pace;
  if(isGain()){const q=U().quiz;pc.dataset.g=1;pc.innerHTML='<option value=".25">Мягкий: +0,25 кг в неделю</option><option value=".5">Умеренный: +0,5 кг в неделю</option>';const want=cur>0?cur:(q.gwhy==='sport'?.5:.25);pc.value=[...pc.options].some(o=>+o.value===want)?String(want).replace(/^0/,''):'.25'}
