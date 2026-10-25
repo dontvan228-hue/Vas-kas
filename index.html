@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Счётчик калорий и трекер похудения бесплатно — VASSKASS • FLOW</title>
 <meta name="description" content="Бесплатный трекер питания, воды, веса и привычек для женщин и мужчин: калории и БЖУ, цели «похудеть», «набрать» или «для себя». Бета-версия, без рекламы.">
 <meta name="keywords" content="счётчик калорий, трекер калорий, дневник питания, калькулятор калорий, похудение, как похудеть, подсчёт калорий онлайн, БЖУ, калорийность продуктов, интервальное голодание, трекер воды, трекер веса, приложение для похудения бесплатно">
@@ -261,17 +261,25 @@ html[data-mode=light] .cbbtns button{background:rgba(255,255,255,.6)}html[data-m
 .cbside button{width:48px;height:48px;border-radius:50%;border:1px solid rgba(var(--acc),.26);background:rgba(var(--bgd),.62);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:22px;cursor:pointer;transition:transform .15s}.cbside button:active{transform:scale(.88)}
 .hrp video{width:100%;height:100%;object-fit:cover}
 </style>
+<style>.lh{font-size:17px;line-height:1.3;text-align:center;margin-top:10px;font-weight:800}.lf{list-style:none;margin:16px 0 4px;display:grid;gap:8px}.lf li{font-size:13px;line-height:1.4;color:var(--mut);background:rgba(0,0,0,.18);border-radius:12px;padding:10px 12px}.lf b{color:var(--txt)}</style>
 <style>#herV{-webkit-mask-image:none!important;mask-image:none!important}</style>
 <style>.her{-webkit-mask-image:none!important;mask-image:none!important}.herh{-webkit-mask-image:linear-gradient(to bottom,#000 0,#000 27%,transparent 36%)}</style><style>#herH{display:none!important}</style></head>
 <body>
 <noscript><main style="padding:24px;font:16px/1.5 sans-serif"><h1>VASSKASS • FLOW — счётчик калорий и трекер питания</h1><p>Бесплатное приложение для питания и привычек: подсчёт калорий и БЖУ, дневник питания, трекер воды и веса, интервальное голодание, расчёт нормы калорий и виртуальная героиня, которая мотивирует не срываться. Работает в браузере и устанавливается на экран телефона, без VPN. Включите JavaScript, чтобы открыть приложение.</p></main></noscript>
 
 
-<div id="splash"><div class="lg">VASSKASS</div><div class="q">«Ты с каждым днем будешь прекраснее чем вчера»</div><i></i></div>
+<div id="splash"><div class="lg">VASSKASS</div><div class="q">«Ты с каждым днём будешь прекраснее, чем вчера»</div><i></i></div>
 
 <main class="scr" id="auth" hidden><div class="card">
   <div class="brand">VASSKASS • FLOW</div>
-  <p class="m" style="text-align:center;margin-top:6px">Бесплатный помощник для спокойного и безопасного похудения</p>
+  <h1 class="lh">Счётчик калорий и трекер питания бесплатно</h1>
+  <p class="m" style="text-align:center;margin-top:6px">Помощник для спокойного похудения, набора веса или просто для себя</p>
+  <ul class="lf">
+    <li><b>Калории и БЖУ.</b> Выбираешь продукт, вводишь вес, остальное приложение считает само.</li>
+    <li><b>Всё в одном месте.</b> Вода, вес, сон и интервальное голодание.</li>
+    <li><b>Мягкий темп.</b> От 0,25 кг в неделю или поддержание без дефицита.</li>
+    <li><b>Без рекламы и VPN.</b> Работает в браузере и ставится на экран телефона.</li>
+  </ul>
   <div class="tabs2"><button id="tLogin" class="on" onclick="authMode('login')">Вход</button><button id="tReg" onclick="authMode('reg')">Регистрация</button></div>
   <div id="fName" hidden><label>Имя</label><input id="aName" autocomplete="given-name"></div>
   <label>Почта</label><input id="aMail" type="email" autocomplete="email" placeholder="you@mail.ru">
@@ -603,7 +611,7 @@ async function analyze(){
 authMode('login');
 setTimeout(()=>{
   $('#splash').style.opacity=0;setTimeout(()=>$('#splash').remove(),700);
-  if(db.session&&db.users[db.session]){me=db.session;enter()}else{show('auth');try{const m=localStorage.getItem('flow_last_mail');if(m&&$('#aMail'))$('#aMail').value=m}catch(e){}}
+  if(db.session&&db.users[db.session]){me=db.session;enter()}else{show('auth');try{const m=localStorage.getItem('flow_last_mail');if(m&&$('#aMail'))$('#aMail').value=m;else authMode('reg')}catch(e){}}
 },1500);
 
 /* ===== Carb module: macros, barcode, fasting, exercise, ketones, recipes (free) ===== */
