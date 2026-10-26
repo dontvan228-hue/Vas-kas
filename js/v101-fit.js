@@ -14,7 +14,10 @@ if(typeof plan!=='function'||typeof U!=='function'||typeof renderFit!=='function
 
 const SHARE=.5,CAP=600,BASE_STEPS=4000,STEP_G=.00058,STEP_N=.00042;
 const ok=()=>{try{return !!(me&&U()&&U().p)}catch(e){return false}};
-const FX=()=>{const u=U(),f=u.fit||(u.fit={});if(f.on==null)f.on=true;if(!(f.goal>0))f.goal=8000;return f};
+const isEdU=()=>{try{return ((U().quiz||{}).health)==='ed'}catch(e){return false}};
+const share=()=>{try{return U().adapt?.3:SHARE}catch(e){return SHARE}};
+const shareTxt=()=>share()===SHARE?'половина':'30%';
+const FX=()=>{const u=U(),f=u.fit||(u.fit={});if(f.on==null)f.on=!isEdU();if(!(f.goal>0))f.goal=8000;return f};
 const kg=()=>{try{return +lastW()||70}catch(e){return 70}};
 const ru=n=>Math.round(n).toLocaleString('ru-RU');
 const r10=n=>Math.round(n/10)*10;
@@ -43,7 +46,7 @@ function fitCalc(d){const f=FX(),p=U().p;d=d||day();const ex=d.ex||[],steps=+d.s
  const mins=ex.reduce((a,x)=>a+(+x.m||0),0),kEx=ex.reduce((a,x)=>a+(+x.k||0),0),nEx=ex.reduce((a,x)=>a+netOf(x),0);
  const nSt=Math.max(0,steps-BASE_STEPS)*kg()*STEP_N*strideK();
  const base=Math.max(0,((+p.act||1.2)-1.2)*bmr()),A=nEx+nSt,over=Math.max(0,A-base);
- const add=f.on?Math.min(CAP,r10(over*SHARE)):0;
+ const add=f.on?Math.min(CAP,r10(over*share())):0;
  return{mins,steps,kEx:Math.round(kEx),kSt:stepKcal(steps),net:Math.round(A),base:Math.round(base),over:Math.round(over),add,on:f.on,goal:f.goal,n:ex.length}}
 const actName=()=>{try{const a=+U().p.act;return a>=1.7?'«Высокая»':a>=1.5?'«Средняя»':a>=1.3?'«Лёгкая»':'«Сидячая»'}catch(e){return ''}};
 
@@ -129,7 +132,7 @@ function goal(n){n=Math.round(+n);if(!(n>=1000&&n<=40000))return toast('Цель
 function toggle(v){FX().on=!!v;save();render();toast(v?'Активность добавляется к норме дня':'Норма больше не меняется от активности')}
 function delEx(i){try{const d=day();if(!d.ex||!d.ex[i])return;d.ex.splice(i,1);save();render();toast('Запись удалена')}catch(e){}}
 function explain(){const c=fitCalc();openPop('Как активность влияет на норму',`<p class="m">Ваша норма считается по формуле Миффлина — Сан Жеора с коэффициентом активности ${actName()}. В ней уже заложено около <b>${ru(c.base)} ккал</b> движения в день, поэтому обычную активность мы не прибавляем: иначе её пришлось бы «съесть» дважды.</p>
-<p class="m">Когда вы двигаетесь больше, считаем только «чистые» калории: сверх тех, что тело тратит в покое. Из того, что выше заложенного, к норме добавляется <b>половина</b> (не больше ${CAP} ккал). Формулы и браслеты часто завышают траты, а так вес меняется предсказуемо.</p>
+<p class="m">Когда вы двигаетесь больше, считаем только «чистые» калории: сверх тех, что тело тратит в покое. Из того, что выше заложенного, к норме добавляется <b>${shareTxt()}</b>${share()===SHARE?'':' (норма уже подстроена под ваш реальный расход, поэтому доля меньше)'} (не больше ${CAP} ккал). Формулы и браслеты часто завышают траты, а так вес меняется предсказуемо.</p>
 <div class="fx-note">Сегодня: занятия и шаги ≈ <b>${ru(c.net)} ккал</b> чистых трат, заложено ${ru(c.base)}, сверх — ${ru(c.over)}.<br>${c.on?`К норме: <b>+${c.add} ккал</b>.`:'Бонус к норме выключен.'}</div>
 <p class="m" style="margin-top:10px;font-size:12px">Ккал занятия = MET × вес × время. Шаги: ≈ ${Math.round(kg()*STEP_G*strideK()*1000)} ккал на 1000 шагов при вашем весе, первые ${ru(BASE_STEPS)} шагов входят в базовую норму.</p>`)}
 
@@ -148,7 +151,7 @@ function build(min,lv){const L=LV[lv],P=POOL[lv],wu=min<=7?Math.min(30,L.wu):L.w
  return{n:`Дома без инвентаря · ${min} мин`+(lv==='std'?'':lv==='beg'?' · для начинающих':' · при беременности'),min,lv,met:L.met,steps,ex:ex.map(x=>x[0])}}
 function homeLvl(){return HLVL||(isPreg()?'preg':'std')}
 function preview(min){const lv=homeLvl(),p=build(min,lv),tot=p.steps.reduce((a,s)=>a+s[2],0),k=Math.round(p.met*kg()*tot/3600),L=LV[lv];
- openPop(p.n,`<p class="m">≈ ${Math.round(tot/60)} мин · ${L.w} с работа / ${L.r} с отдых · ≈${k} ккал (ориентир)</p>${lv==='preg'?`<div class="fx-note" style="margin:0 0 10px"><b>По согласованию с врачом.</b> ${PREG_NOTE}</div>`:''}`+
+ openPop(p.n,`<p class="m">≈ ${Math.round(tot/60)} мин · ${L.w} с работа / ${L.r} с отдых · ≈${k} ккал (ориентир)</p>${lv==='preg'||isPreg()?`<div class="fx-note" style="margin:0 0 10px"><b>По согласованию с врачом.</b> ${PREG_NOTE}</div>`:''}`+
  p.ex.map((e,j)=>`<div class="item"><span>${j+1}. ${esc(e)}</span><small style="color:var(--mut)">${L.w} с</small></div>`).join('')+
  `<p class="m" style="font-size:12px;margin-top:8px">Двигайтесь в комфортном темпе: если упражнение неудобно, замените его маршем на месте. Таймер подскажет, что дальше.</p><button class="btn" onclick="FX101.go(${min})">Начать</button>`)}
 
@@ -184,7 +187,7 @@ document.addEventListener('visibilitychange',()=>{try{if(document.visibilityStat
 /* ---------- экран «Тренировки» ---------- */
 const ring=(v,g)=>{const C=213.6,r=Math.min(1,g?v/g:0);return `<div class="fx-ring" role="img" aria-label="Шаги: ${ru(v)} из ${ru(g)}"><svg viewBox="0 0 96 96"><circle class="bg" cx="48" cy="48" r="34"/><circle class="fg" cx="48" cy="48" r="34" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-r)}"/></svg><div class="c"><b>${v>=10000?(Math.round(v/100)/10).toString().replace('.',',')+'к':ru(v)}</b><small>из ${ru(g)}</small></div></div>`};
 function bonusLine(c){if(!c.on)return c.n||c.steps?`Бонус к норме выключен: норма не меняется от активности.`:'';
- if(c.add>0)return `Норма сегодня <b>+${c.add} ккал</b> за активность: это половина от ${ru(c.over)} ккал сверх заложенного в ваш план.`;
+ if(c.add>0)return `Норма сегодня <b>+${c.add} ккал</b> за активность: это ${shareTxt()} от ${ru(c.over)} ккал сверх заложенного в ваш план.`;
  if(c.n||c.steps>BASE_STEPS)return `Ваша активность пока в пределах заложенной в норму (≈${ru(c.base)} ккал в день), поэтому норма та же. Всё, что сверх, добавим.`;return ''}
 function cardDay(){const c=fitCalc(),f=FX(),left=Math.max(0,c.goal-c.steps);
  return `<h2>Активность сегодня</h2><div class="fx-top">${ring(c.steps,c.goal)}<div class="fx-sum"><b>${ru(c.steps)}</b> шагов${c.steps?` · ≈${c.kSt} ккал`:''}<br>${c.mins} мин занятий${c.kEx?` · ≈${ru(c.kEx)} ккал`:''}<br><span style="color:var(--mut)">${c.steps>=c.goal?'Цель шагов на сегодня выполнена 🎉':c.steps?`До цели ${ru(left)} шагов`:'Добавьте шаги, когда будет удобно'}</span></div></div>
@@ -196,14 +199,14 @@ function cardQuick(){const a=ACT.find(x=>x[0]===SEL)||ACT[0],steps=SEL==='walk'&
  ${SEL==='walk'?`<div class="fx-seg"><span class="chip2 ${!steps?'on':''}" onclick="FX101.wm('min')">Минуты</span><span class="chip2 ${steps?'on':''}" onclick="FX101.wm('steps')">Шаги</span></div>`:''}
  ${steps?`<label>Сколько шагов добавить</label><input id="fxQS" type="number" inputmode="numeric" placeholder="например, 3000" oninput="FX101.pv()"><div class="fx-btns">${[1000,2000,3000,5000].map(n=>`<button onclick="$('#fxQS').value=${n};FX101.pv()">${ru(n)}</button>`).join('')}</div>`:
  `<div class="fx-seg">${INT.map((t,i)=>`<span class="chip2 ${i===LVL?'on':''}" onclick="FX101.lvl(${i})" title="${esc(a[4][i])}">${t}</span>`).join('')}</div><p class="m" style="font-size:12px;margin:-4px 0 8px">${esc(a[4][LVL])}</p><label>Сколько минут</label><input id="fxQM" type="number" inputmode="numeric" placeholder="например, 30" oninput="FX101.pv()"><div class="fx-btns">${[10,20,30,45,60].map(n=>`<button onclick="$('#fxQM').value=${n};FX101.pv()">${n} мин</button>`).join('')}</div>`}
- <div class="fx-prev" id="fxPv"></div><button class="btn" onclick="FX101.log()">Записать</button>`}
+ ${isPreg()&&(LVL===2||['run','swim','dance','str'].includes(SEL))&&!(SEL==='walk'&&WMODE==='steps')?'<div class="fx-note" style="margin:4px 0 0"><b>По согласованию с врачом.</b> Во время беременности интенсивные нагрузки, бег, силовые, плавание и танцы обсуждайте с вашим врачом.</div>':''}<div class="fx-prev" id="fxPv"></div><button class="btn" onclick="FX101.log()">Записать</button>`}
 function pv(){try{const e=$('#fxPv');if(!e)return;const a=ACT.find(x=>x[0]===SEL)||ACT[0];
  if(SEL==='walk'&&WMODE==='steps'){const v=+($('#fxQS')||{}).value||0;e.innerHTML=v>0?`≈ <b>${stepKcal(v)} ккал</b> · примерно ${Math.round(v/100)} мин ходьбы`:`≈ ${Math.round(kg()*STEP_G*strideK()*1000)} ккал на каждую 1000 шагов при вашем весе`;return}
  const m=+($('#fxQM')||{}).value||0,met=a[3][LVL];e.innerHTML=m>0?`≈ <b>${Math.round(met*kg()*m/60)} ккал</b> · MET ${String(met).replace('.',',')} × ${String(n1(kg())).replace('.',',')} кг × ${m} мин`:`MET ${String(met).replace('.',',')}: ≈ ${Math.round(met*kg()/60*10)} ккал за 10 минут`}catch(e){}}
 function cardHome(){const lv=homeLvl(),L=LV[lv];
  return `<h2>Домашние тренировки</h2><p class="m" style="margin-bottom:8px">Без инвентаря, с таймером и подсказками. Хватит места рядом с ковриком.</p><div class="fx-seg">${Object.keys(LV).map(k=>`<span class="chip2 ${k===lv?'on':''}" onclick="FX101.hl('${k}')">${LV[k].n}</span>`).join('')}</div>
  <div class="fx-hp">${[7,15,20].map(m=>`<button onclick="FX101.pre(${m})"><b>${m}</b><small>мин · ≈${Math.round(L.met*kg()*m/60)} ккал</small></button>`).join('')}</div>
- ${lv==='preg'?`<div class="fx-note"><b>По согласованию с врачом.</b> ${PREG_NOTE}${isPreg()&&pWeek()>13?`<br>Сейчас у вас ${pWeek()}-я неделя: упражнения лёжа на спине в эту программу не входят.`:''}</div>`:lv==='beg'?`<div class="fx-note">Мягкий старт: 30 секунд движения и 30 секунд отдыха, без прыжков. Отдыхайте дольше, если нужно, — это нормально.</div>`:''}`}
+ ${lv==='preg'||isPreg()?`<div class="fx-note"><b>По согласованию с врачом.</b> ${PREG_NOTE}${isPreg()&&pWeek()>13?`<br>Сейчас у вас ${pWeek()}-я неделя: упражнения лёжа на спине в эту программу не входят.`:''}</div>`:lv==='beg'?`<div class="fx-note">Мягкий старт: 30 секунд движения и 30 секунд отдыха, без прыжков. Отдыхайте дольше, если нужно, — это нормально.</div>`:''}`}
 function cardToday(){const ex=day().ex||[],c=fitCalc();
  return (ex.length?ex.map((x,i)=>`<div class="item"><span>${esc(x.n)}<br><small style="color:var(--mut)">${x.m} мин · ≈${x.k} ккал</small></span><button class="fx-del" aria-label="Удалить запись" onclick="FX101.del(${i})">✕</button></div>`).join(''):'<p class="m">Сегодня записей пока нет. Подойдёт даже 10-минутная прогулка.</p>')+(c.steps?`<div class="item"><span>Шаги<br><small style="color:var(--mut)">${ru(c.steps)} · ≈${c.kSt} ккал</small></span><button class="fx-del" aria-label="Обнулить шаги" onclick="FX101.steps(-${c.steps})">✕</button></div>`:'')}
 function ensure(){const t=document.getElementById('t-fit');if(!t)return null;if(!t.querySelector('#fxDay')){const back=t.querySelector(':scope>button');
@@ -213,7 +216,7 @@ const _rf101=renderFit;renderFit=function(){const r=_rf101.apply(this,arguments)
  $('#fxDay').innerHTML=cardDay();const qv=($('#fxQM')||{}).value,sv=($('#fxQS')||{}).value,foc=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#fxQuick');
  if(!foc){$('#fxQuick').innerHTML=cardQuick();if(qv&&$('#fxQM'))$('#fxQM').value=qv;if(sv&&$('#fxQS'))$('#fxQS').value=sv;pv()}
  $('#fxHome').innerHTML=cardHome();$('#fitToday').innerHTML=cardToday();
- if(isPreg()){const bad=/Прыж|выпрыг|Бёрпи|Скалолаз|Скручив|Подъём ног|Велосипед|Планка|Тяга в наклоне/;const L=WO.map((w,i)=>({w,i})).filter(x=>FF==='all'||x.w[1]===FF);
+ if(isPreg()){const bad=/Прыж|выпрыг|Бёрпи|Скалолаз|Скручив|Подъём ног|Велосипед|Планка|Тяга в наклоне|мостик|лёжа на спине|на животе/i;const L=WO.map((w,i)=>({w,i})).filter(x=>FF==='all'||x.w[1]===FF);
   [...document.querySelectorAll('#fitList .res')].forEach((el,j)=>{const w=L[j]&&L[j].w;if(w&&w[4].some(e=>bad.test(e[0]))&&!el.querySelector('.fx-tag'))el.querySelector('span').insertAdjacentHTML('beforeend','<br><span class="fx-tag">Не для беременности: выберите домашнюю программу выше</span>')})}
 }catch(e){console.error(e)}return r};
 

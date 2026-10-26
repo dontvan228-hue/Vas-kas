@@ -28,7 +28,7 @@
   const b=$q('#qBody');if(!b||b.querySelector('.q94skip'))return r;
   let left=0;for(let i=qi;i<QZ.length;i++)if(QZ[i][0] in OPT&&!hidden(i))left++;
   const p=b.querySelector('p.m');if(p&&/^Дополнительно: \d+ из \d+$/.test(p.textContent))p.textContent+=' · можно пропустить';
-  b.insertAdjacentHTML('beforeend',`<button type="button" class="btn ghost q94skip" style="margin-top:12px" onclick="qLater()">Пропустить, заполню потом</button><p class="m q94note" style="text-align:center;font-size:13px;margin-top:6px">${left>1?'Осталось '+left+' необязательных вопросов: их можно заполнить позже в «Профиле».':'Это необязательный вопрос.'}</p>`)}catch(e){}return r};
+  b.insertAdjacentHTML('beforeend',`<button type="button" class="btn ghost q94skip" style="margin-top:12px" onclick="qLater()">Пропустить, заполню потом</button><p class="m q94note" style="text-align:center;font-size:13px;margin-top:6px">${left>1?'Осталось '+left+' '+(left%10>=2&&left%10<=4&&(left%100<12||left%100>14)?'необязательных вопроса':left%10===1&&left%100!==11?'необязательный вопрос':'необязательных вопросов')+': их можно заполнить позже в «Профиле».':'Это необязательный вопрос.'}</p>`)}catch(e){}return r};
  /* если в анкете что-то пропущено, сводка не должна показывать «undefined» */
  const _qs94=qSummary;qSummary=function(){try{for(const k in OPT)if(qa[k]==null){qa[k]=OPT[k];(qa.later||(qa.later=[])).push(k)}}catch(e){}return _qs94.apply(this,arguments)};
 
@@ -64,7 +64,7 @@
  function whoUpd(){try{const t=$q('#oWhoT'),sr=$q('#oSex').closest('.row');if(t)t.textContent=fem()?'Женщина':'Мужчина';const e=$q('#oWhoE');if(e)e.textContent=sr.hidden?'изменить':'готово';ageUpd()}catch(e){}}
  let ageMid=null;
  function ageUpd(){try{const h=$q('#oAgeHint'),a=+$q('#oAge').value;if(!h)return;let t='',warn=false;
-  if(a>0&&a<18){t='Тело в этом возрасте ещё растёт, поэтому план лучше обсудить с врачом. Цель и темп выбираешь '+(fem()?'сама.':'сам.');warn=true}
+  if(a>0&&a<18){t='Тело в этом возрасте ещё растёт, поэтому план лучше обсудить с врачом. Цель и темп вы выбираете сами.';warn=true}
   else if(ageMid&&a===ageMid.v)t='Вы выбрали «'+AGER[ageMid.k]+'», поэтому подставили '+a+'. Укажите точный возраст: от него зависит норма калорий.';
   h.textContent=t;h.hidden=!t;h.style.color=warn?'var(--warn)':''}catch(e){}}
  function goalUpd(){try{const gs=$q('#oGoalSel'),tb=$q('#oTBox'),oT=$q('#oT'),w=+$q('#oW').value,h=$q('#oTHint');if(!gs||!tb)return;

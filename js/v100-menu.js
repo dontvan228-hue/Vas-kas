@@ -6,7 +6,7 @@
 const D_VEG='Овощи и зелень',D_FR='Фрукты и ягоды',D_MEAT='Мясо и птица',D_FISH='Рыба и консервы',D_MILK='Молочное и яйца',D_GR='Крупы, макароны, хлеб',D_GROC='Бакалея',D_FRZ='Заморозка';
 const DEPTS=[D_VEG,D_FR,D_MEAT,D_FISH,D_MILK,D_GR,D_GROC,D_FRZ];
 const ING={
- egg:['Яйца куриные',D_MILK,157,.7,0,12.7,11.5,55,'шт',''],
+ egg:['Яйца куриные',D_MILK,157,.7,0,12.7,11.5,50,'шт',''],
  milk:['Молоко 2,5%',D_MILK,52,4.7,0,2.8,2.5,0,'мл',''],
  kefir:['Кефир 1%',D_MILK,40,4,0,3,1,0,'мл',''],
  tvorog:['Творог 5%',D_MILK,121,3,0,17,5,0,'',''],
@@ -73,22 +73,22 @@ const DISHES=[
  ['Овсянка на молоке с бананом','b',{oats:50,milk:200,banana:100}],
  ['Овсянка с ягодами и орехами','b',{oats:50,milk:150,berries:100,walnut:10}],
  ['Гречка с молоком и маслом','b',{buck:60,milk:200,butter:5}],
- ['Омлет с помидорами и хлебом','b',{egg:165,milk:50,tomato:120,bread:30,oil:5}],
- ['Яичница с перцем и луком','b',{egg:110,pepper:100,onion:30,oil:5,bread:30}],
- ['Сырники со сметаной','b',{tvorog:180,egg:55,flour:30,oil:7,smet:30}],
+ ['Омлет с помидорами и хлебом','b',{egg:150,milk:50,tomato:120,bread:30,oil:5}],
+ ['Яичница с перцем и луком','b',{egg:100,pepper:100,onion:30,oil:5,bread:30}],
+ ['Сырники со сметаной','b',{tvorog:180,egg:50,flour:30,oil:7,smet:30}],
  ['Творог с ягодами и мёдом','b',{tvorog:180,berries:100,honey:10}],
- ['Бутерброды с сыром и яйцом, огурец','b',{bread:60,cheese:30,egg:55,cucumber:100}],
+ ['Бутерброды с сыром и яйцом, огурец','b',{bread:60,cheese:30,egg:50,cucumber:100}],
  ['Пшённая каша с тыквой','b',{millet:60,milk:150,pumpkin:150,butter:5}],
  ['Рисовая каша на молоке','b',{rice:50,milk:250,butter:5}],
  ['Ленивая овсянка с йогуртом и яблоком','b',{yog:200,oats:40,apple:150}],
- ['Омлет с брынзой и зеленью','b',{egg:165,brynza:40,greens:30,oil:5}],
- ['Скрэмбл с грибами и сыром','b',{egg:165,mush:100,cheese:20,butter:5}],
- ['Творожная запеканка со сметаной','b',{tvorog:200,egg:55,oats:20,smet:20}],
+ ['Омлет с брынзой и зеленью','b',{egg:150,brynza:40,greens:30,oil:5}],
+ ['Скрэмбл с грибами и сыром','b',{egg:150,mush:100,cheese:20,butter:5}],
+ ['Творожная запеканка со сметаной','b',{tvorog:200,egg:50,oats:20,smet:20}],
  ['Бутерброды с сёмгой и огурцом','b',{bread:60,salmon:50,cucumber:100,tvorog:50}],
  ['Творог со сметаной и орехами','b',{tvorog:180,smet:30,walnut:15}],
- ['Омлет с курицей и сыром','b',{egg:110,chick:80,cheese:20,butter:5}],
- ['Шакшука (яйца в томатах) с хлебом','bm',{egg:165,tomato:250,pepper:100,onion:40,oil:7,bread:30}],
- ['Запеканка из яиц с брокколи и сыром','bm',{egg:165,broccoli:150,cheese:30,milk:50}],
+ ['Омлет с курицей и сыром','b',{egg:100,chick:80,cheese:20,butter:5}],
+ ['Шакшука (яйца в томатах) с хлебом','bm',{egg:150,tomato:250,pepper:100,onion:40,oil:7,bread:30}],
+ ['Запеканка из яиц с брокколи и сыром','bm',{egg:150,broccoli:150,cheese:30,milk:50}],
  ['Борщ со сметаной и хлебом','m',{beef:70,beet:100,cabbage:100,potato:80,carrot:40,onion:30,tpaste:15,oil:5,smet:20,bread:30}],
  ['Щи из свежей капусты с курицей','m',{thigh:80,cabbage:150,potato:80,carrot:40,onion:30,smet:20,bread:30}],
  ['Куриный суп с лапшой','m',{chick:80,pasta:30,carrot:40,onion:30,potato:60,greens:10,bread:30}],
@@ -113,23 +113,27 @@ const DISHES=[
  ['Овощное рагу с фасолью','m',{beans:150,potato:120,zucchini:150,carrot:50,onion:40,pepper:100,oil:10}],
  ['Гречка с грибами и луком','m',{buck:70,mush:200,onion:60,oil:10,smet:20}],
  ['Макароны с сыром и помидорами','m',{pasta:80,cheese:40,tomato:150,oil:5}],
- ['Булгур с овощами и яйцом','m',{bulgur:60,pepper:100,zucchini:100,egg:55,oil:7}],
+ ['Булгур с овощами и яйцом','m',{bulgur:60,pepper:100,zucchini:100,egg:50,oil:7}],
  ['Тофу с овощами и рисом','m',{tofu:150,vegmix:200,rice:50,oil:7}],
  ['Куриное бедро с брокколи и сыром','m',{thigh:150,broccoli:200,cheese:20,oil:5}],
  ['Минтай под сметаной с цветной капустой','m',{pollock:200,smet:40,cauli:200,cheese:15,oil:5}],
  ['Свинина с кабачками и перцем','m',{pork:150,zucchini:200,pepper:100,oil:10}],
  ['Говяжьи котлеты с салатом из овощей','m',{mince:130,egg:25,onion:30,cucumber:150,tomato:150,oil:10}],
- ['Салат с тунцом, яйцом и овощами','m',{tuna:120,egg:110,cucumber:150,tomato:120,lettuce:50,oil:10}],
+ ['Салат с тунцом, яйцом и овощами','m',{tuna:120,egg:100,cucumber:150,tomato:120,lettuce:50,oil:10}],
  ['Салат с брынзой и овощами','m',{cucumber:150,tomato:150,pepper:100,brynza:60,oil:10,walnut:10}],
- ['Капуста тушёная с грибами и яйцом','m',{cabbage:250,mush:150,egg:110,oil:10}],
- ['Кабачки, запечённые с творогом и сыром','m',{zucchini:300,tvorog:120,egg:55,cheese:30}],
+ ['Капуста тушёная с грибами и яйцом','m',{cabbage:250,mush:150,egg:100,oil:10}],
+ ['Кабачки, запечённые с творогом и сыром','m',{zucchini:300,tvorog:120,egg:50,cheese:30}],
+ ['Омлет с сыром и помидором','b',{egg:150,cheese:30,tomato:100,butter:5}],
+ ['Свинина, запечённая с грибами и сыром','m',{pork:150,mush:150,cheese:30,smet:20,oil:5}],
+ ['Курица в сметане с кабачками','m',{thigh:150,zucchini:200,smet:40,oil:5}],
+ ['Брынза с огурцом и орехами','s',{brynza:50,cucumber:100,walnut:10}],
  ['Яблоко и грецкие орехи','s',{apple:180,walnut:15}],
  ['Кефир и яблоко','s',{kefir:250,apple:150}],
  ['Творог с огурцом и зеленью','s',{tvorog:150,cucumber:100,greens:10}],
  ['Йогурт с ягодами','s',{yog:200,berries:80}],
  ['Бутерброд с сыром и помидором','s',{bread:30,cheese:25,tomato:50}],
  ['Кефир с бананом','s',{kefir:200,banana:120}],
- ['Яйца вкрутую с огурцом','s',{egg:110,cucumber:150}],
+ ['Яйца вкрутую с огурцом','s',{egg:100,cucumber:150}],
  ['Сыр и грецкие орехи','s',{walnut:20,cheese:30}],
  ['Творог с бананом','s',{tvorog:120,banana:80}],
  ['Овощные палочки с брынзой','s',{carrot:100,cucumber:100,brynza:40}],
@@ -138,8 +142,8 @@ const DISHES=[
  ['Творог с орехами','s',{tvorog:120,walnut:10}],
  ['Стакан кефира','s',{kefir:250}],
  ['Мандарины и йогурт','s',{mandarin:160,yog:150}],
-].map((d,i)=>{let k=0,c=0,fi=0,p=0,f=0,meat=false,np=false;Object.entries(d[2]).forEach(([key,g])=>{const x=ING[key];k+=x[2]*g/100;c+=x[3]*g/100;fi+=x[4]*g/100;p+=x[5]*g/100;f+=x[6]*g/100;if(x[9].includes('M'))meat=true;if(x[9].includes('P'))np=true});
- const net=c-fi;return{id:i,n:d[0],t:d[1],ing:d[2],k,c,fi,p,f,net,veg:!meat,np,lc:net<=(d[1]==='s'?10:13)}});
+].map((d,i)=>{let k=0,c=0,fi=0,p=0,f=0,vf=0,meat=false,np=false;Object.entries(d[2]).forEach(([key,g])=>{const x=ING[key];k+=x[2]*g/100;c+=x[3]*g/100;fi+=x[4]*g/100;p+=x[5]*g/100;f+=x[6]*g/100;if(x[9].includes('M'))meat=true;if(x[9].includes('P'))np=true;if((x[1]===D_VEG||x[1]===D_FR||['berries','broccoli','cauli','vegmix'].includes(key))&&key!=='potato'&&key!=='garlic')vf+=g});
+ const net=c-fi;return{id:i,n:d[0],t:d[1],ing:d[2],k,c,fi,p,f,vf,net,tuna:!!d[2].tuna,egg:!!d[2].egg,veg:!meat,np,lc:net<=(d[1]==='s'?10:13)}});
 window.MENU_DISHES=DISHES;
 
 /* --- настройки --- */
@@ -147,7 +151,7 @@ const SLOTS={2:[['Завтрак','b',.45],['Ужин','m',.55]],3:[['Завтр
 const DIETN={all:'Обычное',lc:'Лоу-карб',veg:'Вегетарианское'};
 const WD=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],WDF=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 const q=()=>(U()&&U().quiz)||{};
-const defDiet=()=>{const d=q().diet;return d==='lc'||d==='veg'?d:(typeof LIM==='function'&&LIM()?'lc':'all')};
+const defDiet=()=>{const d=q().diet;if(isPreg()&&(d==='lc'||!d))return 'all';return d==='lc'||d==='veg'?d:(typeof LIM==='function'&&LIM()?'lc':'all')};
 const defMeals=()=>({'2':2,'3':3,'5':5}[q().meals]||4);
 const isPreg=()=>{const u=U();return q().health==='preg'||!!(u&&u.hl&&(u.hl.st==='preg'||u.hl.st==='feed'))};
 const M=()=>U().menu;
@@ -158,14 +162,16 @@ const dateAt=(start,i)=>{const t=new Date(Date.parse(start)+i*864e5);return{wd:t
 function targets(diet){
  const b=plan().b,mn=mnorm(),P=mn.P;
  if(diet==='lc'){const C=(typeof LIM==='function'&&LIM())?NG():Math.min(50,mn.C);return{b,P,C,F:Math.max(40,Math.round((b-4*P-4*C)/9)),lc:1}}
- return{b,P,F:mn.F,C:mn.C,lc:0};
+ return{b,P,F:mn.F,C:mn.Ct||mn.C,lc:0};
 }
 function pool(diet,preg){return DISHES.filter(d=>(!preg||!d.np)&&(diet!=='veg'||d.veg)&&(diet!=='lc'||d.lc))}
 /* сумма по дню: items [{id,x}] */
-function sum(items){const s={k:0,p:0,f:0,c:0,net:0};items.forEach(it=>{const d=DISHES[it.id];s.k+=d.k*it.x;s.p+=d.p*it.x;s.f+=d.f*it.x;s.c+=d.c*it.x;s.net+=d.net*it.x});return s}
+function sum(items){const s={k:0,p:0,f:0,c:0,net:0,fi:0,vf:0};items.forEach(it=>{const d=DISHES[it.id];s.k+=d.k*it.x;s.p+=d.p*it.x;s.f+=d.f*it.x;s.c+=d.c*it.x;s.net+=d.net*it.x;s.fi+=d.fi*it.x;s.vf+=d.vf*it.x});return s}
 function pen(v,t){const d=(v-t)/t,a=Math.abs(d);return d*d+(a>.1?(a-.1)*3:0)}
 function score(items,T){const s=sum(items);let sc=3*pen(s.k,T.b)+pen(s.p,T.P)+.8*pen(s.f,T.F);
  if(T.lc){if(s.net>T.C)sc+=pen(s.net,T.C)*2}else sc+=.8*pen(s.c,T.C);
+ if(s.vf<400)sc+=Math.pow((400-s.vf)/400,2)*1.5;
+ if(s.fi<25)sc+=Math.pow((25-s.fi)/25,2)*(T.lc?.6:1.5);
  return sc}
 const XMIN=.5,XMAX=2,STEP=.05;
 function refine(items,T,only){/* покоординатный спуск по размерам порций */
@@ -175,10 +181,11 @@ function refine(items,T,only){/* покоординатный спуск по р
   if(!moved)break}
  return best}
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const capOf=(d,lim,T)=>(T.preg&&d.tuna)?1:lim;
 function buildDay(slots,T,P,cnt,lim){
  let best=null;const cand=[];
  for(let it=0;it<260;it++){const used=new Set(),items=[];let ok=true;
-  for(const [,ty,sh] of slots){const opts=P.filter(d=>d.t.includes(ty)&&!used.has(d.id)&&(cnt[d.id]||0)<lim);if(!opts.length){ok=false;break}
+  for(const [,ty,sh] of slots){const opts=P.filter(d=>d.t.includes(ty)&&!used.has(d.id)&&(cnt[d.id]||0)<capOf(d,lim,T));if(!opts.length){ok=false;break}
    const d=rnd(opts);used.add(d.id);items.push({id:d.id,x:Math.min(XMAX,Math.max(XMIN,Math.round(T.b*sh/d.k*20)/20))})}
   if(!ok)continue;cand.push({items,sc:score(items,T)})}
  cand.sort((a,b)=>a.sc-b.sc);
@@ -186,11 +193,13 @@ function buildDay(slots,T,P,cnt,lim){
  return best}
 function generate(opt){
  const u=U(),old=u.menu||{},diet=(opt&&opt.diet)||old.diet||defDiet(),meals=(opt&&opt.meals)||old.meals||defMeals(),preg=isPreg();
- const T=targets(diet),slots=SLOTS[meals],P=pool(diet,preg);
+ const T=targets(diet),slots=SLOTS[meals],P=pool(diet,preg);T.preg=preg;
  let lim=2,days=null;
- for(;lim<=4&&!days;lim++){const cnt={},ds=[];let ok=true;
-  for(let i=0;i<7;i++){const b=buildDay(slots,T,P,cnt,lim);if(!b){ok=false;break}b.items.forEach(x=>cnt[x.id]=(cnt[x.id]||0)+1);ds.push({items:b.items,lg:{}})}
-  if(ok)days=ds}
+ for(;lim<=4&&!days;lim++){let bestW=null;
+  for(let tr=0;tr<3;tr++){const cnt={},ds=[];let ok=true,tot=0;
+   for(let i=0;i<7;i++){const b=buildDay(slots,T,P,cnt,lim);if(!b){ok=false;break}tot+=b.sc;b.items.forEach(x=>cnt[x.id]=(cnt[x.id]||0)+1);ds.push({items:b.items,lg:{}})}
+   if(ok&&(!bestW||tot<bestW.tot))bestW={ds,tot}}
+  if(bestW)days=bestW.ds.sort(()=>Math.random()-.5)}
  lim--;
  u.menu={v:1,start:today(),diet,meals,preg,lim,days:days||[],shop:(old.shop)||{},made:Date.now()};
  save();return u.menu}
@@ -213,6 +222,7 @@ function mark(v,t,lc){const ok=lc?v<=t*1.1:Math.abs(v-t)<=t*.1;return`<i class="
 function rMenu(m){
  const sl=slotsOf(m),di=dayIdx(m),T=targets(m.diet);
  let h='';
+ if(!!m.preg!==isPreg())h+=`<div class="wm-note">${isPreg()?'Вы отметили беременность или кормление. Давайте пересоставим меню: уберу слабосолёную рыбу и печень, тунец оставлю не чаще раза в неделю.':'Статус беременности изменился. Можно пересоставить меню под текущие настройки.'}<button class="btn" onclick="wmNew()">Пересоставить меню</button></div>`;
  if(di>6)h+=`<div class="wm-note">Неделя по этому меню закончилась. Можно составить новое — с учётом ваших текущих настроек.<button class="btn" onclick="wmNew()">Составить новое меню</button></div>`;
  h+=`<div class="wm-days" role="tablist">${m.days.map((d,i)=>{const a=dateAt(m.start,i);return`<button role="tab" aria-selected="${i===wDay}" class="${i===wDay?'on':''}${i===di?' td':''}" onclick="wmDay(${i})"><small>${WD[a.wd]}</small><b>${a.d}</b></button>`}).join('')}</div>`;
  const D=m.days[wDay];if(!D)return h+'<p class="m">Не получилось подобрать блюда. Попробуйте другой тип питания.</p>';
@@ -221,7 +231,7 @@ function rMenu(m){
  <div class="wm-mac"><span>Б ${fmt(s.p)} / ${fmt(T.P)} г ${mark(s.p,T.P)}</span><span>Ж ${fmt(s.f)} / ${fmt(T.F)} г ${mark(s.f,T.F)}</span>${T.lc?`<span>Чистые У ${fmt(s.net)} / до ${fmt(T.C)} г ${mark(s.net,T.C,1)}</span>`:`<span>У ${fmt(s.c)} / ${fmt(T.C)} г ${mark(s.c,T.C)}</span>`}</div></div>`;
  h+=D.items.map((it,i)=>{const d=DISHES[it.id],lg=D.lg&&D.lg[i];
   return`<div class="wm-it"><div class="wm-top"><div><small>${sl[i]?sl[i][0]:''}</small><b>${esc(d.n)}</b></div><span class="wm-k">${fmt(d.k*it.x)}<small> ккал</small></span></div>
-  <div class="m wm-ing">${ingLine(d,it.x)}</div>
+  <div class="m wm-ing">${ingLine(d,it.x)}${m.preg&&d.egg?' · <b>желток полностью сварен</b>':''}</div>
   <div class="m wm-bju">≈${fmt(portionG(d,it.x))} г · Б ${fmt(d.p*it.x)} · Ж ${fmt(d.f*it.x)} · У ${fmt(d.c*it.x)}</div>
   <div class="wm-act"><button class="btn ghost sm" onclick="wmSwap(${wDay},${i})" aria-label="Заменить блюдо: ${esc(d.n)}">↻ Заменить</button>${lg?`<button class="btn ghost sm wm-done" onclick="wmLog(${wDay},${i})">✓ В дневнике</button>`:`<button class="btn sm" onclick="wmLog(${wDay},${i})" aria-label="Записать в дневник: ${esc(d.n)}">＋ В дневник</button>`}</div></div>`}).join('');
  h+=`<button class="btn" onclick="wmLogDay(${wDay})">Записать весь день в дневник</button>`;
@@ -229,7 +239,7 @@ function rMenu(m){
  h+=`<details class="wm-set"><summary>Настройки меню</summary>
  <p class="m" style="margin:8px 0 4px">Тип питания</p><div class="chips">${Object.keys(DIETN).map(k=>chip(m.diet===k,DIETN[k],`wmSet('diet','${k}')`)).join('')}</div>
  <p class="m" style="margin:4px 0">Приёмов пищи в день</p><div class="chips">${[2,3,4,5].map(n=>chip(+m.meals===n,n,`wmSet('meals',${n})`)).join('')}</div>
- ${m.preg?'<p class="m">Учитываю беременность или кормление: в меню нет слабосолёной рыбы и печени. Сыры и молочное — пастеризованные.</p>':''}
+ ${m.preg?'<p class="m">Учитываю беременность или кормление: в меню нет слабосолёной рыбы и печени, тунец — не чаще раза в неделю, яйца готовьте до полностью сваренного желтка. Сыры и молочное — пастеризованные.</p>':''}
  ${m.lim>2?'<p class="m">Для таких настроек блюд немного, поэтому некоторые повторяются чуть чаще обычного.</p>':''}
  <button class="btn ghost" onclick="wmNew()">Составить меню заново</button></details>`;
  return h}
@@ -265,9 +275,9 @@ window.wmClose=function(){const s=document.getElementById('wmSheet');if(s)s.clas
 window.wmTab=function(t){wTab=t;render100();const i=document.querySelector('#wmSheet .hlin');if(i)i.scrollTop=0};
 window.wmDay=function(i){wDay=i;render100()};
 window.wmNew=function(){generate();const m=M();wDay=Math.min(6,Math.max(0,dayIdx(m)));render100();toast('Новое меню на неделю готово')};
-window.wmSet=function(k,v){const m=M();m[k]=v;generate({diet:m.diet,meals:m.meals});render100();toast(k==='diet'?`Меню: ${DIETN[v].toLowerCase()} питание`:`Меню на ${v} приёма пищи`.replace('на 5 приёма','на 5 приёмов'))};
-window.wmSwap=function(di,si){const m=M(),D=m.days[di],T=targets(m.diet),sl=slotsOf(m),cnt=counts(m),cur=D.items[si].id,ty=sl[si][1];
- const P=pool(m.diet,m.preg).filter(d=>d.t.includes(ty)&&d.id!==cur&&!D.items.some(x=>x.id===d.id)&&(cnt[d.id]||0)<Math.max(2,m.lim||2));
+window.wmSet=function(k,v){const m=M();if(k==='diet'&&v==='lc'&&isPreg()&&!confirm('Во время беременности и кормления лоу-карб обычно не советуют без врача: малышу и вам нужны углеводы из круп, фруктов и овощей, а при резком снижении углеводов чаще бывают кетоны, слабость и запоры. Составить лоу-карб меню всё равно?'))return;m[k]=v;generate({diet:m.diet,meals:m.meals});render100();toast(k==='diet'?`Меню: ${DIETN[v].toLowerCase()} питание`:`Меню на ${v} приёма пищи`.replace('на 5 приёма','на 5 приёмов'))};
+window.wmSwap=function(di,si){const m=M(),D=m.days[di],T=Object.assign(targets(m.diet),{preg:m.preg}),sl=slotsOf(m),cnt=counts(m),cur=D.items[si].id,ty=sl[si][1];
+ const P=pool(m.diet,m.preg).filter(d=>d.t.includes(ty)&&d.id!==cur&&!D.items.some(x=>x.id===d.id)&&(cnt[d.id]||0)<((m.preg&&d.tuna)?1:Math.max(2,m.lim||2)));
  if(!P.length)return toast('Других подходящих блюд пока нет');
  const res=P.map(d=>{const items=D.items.map(x=>({id:x.id,x:x.x}));items[si]={id:d.id,x:Math.min(XMAX,Math.max(XMIN,Math.round(T.b*sl[si][2]/d.k*20)/20))};const sc=refine(items,T,si);return{items,sc}}).sort((a,b)=>a.sc-b.sc);
  const pick=rnd(res.slice(0,Math.min(4,res.length)));D.items=pick.items;if(D.lg)delete D.lg[si];save();render100();toast('Блюдо заменено')};

@@ -5,6 +5,7 @@
    4) heroWords: работает только для мужского рода и не чаще раза в 200 мс */
 (function(){
 'use strict';
+if(window.__v92)return;/* защита от двойного подключения */
 const REF='idbref:',MK='media:',FBK='dbfallback',DAY=864e5;
 const now=()=>Date.now();
 const clone=o=>o==null?o:JSON.parse(JSON.stringify(o));
@@ -202,7 +203,7 @@ try{const _cu=clUse;clUse=async function(kind){if(kind!=='pull')return _cu.apply
 let AUTHM=null;/* почта, для которой сейчас идёт вход в облако */
 const low=x=>String(x||'').toLowerCase();
 const clOwn=()=>{try{if(!CL||!CL.user||!me)return false;if(!CL.owner&&AUTHM)CL.owner=AUTHM;return !!CL.owner&&CL.owner===low(me)}catch(e){return false}};
-window.__v92own=clOwn;
+window.__v92own=clOwn;window.__v92auth=()=>AUTHM;/* идёт вход в облако для этой почты (для v99: не гасить облако гостя в это время) */
 /* старая сессия без владельца: привязываем, только если владелец однозначен */
 try{if(CL&&CL.user&&!CL.owner){const ses=low(db&&db.session),em=low(CL.user.email),real=Object.keys((db&&db.users)||{}).filter(k=>k.indexOf('guest:')!==0);
  if(em&&db.users[em])CL.owner=em;else if(ses&&real.length===1&&real[0]===ses)CL.owner=ses;

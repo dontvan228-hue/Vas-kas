@@ -80,12 +80,31 @@ function paRun(){const a=paGet();if(!a||paBusy||!okUser())return;const app=docum
   else if(a==='water'){const w=+day().water||0;if(w>=8)toast('Норма воды на сегодня уже выполнена 💧');else{setWater(w+1);toast('Вода +1 💧 '+(w+1)+' из 8')}}
  }catch(e){}},350)}
 
+/* ---------- 7. числа с запятой и «ЧУ» вместо «Н» (n1 — const, поэтому правим готовый текст) ----------
+   Меняем только числа с единицей (г, кг, ккал, л, %, ч, мин, ммоль) или число целиком в <b>; даты вида 25.10.2026 не трогаем. */
+const UNIT='(?=\\s?(?:г|кг|ккал|л|%|ч|мин|ммоль|см)(?![а-яё]))';
+const RX_U=new RegExp('(^|[^\\d.,])(\\d+)\\.(\\d+)'+UNIT,'g');
+const RX_L=/((?:^|[\s·(])(?:ЧУ|Н|Б|Ж|У|Кл)\s?)(\d+)\.(\d+)(?![\d.])/g;
+const RX_S=/(^|[^\d.,])(\d+)\.(\d+)(?=\s?\/\s?\d)/g;
+const RX_B=/^(\s*[−+-]?\d+)\.(\d+)(\s*)$/;
+const RX_N=/(^|[\s·(])Н\s?(?=\d)/g;
+const ROOTS=['app','pop','sheet','qa90'];
+function fixText(n){let t=n.nodeValue,o=t;if(!t||!/\d/.test(t))return;
+ t=t.replace(RX_U,'$1$2,$3').replace(RX_S,'$1$2,$3').replace(RX_L,'$1$2,$3').replace(RX_N,'$1ЧУ ');
+ const p=n.parentNode;if(p&&(p.tagName==='B'||p.tagName==='STRONG')&&p.childNodes.length===1)t=t.replace(RX_B,'$1,$2$3');
+ if(t!==o)n.nodeValue=t}
+let fmtQ=0;function fmtAll(){fmtQ=0;try{ROOTS.forEach(id=>{const r=document.getElementById(id);if(!r)return;const w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,{acceptNode:x=>{const pn=x.parentNode&&x.parentNode.nodeName;return pn==='SCRIPT'||pn==='STYLE'||pn==='TEXTAREA'?2:1}});let n;while(n=w.nextNode())fixText(n)})}catch(e){}}
+const fmtSoon=()=>{if(!fmtQ)fmtQ=requestAnimationFrame(fmtAll)};
+['renderCarb','showRes','homeSearch','openPop','openSheet','shUpd','renderStats','renderFav','renderMy','rcShow'].forEach(nm=>{try{const f=window[nm];if(typeof f!=='function')return;window[nm]=function(){const x=f.apply(this,arguments);fmtSoon();return x}}catch(e){}});
+['qa90Open','qa90Meal'].forEach(nm=>{const f=window[nm];if(typeof f==='function')window[nm]=function(){const x=f.apply(this,arguments);fmtSoon();return x}});
+document.addEventListener('input',e=>{if(e.target&&(e.target.id==='qa90Q'||e.target.id==='cQ'||e.target.id==='fN'||e.target.id==='shG'))setTimeout(fmtSoon,0)},true);
+
 /* ---------- обёртки ---------- */
 if(typeof renderWeight==='function'){const _rw96=renderWeight;renderWeight=function(){const x=_rw96.apply(this,arguments);try{weightEmpty()}catch(e){}return x}}
 if(typeof renderCarb==='function'){const _rc96=renderCarb;renderCarb=function(){const x=_rc96.apply(this,arguments);try{mealPlus()}catch(e){}return x}}
 if(typeof renderStats==='function'){const _rs96=renderStats;renderStats=function(){const x=_rs96.apply(this,arguments);try{statsEmpty()}catch(e){}return x}}
 const _r96=render;render=function(){cbFix();try{heroDefault()}catch(e){}const x=_r96.apply(this,arguments);
- try{headSub()}catch(e){}try{statsEmpty()}catch(e){}try{weightEmpty()}catch(e){}try{mealPlus()}catch(e){}try{paRun()}catch(e){}return x};
+ try{headSub()}catch(e){}try{statsEmpty()}catch(e){}try{weightEmpty()}catch(e){}try{mealPlus()}catch(e){}try{paRun()}catch(e){}fmtSoon();return x};
 if(typeof enter==='function'){const _en96=enter;enter=function(){cbFix();const x=_en96.apply(this,arguments);try{paRun()}catch(e){}return x}}
 
 document.head.insertAdjacentHTML('beforeend','<style id="v96css">'+

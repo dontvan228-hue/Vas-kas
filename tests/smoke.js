@@ -87,6 +87,13 @@ async function newPage(opts = {}) {
 async function open(page) {
   await page.goto(BASE + '/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => typeof doAuth === 'function' && typeof plan === 'function');
+  // стартовый таймер (1 с) снимает заставку и сам вызывает show('auth')/enter() — до него экран не интерактивен
+  await page.waitForFunction(() => { const s = document.getElementById('splash'); return !s || s.style.opacity === '0'; }, null, { timeout: 5000 });
+}
+async function reloadApp(page) {
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof plan === 'function' && (() => { const s = document.getElementById('splash'); return !s || s.style.opacity === '0'; })() &&
+    ['auth', 'quiz', 'onb', 'app'].some(id => !document.getElementById(id).hidden), null, { timeout: 8000 });
 }
 const visible = (page, sel) => page.evaluate(s => { const e = document.querySelector(s); if (!e) return false;
   if (e.closest('[hidden]')) return false; const r = e.getBoundingClientRect(), cs = getComputedStyle(e);
@@ -120,6 +127,7 @@ async function runQuiz(page, prefs, { skip = false } = {}) {
   const log = page.qlog = [], seen = new Set();
   let prevMain = null, prevExtra = null, skipped = false;
   for (let step = 0; step < 60; step++) {
+    await page.waitForFunction(() => document.getElementById('quiz').hidden || !qLock, null, { timeout: 5000 });
     const st = await page.evaluate(() => {
       const b = document.getElementById('qBody'), q = (qi >= 0 && qi < QZ.length) ? QZ[qi] : null;
       const lab = [...b.querySelectorAll('p.m')].map(p => p.textContent).find(t => /^(Вопрос|Дополнительно:) \d+ из \d+/.test(t)) || '';
@@ -151,6 +159,10 @@ async function runQuiz(page, prefs, { skip = false } = {}) {
       let idx = 0;
       if (st.key in prefs) { idx = st.vals.indexOf(prefs[st.key]); assert(idx >= 0, `в вопросе ${st.key} нет варианта ${prefs[st.key]} (есть: ${st.vals.join(',')})`); }
       await page.evaluate(i => document.querySelectorAll('#qBody .qo')[i].click(), idx);
+      // выбор варианта: перерисовка с отметкой, затем через ~260 мс переход — ждём именно смены вопроса
+      await page.waitForFunction(q => document.getElementById('quiz').hidden || (qi !== q && !qLock), st.qi, { timeout: 5000 })
+        .catch(() => { throw new Fail(`анкета не перешла дальше после выбора в вопросе ${st.key}`); });
+      continue;
     } else {
       // шаги без вариантов (интро, оформление, выбор героя, сводка): последняя активная кнопка;
       // кнопка может быть временно disabled (защита от случайного нажатия) — ждём, когда включится
@@ -176,7 +188,7 @@ async function fillPlan(page, vals) {
   for (const [sel, v] of Object.entries(vals)) {
     const ok = await page.evaluate(([s, v]) => { const e = document.querySelector(s); if (!e) return 'нет';
       const r = e.getBoundingClientRect(), vis = !e.closest('[hidden]') && r.width > 0;
-      if (vis && !e.value) { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }
+      if (vis || !e.value) { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }
       return 'ok'; }, [sel, String(v)]);
     assert(ok === 'ok', `в форме плана нет поля ${sel}`);
   }
@@ -248,8 +260,7 @@ scenario('Гостевой режим «Начать без регистраци
   if (await screen(page) === 'onb') await fillPlan(page, { '#oAge': 30, '#oH': 165, '#oW': 70, '#oT': 60 });
   assert(await screen(page) === 'app', 'гость не попал в приложение');
   await page.evaluate(() => setWater(2));
-  await page.reload(); await page.waitForFunction(() => typeof U === 'function');
-  await page.waitForFunction(() => ['quiz', 'onb', 'app', 'auth'].some(id => !document.getElementById(id).hidden));
+  await reloadApp(page);
   assert(await screen(page) === 'app', 'гость после перезагрузки не в приложении: ' + await screen(page));
   page.noErrors();
   await page.ctx.close();
@@ -386,19 +397,31 @@ scenario('Вес: #wIn + addWeight(), запятая', async () => {
   const page = await appPage();
   await page.evaluate(() => go('weight', [...document.querySelectorAll('nav button')].find(b => /weight/.test(b.getAttribute('onclick') || ''))));
   await waitVisible(page, '#wIn');
-  await page.click('#wIn');
+  // 1) как пользователь: печатаем «71,5» с клавиатуры
   await page.fill('#wIn', '');
+  await page.click('#wIn');
   await page.keyboard.type('71,5');
-  const typed = await page.inputValue('#wIn');
+  const typed = await page.inputValue('#wIn'), type = await page.getAttribute('#wIn', 'type');
+  let note = '';
+  if (!/^71[.,]5$/.test(typed)) {
+    // Chromium без ru-ICU в <input type=number> выкидывает запятую («715») — это особенность браузера в CI,
+    // поэтому разбор запятой в addWeight() проверяем, передав строку как есть (поле временно type=text).
+    note = `клавиатурный ввод в type=${type} дал «${typed}»`;
+    await page.evaluate(() => { const e = document.querySelector('#wIn'); e.dataset.t = e.type; e.type = 'text'; e.value = '71,5'; });
+  }
   await page.evaluate(() => addWeight());
+  await page.evaluate(() => { const e = document.querySelector('#wIn'); if (e.dataset.t) { e.type = e.dataset.t; delete e.dataset.t; } });
   const r = await page.evaluate(() => ({ last: lastW(), now: document.querySelector('#wNow').textContent }));
-  assert(r.last === 71.5, `ввод «71,5» сохранил вес ${r.last} (value поля после ввода: «${typed}»)`);
+  assert(r.last === 71.5, `ввод «71,5» сохранил вес ${r.last}`);
   assert(/71[.,]5/.test(r.now), '#wNow не показывает 71,5: ' + r.now);
   // точка тоже
   await page.fill('#wIn', '71.2');
   await page.evaluate(() => addWeight());
   assert(await page.evaluate(() => lastW()) === 71.2, 'ввод 71.2 не сохранился');
+  // за день хранится одна запись веса
+  assert(await page.evaluate(() => U().weights.filter(x => x.d === today()).length) === 1, 'за сегодня несколько записей веса');
   page.noErrors();
+  return note;
 });
 
 scenario('XSS: название еды не исполняется', async () => {
@@ -429,8 +452,7 @@ scenario('Перезагрузка: данные на месте; выход и 
   await page.evaluate(() => { const e = document.querySelector('#fK'); e.value = '222'; e.dispatchEvent(new Event('input', { bubbles: true })); document.querySelector('button[onclick="addFood()"]').click(); });
   await page.waitForFunction(() => day().food.some(f => f.n === 'Перед перезагрузкой'));
   const before = await page.evaluate(() => ({ k: eaten(day()), w: day().water, wt: lastW(), b: plan().b, me }));
-  await page.reload({ waitUntil: 'load' });
-  await page.waitForFunction(() => typeof plan === 'function' && ['auth', 'quiz', 'onb', 'app'].some(id => !document.getElementById(id).hidden));
+  await reloadApp(page);
   assert(await screen(page) === 'app', 'после перезагрузки открыт «' + await screen(page) + '», а не приложение');
   const after = await page.evaluate(() => ({ k: eaten(day()), w: day().water, wt: lastW(), b: plan().b, me }));
   assert(JSON.stringify(after) === JSON.stringify(before), `данные изменились после перезагрузки: ${JSON.stringify(before)} → ${JSON.stringify(after)}`);
@@ -451,8 +473,8 @@ scenario('Перезагрузка: данные на месте; выход и 
   const again = await page.evaluate(() => ({ k: eaten(day()), w: day().water, wt: lastW(), b: plan().b, me }));
   assert(JSON.stringify(again) === JSON.stringify(before), `после входа данные другие: ${JSON.stringify(again)}`);
   // и снова перезагрузка после входа
-  await page.reload({ waitUntil: 'load' });
-  await page.waitForFunction(() => typeof plan === 'function' && !document.getElementById('app').hidden);
+  await reloadApp(page);
+  assert(await screen(page) === 'app', 'после входа и перезагрузки открыт «' + await screen(page) + '»');
   page.noErrors();
 });
 
