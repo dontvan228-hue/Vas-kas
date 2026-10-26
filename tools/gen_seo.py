@@ -251,7 +251,8 @@ def build_db(lists, log):
         if it["name"] in RENAME:
             it["name"] = RENAME[it["name"]]
         if k in FIX:
-            log["fixed"].append((it["name"], it["v"][0], FIX[k][0]))
+            if abs(it["v"][0] - FIX[k][0]) > .5:
+                log["fixed"].append((it["name"], it["v"][0], FIX[k][0]))
             it["v"] = list(FIX[k])
         kc, c, fi, p, f = it["v"]
         if it["alts"] and k not in FIX:
@@ -461,11 +462,11 @@ def page(title, desc, canon_path, body, jsonld, depth=1, og_type="article"):
 <body>
 <div class="wrap">
 <header class="top"><a class="logo" href="{up}"><img src="{up}icon-192.png" alt="" width="32" height="32">{BRAND}</a>
-<nav><a href="{up}kaloriynost/">Калорийность</a><a href="{up}kalkulyator-kaloriy/" class="hide-s">Калькулятор</a></nav></header>
+<nav><a href="{up}kaloriynost/">Калорийность</a><a href="{up}kalkulyator-kaloriy/" class="hide-s">Калькулятор</a><a href="{up}stati/">Статьи</a></nav></header>
 {body}
 <footer>
 <p>{BRAND} — бесплатный счётчик калорий и трекер питания, воды и веса. Без рекламы.</p>
-<p><a href="{up}">Открыть приложение</a> · <a href="{up}kaloriynost/">Таблица калорийности</a> · <a href="{up}kalkulyator-kaloriy/">Калькулятор нормы калорий</a></p>
+<p><a href="{up}">Открыть приложение</a> · <a href="{up}kaloriynost/">Таблица калорийности</a> · <a href="{up}kalkulyator-kaloriy/">Калькулятор нормы калорий</a> · <a href="{up}stati/">Статьи о питании</a></p>
 <p>Данные о калорийности средние и приведены для справки. Информация на сайте не заменяет консультацию врача или диетолога.</p>
 </footer>
 </div>
@@ -655,7 +656,7 @@ def catalog_page(foods, by_cat):
 {''.join(secs)}
 <h2 id="abc">По алфавиту</h2>
 <div class="card">{abc}</div>
-<p><a href="../kalkulyator-kaloriy/">Калькулятор нормы калорий</a> — узнайте, сколько калорий нужно в день.</p>
+<p><a href="../kalkulyator-kaloriy/">Калькулятор нормы калорий</a> — узнайте, сколько калорий нужно в день. В разделе <a href="../stati/">статей</a> — как считать калории и БЖУ, сколько пить воды и что делать с плато.</p>
 </main>"""
     bc = [("Главная", ""), ("Калорийность продуктов", path)]
     ld = {"@context": "https://schema.org", "@graph": [
@@ -751,7 +752,7 @@ def calc_page(foods):
 <a class="cta" href="../?ref=seo-calc">Считать калории бесплатно<small>Приложение посчитает норму и будет вести дневник питания</small></a>
 <h2>Как пользоваться результатом</h2>
 <p>Норма поддержания — это примерное количество калорий, при котором вес остаётся стабильным. Для плавного снижения веса калькулятор показывает умеренный дефицит, но не опускается ниже 1200 ккал для женщин и 1500 ккал для мужчин. Детям и подросткам до 18 лет, беременным и кормящим калькулятор не предлагает дефицит: их питание стоит обсудить с врачом.</p>
-<p>Чтобы держаться выбранной цифры, удобно записывать еду в дневник. Калорийность популярных продуктов есть в <a href="../kaloriynost/">таблице калорийности</a>.</p>
+<p>Чтобы держаться выбранной цифры, удобно записывать еду в дневник. Калорийность популярных продуктов есть в <a href="../kaloriynost/">таблице калорийности</a>. Подробнее о норме — в статье <a href="../stati/skolko-kaloriy-nuzhno-v-den.html">«Сколько калорий нужно в день»</a>, а другие материалы собраны в разделе <a href="../stati/">«Статьи»</a>.</p>
 <h2>Популярные продукты</h2>
 <ul class="list">{pop_html}</ul>
 <h2>Вопросы и ответы</h2>
@@ -774,24 +775,47 @@ def calc_page(foods):
 
 # ------------------------------------------------------------- sitemap -----
 
-def sitemap(paths):
-    urls = [(SITE, "weekly", "1.0")]
-    for p, freq, pr in paths:
-        urls.append((SITE + p, freq, pr))
+def update_sitemap(entries, prefixes):
+    """Обновляет sitemap.xml: убирает URL с данными префиксами и добавляет entries.
+
+    entries: [(путь от корня сайта, changefreq, priority[, lastmod])]. Остальные URL
+    (главная, разделы других генераторов) сохраняются как есть.
+    """
+    import xml.etree.ElementTree as ET
+    fp = os.path.join(ROOT, "sitemap.xml")
+    ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+    kept = []
+    if os.path.exists(fp):
+        for u in ET.parse(fp).getroot().findall(ns + "url"):
+            loc = (u.findtext(ns + "loc") or "").strip()
+            rel = loc[len(SITE):] if loc.startswith(SITE) else None
+            if rel is not None and rel and any(rel.startswith(p) for p in prefixes):
+                continue
+            kept.append((loc, u.findtext(ns + "lastmod") or TODAY,
+                         u.findtext(ns + "changefreq") or "monthly", u.findtext(ns + "priority") or "0.5"))
+    if not any(k[0] == SITE for k in kept):
+        kept.insert(0, (SITE, TODAY, "weekly", "1.0"))
+    for e in entries:
+        kept.append((SITE + e[0], e[3] if len(e) > 3 else TODAY, e[1], e[2]))
+    home = [k for k in kept if k[0] == SITE][:1]
+    rest = [k for k in kept if k[0] != SITE]
     out = ['<?xml version="1.0" encoding="UTF-8"?>',
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for loc, freq, pr in urls:
-        out.append(f"<url><loc>{html.escape(loc)}</loc><lastmod>{TODAY}</lastmod>"
+    for loc, lm, freq, pr in home + rest:
+        out.append(f"<url><loc>{html.escape(loc)}</loc><lastmod>{lm}</lastmod>"
                    f"<changefreq>{freq}</changefreq><priority>{pr}</priority></url>")
     out.append("</urlset>")
-    return "\n".join(out) + "\n"
+    open(fp, "w", encoding="utf-8").write("\n".join(out) + "\n")
+    return len(home + rest)
 
 
 # ---------------------------------------------------------------- main -----
 
-def main():
+def prepare_foods(log=None):
+    """База продуктов со slug, категорией и бытовыми порциями (используется и gen_articles.py)."""
     src = open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
-    log = {"skipped": set(), "conflicts": [], "rejected": [], "fixed": []}
+    if log is None:
+        log = {"skipped": set(), "conflicts": [], "rejected": [], "fixed": []}
     foods = build_db(load_foods(src), log)
 
     seen = {}
@@ -810,6 +834,12 @@ def main():
     for it in foods:
         it["hp"] = hp.get(norm(it["name"])) or next(
             (hp[norm(k)] for k, v in ALIAS.items() if v == it["name"] and norm(k) in hp), None)
+    return foods, seen
+
+
+def main():
+    log = {"skipped": set(), "conflicts": [], "rejected": [], "fixed": []}
+    foods, seen = prepare_foods(log)
     print(f"Бытовые порции из js/portions-data.js: {sum(1 for x in foods if x['hp'])} продуктов")
 
     by_cat = {}
@@ -840,9 +870,9 @@ def main():
     p, doc = calc_page(foods)
     open(os.path.join(ROOT, p), "w", encoding="utf-8").write(doc)
     sm = [("kaloriynost/", "weekly", "0.8"), ("kalkulyator-kaloriy/", "monthly", "0.8")] + sm
-    open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(sitemap(sm))
+    total = update_sitemap(sm, ("kaloriynost/", "kalkulyator-kaloriy/"))
 
-    print(f"Продуктов: {len(foods)}; страниц всего: {len(foods) + 2}; URL в sitemap: {len(sm) + 1}")
+    print(f"Продуктов: {len(foods)}; страниц всего: {len(foods) + 2}; URL в sitemap: {total}")
     for cid, lst in by_cat.items():
         print(f"  {CAT_NAME[cid]}: {len(lst)}")
     print(f"Пропущено (бренды/дубли): {len(log['skipped'])}")

@@ -41,11 +41,12 @@ T('cream','@{--lime:#5c684b;--acc:92,104,75;--mut:rgba(58,50,38,.8)}'),
 T('mint','@{--lime:#1d7863;--acc:29,120,99;--mut:rgba(31,61,55,.8)}'),
 T('calm','@{--lime:#50663d;--acc:80,102,61}'),
 T('y2k','@{--lime:#c41a7d;--acc:196,26,125}'),
-T('pearl','@{--lime:#6d44c1;--acc:109,68,193;--mut:rgba(46,42,82,.8)}'),
+T('pearl','@{--lime:#6a42bb;--acc:106,66,187;--mut:rgba(46,42,82,.8)}'),
 T('pearl','@ .tabs2 button:not(.on){color:var(--txt)!important}'),
 T('warm','@ .meDel{color:#a33a33!important}'),
 /* neon: розовые заливки оставляем, текст на них — тёмный */
 T('neon','@{--on:#1a0010}'),
+T('neon','@ .btn:not(.ghost){color:var(--on)!important}'),
 T('neon','@ .bd:not(.on){color:var(--mut)!important}'),
 /* slate: белый текст на сером — фон темнее на ~1 ступень, --mut плотнее */
 T('slate','@{--bg:#56686a;--bg2:#5f7273;--g1:#5f7273;--g2:#56686a;--g3:#4b5c5d;--bgd:86,104,106;--mut:rgba(244,247,246,.86)}'),
@@ -65,7 +66,8 @@ detectLight();
 /* ---------- диалоги ---------- */
 const FOC='a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),[contenteditable="true"]';
 const visible=e=>!!(e.offsetWidth||e.offsetHeight||e.getClientRects().length)&&getComputedStyle(e).visibility!=='hidden';
-const stack=[];const reg=new Map();
+const stack=[];const reg=new Map();let lastOut=null;
+D.addEventListener('focusin',e=>{const t=e.target;if(t&&t!==D.body&&![...reg.keys()].some(el=>el.contains(t)))lastOut=t},true);
 function defOpen(el){return el.classList.contains('on')||el.classList.contains('open')||el.classList.contains('show')||el.hasAttribute('open')}
 function hasTextInput(el){return $$('input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=hidden]),textarea,select',el).some(visible)}
 function topLevel(el){let n=el;while(n.parentElement&&n.parentElement!==D.body)n=n.parentElement;return n}
@@ -107,7 +109,7 @@ function a11yDialog(el,onClose,opts){
  function sync(){
   const o=!!opts.isOpen(el);if(o===d.open)return;d.open=o;
   if(o){
-   d.ret=D.activeElement&&D.activeElement!==D.body&&!el.contains(D.activeElement)?D.activeElement:d.ret;
+   d.ret=D.activeElement&&D.activeElement!==D.body&&!el.contains(D.activeElement)?D.activeElement:(lastOut&&!el.contains(lastOut)?lastOut:d.ret);
    el.removeAttribute('aria-hidden');{const i=stack.indexOf(d);if(i>=0)stack.splice(i,1)}stack.push(d);
    ensureX(el,d);applyInert();setTimeout(()=>{if(d.open&&!el.contains(D.activeElement))d.focusIn()},60);
   }else{
@@ -115,7 +117,7 @@ function a11yDialog(el,onClose,opts){
    const r=d.ret;d.ret=null;const nxt=stack[stack.length-1];
    if(nxt){if(!nxt.el.contains(D.activeElement))nxt.focusIn()}
    else if(r&&r.isConnected&&visible(r)){try{r.focus({preventScroll:true})}catch(e){}}
-   else if(el.contains(D.activeElement)||D.activeElement===D.body){const m=$('[role=main]:not([hidden]),main');if(m&&visible(m)){m.tabIndex=-1;try{m.focus({preventScroll:true})}catch(e){}}}
+   else if(el.contains(D.activeElement)||D.activeElement===D.body){const m=$$('[role=main],main').find(visible);if(m){m.tabIndex=-1;try{m.focus({preventScroll:true})}catch(e){}}}
   }
  }
  d.sync=sync;
@@ -165,7 +167,10 @@ function fix(){
  if($('#pop'))a11yDialog($('#pop'),()=>window.closeSheet&&window.closeSheet(),{labelledBy:'#popT'});
  if($('#sheet'))a11yDialog($('#sheet'),()=>window.closeSheet&&window.closeSheet(),{labelledBy:'#shT'});
  /* новые окна других слоёв: role=dialog / класс sheet|modal|dialog */
- $$('body>[role=dialog],body>[class*="sheet"],body>[class*="modal"],body>[id$="Sheet"],body>[id$="Modal"]').forEach(el=>{if(!reg.has(el)&&!/(^|[-_])(bk|backdrop|overlay|scrim|shade)|bk$/i.test(el.id+' '+el.className))a11yDialog(el)});
+ $$('body>[role=dialog],body>[class*="sheet"],body>[class*="modal"],body>[id$="Sheet"],body>[id$="Modal"]').forEach(el=>{if(reg.has(el)||/(^|[-_])(bk|backdrop|overlay|scrim|shade)|bk$/i.test(el.id+' '+el.className))return;
+  const id=el.id,bk=id&&(D.getElementById(id+'bk')||D.getElementById(id+'Bk')||D.getElementById(id+'-bk'))||null;
+  const cf=id&&typeof window[id+'Close']==='function'?window[id+'Close']:null;
+  a11yDialog(el,cf?()=>window[id+'Close']():bk?()=>bk.click():null,{backdrop:bk||$('#bk')})});
  /* svg-иконки */
  $$('svg:not([aria-hidden]):not([role=img]):not([aria-label])').forEach(s=>{if(s.closest('button,a,[role=button],[onclick],.hb,nav')||!s.querySelector('title')){s.setAttribute('aria-hidden','true');s.setAttribute('focusable','false')}});
  /* поля ввода */
@@ -175,6 +180,13 @@ function fix(){
   if(p&&p.tagName==='LABEL'&&!p.htmlFor&&!p.querySelector('input,select,textarea')){if(!i.id)i.id='a11yI'+Math.random().toString(36).slice(2,8);p.htmlFor=i.id;return}
   const l=LBL[i.id]||i.getAttribute('placeholder')||i.getAttribute('title');if(l)i.setAttribute('aria-label',l);
  });
+ /* div/span[onclick] → кнопки */
+ $$('[onclick]:not(button):not(a):not(input):not(select):not(textarea):not(label):not(body):not(#bk):not(nav):not([role=dialog])').forEach(e=>{
+  if(e.dataset.a11yBtn)return;e.dataset.a11yBtn='1';
+  if(!e.hasAttribute('tabindex'))e.tabIndex=0;
+  if(!e.hasAttribute('role')&&!e.querySelector('button,a[href],input,select,textarea,[role=button],[onclick]'))e.setAttribute('role','button');
+  e.addEventListener('keydown',keyAct);
+ });
  /* кнопки без текста / только символ */
  $$('button,[role=button]').forEach(b=>{
   if(b.hasAttribute('aria-label')||b.hasAttribute('aria-labelledby'))return;
@@ -182,6 +194,7 @@ function fix(){
   const m=oc.match(/^setMood\((\d)\)/);if(m){b.setAttribute('aria-label',MOOD[+m[1]]||txt);return}
   if(!isSym(txt.replace(/[\s ]/g,''))&&txt.length>2)return;
   for(const [re,l] of BTN)if(re.test(oc)){b.setAttribute('aria-label',l);return}
+  if(/close|Close\(|closeSheet/.test(oc)&&!txt){b.setAttribute('aria-label','Закрыть');return}
   if(b.title)b.setAttribute('aria-label',b.title);
  });
  /* навигация */
@@ -192,13 +205,6 @@ function fix(){
   if(g.getAttribute('role')!=='tablist'){g.setAttribute('role','tablist');g.addEventListener('keydown',e=>{if(!/^Arrow(Left|Right)$|^Home$|^End$/.test(e.key))return;const all=$$(':scope>[role=tab]',g);let i=all.indexOf(D.activeElement);if(i<0)return;e.preventDefault();i=e.key==='Home'?0:e.key==='End'?all.length-1:(i+(e.key==='ArrowRight'?1:-1)+all.length)%all.length;all[i].focus();all[i].click()})}
   const anyOn=bs.some(b=>b.classList.contains('on'));
   bs.forEach((b,i)=>{const on=anyOn?b.classList.contains('on'):i===0;b.setAttribute('role','tab');b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1});
- });
- /* div/span[onclick] → кнопки */
- $$('[onclick]:not(button):not(a):not(input):not(select):not(textarea):not(label):not(body):not(#bk):not(nav):not([role=dialog])').forEach(e=>{
-  if(e.dataset.a11yBtn)return;e.dataset.a11yBtn='1';
-  if(!e.hasAttribute('tabindex'))e.tabIndex=0;
-  if(!e.hasAttribute('role')&&!e.querySelector('button,a[href],input,select,textarea,[role=button],[onclick]'))e.setAttribute('role','button');
-  e.addEventListener('keydown',keyAct);
  });
  /* h2[role=button] (сворачиваемые карточки) → кнопка внутри заголовка */
  $$('h2[role=button]').forEach(h=>{

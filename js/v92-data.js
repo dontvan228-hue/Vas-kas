@@ -23,7 +23,7 @@ try{const _tk=tick;let tl=0;tick=function(){const n=now();if(n-tl<15000)return;t
 
 /* ---------- 2. медиа в IndexedDB ---------- */
 const MED=new Map(),MID=new Map();/* данные → id и id → данные: только то, что проверено в IDB */
-let OFF=false,FB=false,migBusy=false,migFail=0,qT=0,medDone;
+let medReady=false,OFF=false,FB=false,migBusy=false,migFail=0,qT=0,medDone;
 const medP=new Promise(r=>medDone=r);
 const SV0=+(db&&db._sv)||0;try{delete db._sv}catch(e){}
 const isQ=e=>!!e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED'||e.code===22||e.code===1014);
@@ -50,7 +50,6 @@ async function migrate(){if(!idbOK||!medReady||migBusy||now()-migFail<60000)retu
   for(const v of todo){const id=mkId(v);await idbSet(MK+id,v);const r=await idbGet(MK+id);if(r!==v)throw new Error('IDB: проверка не прошла');MED.set(v,id);MID.set(id,v);n++}}
  catch(e){migFail=now()}
  migBusy=false;if(n&&!OFF)try{save()}catch(e){}return n}
-let medReady=false;
 async function boot(){let restored=false,hyd=0;
  if(!idbOK){medReady=true;medDone();return}
  /* запасная копия после переполнения: берём, только если она новее того, что в localStorage */

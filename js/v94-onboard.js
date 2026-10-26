@@ -19,8 +19,8 @@
  const _sq94=startQuiz;startQuiz=function(){jumpFrom=null;return _sq94.apply(this,arguments)};
  const _qr94=qRender;qRender=function(){const r=_qr94.apply(this,arguments);try{
   if(qi<0||qi>=QZ.length)return r;
-  /* нумерация «из N» не растёт по ходу анкеты: пока ответа нет, считаем ветку показанной */
-  {const may=i=>{const k=QZ[i][0];if(k==='life')return !qa.sex||qa.sex==='f';if(k==='gwhy'||k==='ghow')return !qa.goal||qa.goal==='gain';return true};
+  /* нумерация «из N» не скачет вниз: условный вопрос считаем, только когда его условие уже известно и выполнено */
+  {const may=i=>{const k=QZ[i][0];if(k==='life')return qa.sex==='f';if(k==='gwhy'||k==='ghow')return qa.goal==='gain';return true};
    const opt=(QZ[qi][0] in OPT),v=[];for(let i=0;i<QZ.length;i++)if((i===qi||may(i))&&((QZ[i][0] in OPT)===opt))v.push(i);
    const k=v.indexOf(qi),pm=$q('#qBody>p.m');
    if(k>-1&&pm&&/^Вопрос \d+ из \d+$/.test(pm.textContent)){pm.textContent=opt?`Дополнительно: ${k+1} из ${v.length}`:`Вопрос ${k+1} из ${v.length}`;const bar=$q('#qBar');if(bar)bar.style.width=(opt?75+20*(k+1)/v.length:75*(k+1)/v.length)+'%'}}

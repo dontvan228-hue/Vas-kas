@@ -61,10 +61,11 @@ var css=[
 /* ---------- 6. granny: Макро — поле поиска, кольцо, строки результатов ---------- */
 'html[data-ui=granny] .card .row{display:flex!important;gap:10px!important;align-items:flex-end!important}',
 'html[data-ui=granny] .card .row>div{flex:1 1 auto!important;min-width:0!important}',
-'html[data-ui=granny] .card .row>.btn{flex:0 0 56px!important;width:56px!important;min-width:56px!important;height:56px!important;padding:0!important;margin:0!important;border-radius:var(--r-ctl)!important}',
+'html[data-ui=granny] .card .row>.btn.sm{flex:0 0 auto!important;width:auto!important;min-width:56px!important;height:56px!important;padding:0 16px!important;margin:0!important;border-radius:var(--r-ctl)!important}',
 'html[data-ui=granny] .card .row input{width:100%!important;min-width:0!important}',
 'html[data-ui=granny] #mBars .big{flex-direction:column!important;align-items:center!important;text-align:center!important;gap:10px!important}',
-'html[data-ui=granny] #mBars .big .m{display:inline}',
+'html[data-ui=granny] #mBars .big>div:last-child{display:flex;flex-direction:column;align-items:center;gap:2px}',
+'html[data-ui=granny] #mBars .big .m{display:block;margin:0}',
 'html[data-ui=granny] .res{gap:10px}',
 'html[data-ui=granny] .res>span{flex:1 1 auto;min-width:0}',
 'html[data-ui=granny] .res>i{flex:none}',
@@ -76,8 +77,10 @@ var css=[
 'html[data-ui=granny] #t-me .card .btn{font-size:16px!important;padding-left:10px!important;padding-right:10px!important}',
 
 /* ---------- 8. y2k: подписи под иконками, как в остальных темах ---------- */
-'html[data-ui=y2k] nav button em{display:block!important;font-size:9px;letter-spacing:.06em;text-transform:uppercase;opacity:.75}',
-'html[data-ui=y2k] nav button.on em{opacity:1;letter-spacing:.06em!important}',
+'html[data-ui=y2k] nav button:not(.fab){flex:1 1 0!important;min-width:0!important}',
+'html[data-ui=y2k] nav button em{display:block!important;font-size:9.5px!important;letter-spacing:0!important;text-transform:none!important;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}',
+'html[data-ui=y2k] nav button.on em{opacity:1}',
+'html[data-ui=y2k] nav,html[data-ui=glam] nav{backdrop-filter:blur(18px) saturate(1.4)!important;-webkit-backdrop-filter:blur(18px) saturate(1.4)!important}',
 'html[data-ui=y2k] nav button.on{padding-left:8px!important;padding-right:8px!important}',
 
 /* ---------- 9. wine: розовый акцент вместо салатового ---------- */
