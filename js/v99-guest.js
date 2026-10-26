@@ -10,7 +10,7 @@
  const lastMail=()=>{try{return localStorage.getItem('flow_last_mail')||''}catch(e){return ''}};
  const hasAcc=()=>!!lastMail()||Object.keys(db.users||{}).some(k=>!isG(k));
 
- document.head.insertAdjacentHTML('beforeend','<style>#auth .g99h{display:none!important}#g99{margin:16px 0 4px}#g99 .btn{margin-top:8px}#g99 p.m{text-align:center;font-size:13px;margin-top:8px}#g99Back{display:block;margin:12px auto 0;background:none;border:0;color:inherit;opacity:.85;text-decoration:underline;font:inherit;font-size:14px;padding:8px;cursor:pointer}#g99Save .row{margin-top:10px}</style>');
+ document.head.insertAdjacentHTML('beforeend','<style>#auth .g99h{display:none!important}#g99{margin:16px 0 4px}#g99 .btn{margin-top:8px}#g99 p.m{text-align:center;font-size:13px;margin-top:8px}#g99Back{display:block;margin:12px auto 0;background:none;border:0;color:inherit;opacity:.85;text-decoration:underline;font:inherit;font-size:14px;padding:8px;cursor:pointer}#g99Save .row{margin-top:10px}#g99Save .row .btn{white-space:normal;line-height:1.2}#auth.g99s .lf,#auth.g99s .lh,#auth.g99s .lh+p.m{display:none!important}#g99Head{text-align:center;margin:12px 0 14px}#g99Head b{display:block;font-size:20px;margin-bottom:6px}</style>');
 
  /* ---------- экран входа: «Начать без регистрации» главное, форма по кнопке ---------- */
  let ui=null;
@@ -34,6 +34,9 @@
   u.back.textContent=g?'Вернуться без регистрации':(gKey()?'Продолжить без регистрации':'Начать без регистрации');
   u.go.textContent=gKey()?'Продолжить без регистрации':'Начать без регистрации'}
  function authState(){try{const g=guest();
+  const a=$g('#auth');if(a)a.classList.toggle('g99s',g);
+  let h=$g('#g99Head');if(g&&!h){const t=$g('#auth .tabs2');if(t){t.insertAdjacentHTML('beforebegin','<div id="g99Head"><b>Сохраните ваши записи</b><span class="m">Укажите почту и пароль. Всё, что вы уже записали, перенесётся в аккаунт.</span></div>');h=$g('#g99Head')}}
+  if(h)h.hidden=!g;
   if(g){formOpen(true);authMode('reg');const e=$g('#aErr');if(e)e.textContent='';return}
   formOpen(hasAcc())}catch(e){}}
 

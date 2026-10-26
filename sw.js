@@ -32,7 +32,7 @@ const FALLBACK = [
   'icon-180.png?v=47', 'icon-192.png?v=47', 'icon-512.png?v=47',
   'icons/icon-maskable-512.png', 'icons/icon-maskable-192.png',
   'js/portions-data.js', 'js/v89-safety.js', 'js/v90-ux.js', 'js/v91-design.js', 'js/v92-data.js',
-  'js/v93-a11y.js', 'js/v94-onboard.js', 'js/v95-growth.js', 'js/v96-empty.js'
+  'js/v93-a11y.js', 'js/v94-onboard.js', 'js/v95-growth.js', 'js/v96-empty.js', 'js/v97-quality.js', 'js/v99-guest.js'
 ];
 const HERO_FALLBACK = {
   mira: ['idle', 'happy', 'angry', 'shy', 'eat', 'drink'],

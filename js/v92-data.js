@@ -157,10 +157,10 @@ try{const _mg=clMergeInto;clMergeInto=function(u,r){if(!u||!r||typeof r!=='objec
 
 /* ---------- облако: что отправляем ---------- */
 function payload(){const d=clData();
- if(Array.isArray(d.photos)){d.photos=d.photos.filter(p=>!(p&&typeof p.img==='string'&&(p.img.startsWith(REF)||MED.has(p.img))));if(!d.photos.length)delete d.photos}/* фото прогресса, уже лежащие в IDB, в облако не шлём */
  walk(d,(o,k,v)=>{if(v.startsWith(REF)){const x=MID.get(v.slice(REF.length));if(x)o[k]=x;else delete o[k]}});
  return d}
 const lastHash=()=>{const s=JSON.stringify(clData());return s.length+':'+hashS(s)};
+let phWarn=0;
 const isDup=e=>/duplicate|conflict|409|23505/i.test(String(e&&e.message||e));
 async function pullMerge(){const c=await clPull();clMergedUid=CL.user.id;CL.rtsU=CL.user.id;
  if(c){CL.rts=c.updated_at||null;if(c.data){const u=U();if(u&&clMergeInto(u,c.data)){save();try{render()}catch(e){}}}}else CL.rts=null;
@@ -174,7 +174,10 @@ try{clPush=async function(){
  for(let i=0;i<4;i++){
   let noRow=false;
   if(!CL.rts||CL.rtsU!==uid||clMergedUid!==uid){const c=await pullMerge();noRow=!c}
-  const d=payload(),at=new Date().toISOString(),body=JSON.stringify({user_id:uid,data:d,updated_at:at});
+  const d=payload(),at=new Date().toISOString();let body=JSON.stringify({user_id:uid,data:d,updated_at:at}),cut=0;
+  /* фото прогресса уходят в облако целиком (это резервная копия); не влезаем в лимит — убираем самые старые */
+  while(body.length>6e6&&Array.isArray(d.photos)&&d.photos.length){d.photos.shift();cut++;body=JSON.stringify({user_id:uid,data:d,updated_at:at})}
+  if(cut&&!phWarn){phWarn=1;try{toast('В облако не поместились '+cut+' самых старых фото прогресса: они остались на этом телефоне')}catch(e){}}
   if(body.length>6e6)throw new Error('Данных слишком много для облака (больше 6 МБ)');
   let res=null;
   if(noRow){try{res=await sbReq('/rest/v1/user_data?select=updated_at',{method:'POST',headers:{Prefer:'return=representation'},body},true)}catch(e){if(isDup(e)){CL.rts=null;continue}throw e}}
@@ -191,7 +194,7 @@ try{const _cu=clUse;clUse=async function(kind){if(kind!=='pull')return _cu.apply
  const u=U();let keep=[];try{keep=(u&&Array.isArray(u.photos))?u.photos.slice():[];if(idbOK&&u)await idbSet('bak:pull:'+me,{ts:now(),s:JSON.stringify(u)})}catch(e){}
  const r=await _cu.apply(this,arguments);
  try{const v=U();if(v){/* фото прогресса в облако больше не уходят: оставляем свои */
-   if(keep.length){const have=new Set((v.photos||[]).map(p=>p&&p.img));const add=keep.filter(p=>p&&!have.has(p.img));if(add.length){v.photos=(Array.isArray(v.photos)?v.photos:[]).concat(add).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);save();try{renderPhotos()}catch(e){}}}
+   if(keep.length){/* если облако без части фото (лимит размера) — добавляем свои недостающие */const have=new Set((v.photos||[]).map(p=>p&&p.img));const add=keep.filter(p=>p&&!have.has(p.img));if(add.length){v.photos=(Array.isArray(v.photos)?v.photos:[]).concat(add).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);save();try{renderPhotos()}catch(e){}}}
    BL.set(v,snap(v));if(CL)CL.rts=null}}catch(e){}
  return r}}catch(e){}
 
