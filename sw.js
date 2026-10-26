@@ -14,7 +14,7 @@
 //   картинки, видео, шрифты — сразу из кэша, в фоне обновляются (stale-while-revalidate);
 //   supabase и прочие сторонние хосты — не трогаем вообще, никогда не кэшируем.
 
-const VERSION = 'v103-1';
+const VERSION = 'v104-1';
 const CDN_VER = '1';
 const CORE = 'flow-core-' + VERSION;
 const PAGES = 'flow-pages-' + VERSION;
