@@ -66,8 +66,9 @@ detectLight();
 /* ---------- диалоги ---------- */
 const FOC='a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),[contenteditable="true"]';
 const visible=e=>!!(e.offsetWidth||e.offsetHeight||e.getClientRects().length)&&getComputedStyle(e).visibility!=='hidden';
-const stack=[];const reg=new Map();let lastOut=null;
-D.addEventListener('focusin',e=>{const t=e.target;if(t&&t!==D.body&&![...reg.keys()].some(el=>el.contains(t)))lastOut=t},true);
+const stack=[];const reg=new Map();const fHist=[];
+D.addEventListener('focusin',e=>{const t=e.target;if(t&&t!==D.body){fHist.push(t);if(fHist.length>8)fHist.shift()}},true);
+const lastOutside=el=>{for(let i=fHist.length-1;i>=0;i--){const t=fHist[i];if(t.isConnected&&!el.contains(t)&&![...reg.keys()].some(r=>r.contains(t)))return t}return null};
 function defOpen(el){return el.classList.contains('on')||el.classList.contains('open')||el.classList.contains('show')||el.hasAttribute('open')}
 function hasTextInput(el){return $$('input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=hidden]),textarea,select',el).some(visible)}
 function topLevel(el){let n=el;while(n.parentElement&&n.parentElement!==D.body)n=n.parentElement;return n}
@@ -109,7 +110,7 @@ function a11yDialog(el,onClose,opts){
  function sync(){
   const o=!!opts.isOpen(el);if(o===d.open)return;d.open=o;
   if(o){
-   d.ret=D.activeElement&&D.activeElement!==D.body&&!el.contains(D.activeElement)?D.activeElement:(lastOut&&!el.contains(lastOut)?lastOut:d.ret);
+   d.ret=D.activeElement&&D.activeElement!==D.body&&!el.contains(D.activeElement)?D.activeElement:(lastOutside(el)||d.ret);
    el.removeAttribute('aria-hidden');{const i=stack.indexOf(d);if(i>=0)stack.splice(i,1)}stack.push(d);
    ensureX(el,d);applyInert();setTimeout(()=>{if(d.open&&!el.contains(D.activeElement))d.focusIn()},60);
   }else{

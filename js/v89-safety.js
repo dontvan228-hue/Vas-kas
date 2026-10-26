@@ -95,11 +95,34 @@ const PREG_ADD='Рыбу с высоким содержанием ртути (а
 function pnFix(root){try{(root||document).querySelectorAll('p').forEach(e=>{if(!e.dataset.pn89&&e.textContent.startsWith('Исключить: алкоголь')){e.dataset.pn89=1;e.insertAdjacentText('beforeend',' '+PREG_ADD)}})}catch(e){}}
 const _oh89=openHealth;openHealth=function(){const r=_oh89.apply(this,arguments);pnFix($('#hlBody'));return r};
 
-/* исправления базы продуктов */
+/* исправления базы продуктов: явные ошибки и однозначные названия для дублей */
 try{const fix=(arr,name,vals)=>arr.forEach(x=>{if(x[0]===name)vals.forEach((v,i)=>{if(v!=null)x[i+1]=v})});
+ const ren=(arr,from,to)=>arr.forEach(x=>{if(x[0]===from)x[0]=to});
  fix(FDB,'Свинина постная варёная',[185,0,0,28,8]);
- fix(FOODS,'Банан',[89]);fix(FOODS,'Тунец консервированный',[116]);fix(FOODS,'Говядина варёная',[254]);
+ fix(FDB,'Морковь варёная',[35,7.2,3,.8,.3]);/* было 25, по USDA около 35 */
+ fix(FDB,'Мандарин',[53,13.3,1.8,.8,.3]);/* было 38, по USDA 53 */
+ fix(FDB,'Солянка мясная',[70,3,.5,5,4.5]);/* было 90 при Б7 Ж6 У3, типичный рецепт около 70 */
+ fix(FOODS,'Банан',[89]);fix(FOODS,'Говядина варёная',[254]);
+ /* разные продукты под похожими именами */
+ [[FDB,'Куриная грудка','Куриная грудка запечённая'],[FOODS,'Куриная грудка','Куриная грудка запечённая'],
+  [FDB,'Тунец консервированный','Тунец консервированный без жидкости'],[FOODS,'Тунец консервированный','Тунец консервированный без жидкости'],
+  [FDB,'Грибы шампиньоны жареные','Шампиньоны жареные с небольшим количеством масла'],[FDB,'Шампиньоны жареные','Шампиньоны жареные на масле'],
+  [FDB,'Кабачок жареный','Кабачок жареный с небольшим количеством масла'],[FDB,'Кабачки жареные','Кабачки жареные на масле']].forEach(a=>ren(...a));
+ fix(FOODS,'Тунец консервированный без жидкости',[116]);
+ const fl=$('#fl');if(fl)fl.innerHTML=FOODS.map(f=>`<option value="${f[0]}">`).join('');
 }catch(e){}
+
+/* 8. Углеводы: одна норма на «Макро» и в «БЖУ за сегодня» */
+const _mn89n=mnorm;mnorm=function(){const r=_mn89n.apply(this,arguments);try{if(LIM()){const b=plan().b,C=MG().net;r.C=C;r.F=Math.max(r.F,Math.round((b-4*r.P-4*C)/9));r.net=1}}catch(e){}return r};
+renderBzu=function(){const e=$('#bzu');if(!e||!U()||!U().p)return;const m=macros(day()),N=mnorm(),lim=!!N.net,miss=day().food.filter(f=>f.p==null&&f.c==null).length;
+ const row=(l,v,n,col)=>`<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${l}</span><b>${n1(v)} / ${n} г</b></div><div style="height:8px;border-radius:5px;background:var(--trk);overflow:hidden;margin-top:4px"><div style="height:100%;width:${Math.min(100,n?v/n*100:0)}%;background:${col};border-radius:5px"></div></div></div>`;
+ e.innerHTML=row('Белки',m.p,N.P,'var(--lime)')+row('Жиры',m.f,N.F,'#e8c76a')+(lim?row('Углеводы чистые (лимит)',Math.max(0,m.c-m.fi),N.C,'#e59a86'):row('Углеводы',m.c,N.C,'#e59a86'))
+  +(miss?`<p class="m" style="font-size:11px">${miss} запис${miss==1?'ь':'и'} без БЖУ (добавлены только по ккал).</p>`:'')
+  +`<p class="m" style="font-size:11px">${lim?`Лимит ${N.C} г чистых углеводов (без клетчатки), основная энергия из белка и жиров.`:'Норма: белки около 30% калорий, жиры 28%, остальное углеводы.'}</p>`};
+/* итоги анкеты: реальная цифра вместо «до 100 г» */
+const _qs89b=qSummary;qSummary=function(){_qs89b.apply(this,arguments);try{$('#qBody').querySelectorAll('.item').forEach(e=>{if(e.textContent.includes('Углеводы')){const b=e.querySelector('b');if(b)b.textContent=qa.diet==='lc'?'до 30 г чистых':'без жёсткого лимита, ориентир по вашей норме'}})}catch(e){}};
+/* беременность или кормление + «лоу-карб» в анкете: лимит 30 г только после подтверждения */
+const _qf89b=qFinish;qFinish=function(){_qf89b.apply(this,arguments);try{const u=U();if(qa.diet==='lc'&&lifeNoDef(u)&&!confirm('Лимит 30 г углеводов (кето)\n\n• '+riskWhy(u).join('\n• ')+'\n\nПоставить лимит 30 г? Если нет, углеводы будут без лимита, а лоу-карб можно включить позже в разделе «Диеты».')){u.mg={net:0,v:1};u.quiz.diet='all';save()}}catch(e){}};
 
 /* 4. РПП в прошлом: без наград за потерю веса и голодание */
 const _rb89=renderBadges;renderBadges=function(){_rb89.apply(this,arguments);try{if(edLose(U()))document.querySelectorAll('#badges .bd').forEach(e=>{if(/Минус|Голодание/.test(e.textContent))e.remove()})}catch(e){}};

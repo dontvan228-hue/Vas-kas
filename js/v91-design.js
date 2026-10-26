@@ -53,7 +53,9 @@ var css=[
 'html[data-ui=granny] header>div:first-child>b{font-size:15px!important;letter-spacing:.02em!important}',
 'html[data-ui=granny] #hSub{font-size:12px!important}',
 'html[data-theme=slate] header>div:first-child>b{letter-spacing:.18em!important}',
-'@media (max-width:340px){header>div:first-child>b{font-size:14px!important}html[data-theme=slate] header>div:first-child>b{letter-spacing:.1em!important}}',
+'@media (max-width:340px){header>div:first-child>b{font-size:14px!important}html[data-ui=granny] header>div:first-child>b{font-size:13px!important;letter-spacing:0!important}html[data-theme=slate] header>div:first-child>b{letter-spacing:.1em!important}',
+' nav button em{font-size:9px!important;letter-spacing:0!important}html[data-ui=y2k] nav button em{font-size:8.5px!important}',
+' html[data-theme=iron] .btn,html[data-ui=glam] .btn{font-size:13px!important;letter-spacing:.01em!important}}',
 
 /* ---------- 5. granny: непрозрачная нижняя панель ---------- */
 'html[data-ui=granny] nav{background:var(--bg)!important;box-shadow:0 -8px 24px -6px rgba(47,40,29,.18)!important;border-color:var(--line)!important}',
@@ -73,7 +75,6 @@ var css=[
 /* ---------- 7. кнопки: без переносов там, где строка одна ---------- */
 '.btn{overflow-wrap:normal}',
 'html[data-theme=iron] .btn{letter-spacing:.03em!important;font-size:14px!important}',
-'#t-me .row .btn,#t-me .btn.ghost{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
 'html[data-ui=granny] #t-me .card .btn{font-size:16px!important;padding-left:10px!important;padding-right:10px!important}',
 
 /* ---------- 8. y2k: подписи под иконками, как в остальных темах ---------- */
