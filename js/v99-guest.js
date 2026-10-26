@@ -48,7 +48,7 @@
  window.guestStart=guestStart;
 
  /* ---------- облако: для гостя ничего не отправляем и не тянем ---------- */
- const noCloud=()=>{if(guest()){try{CL=null}catch(e){}return true}return false};
+ const noCloud=()=>{if(guest()&&!(typeof window.__v92auth==='function'&&window.__v92auth())){try{CL=null}catch(e){}return true}return false};
  const wrapA=name=>{try{const f=window[name];if(typeof f!=='function')return;const w=async function(){if(noCloud())return null;return f.apply(this,arguments)};window[name]=w}catch(e){}};
  ['clPush','clPull','clRefresh46','clUse','clAuth'].forEach(wrapA);
  try{const _rc=renderCloud;renderCloud=function(){if(guest()){const e=$g('#cloudBox');if(e)e.innerHTML='<p class="m">Облако работает с аккаунтом. Создайте его, и записи с этого телефона сохранятся, а открыть их можно будет на любом устройстве.</p><button class="btn" onclick="guestSave()">Создать аккаунт</button>';return}return _rc.apply(this,arguments)}}catch(e){}

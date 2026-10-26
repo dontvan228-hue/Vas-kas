@@ -2,6 +2,7 @@
    подключать после js/v92-data.js */
 (function(){
 'use strict';
+if(window.__v92b)return;
 const FMT='vasskass-backup',VER=1,REF='idbref:',DAY=864e5;
 const bkKey=()=>'flow_bk:'+me;
 const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};

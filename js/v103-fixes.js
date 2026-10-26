@@ -28,5 +28,10 @@ function fixForecast(){try{document.querySelectorAll('#t-weight p, #t-weight div
 document.head.insertAdjacentHTML('beforeend','<style>html[data-theme] #rg.over{stroke:var(--warn)!important}</style>');
 function ringOver(){try{const rg=$('#rg');if(rg&&U()&&U().p)rg.classList.toggle('over',eaten(day())>plan().b)}catch(e){}}
 
+/* поле веса принимает запятую в любом браузере */
+try{const w=$('#wIn');if(w&&w.type==='number'){w.type='text';w.setAttribute('inputmode','decimal')}}catch(e){}
+/* стартовый таймер не перезапускает уже начатую анкету */
+const _en=enter;enter=function(){try{if(!$('#quiz').hidden&&qi>=0)return}catch(e){}return _en.apply(this,arguments)};
+
 const _r=render;render=function(){const r=_r.apply(this,arguments);fixForecast();ringOver();return r};
 })();
