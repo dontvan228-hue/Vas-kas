@@ -53,12 +53,38 @@ if(typeof qcShow==='function'&&typeof QCH!=='undefined'){const _qs96=qcShow;let 
  qcShow=function(){try{if(man()){QCH.sort((a,b)=>(CHARS[b].male?1:0)-(CHARS[a].male?1:0));if(!qcSel&&!pre&&MALE_DEF){pre=true;qcSel=MALE_DEF}}
   else QCH.sort((a,b)=>(CHARS[a].male?1:0)-(CHARS[b].male?1:0))}catch(e){}return _qs96.apply(this,arguments)}}
 
+/* ---------- 5. частичный объект героя (после импорта/облака) — дополняем значениями по умолчанию ----------
+   CB() объявлена через const, поэтому чиним сам U().cb: при загрузке и перед каждой отрисовкой. */
+function cbFix(){try{const u=U();if(!u)return;if(u.cb!=null&&(typeof u.cb!=='object'||Array.isArray(u.cb)))delete u.cb;const c=u.cb;if(!c)return; /* нет cb — CB() создаст полный */
+ const now=Date.now(),D={name:'Чиби',skin:'#f6d3b8',hair:'#6b4430',eye:'#4a3426',style:'bob',outfit:'#c6e3a0',ot:'tee',acc:'none',coins:0};
+ for(const k in D)if(c[k]==null)c[k]=D[k];
+ if(!Array.isArray(c.own))c.own=['none'];if(!Array.isArray(c.ms))c.ms=[];if(!(isFinite(c.coins)))c.coins=0;
+ ['sat','wat'].forEach(k=>{const v=c[k];if(!v||typeof v!=='object'||!isFinite(v.v)||!isFinite(v.t))c[k]={v:isFinite(v&&v.v)?+v.v:60,t:isFinite(v&&v.t)?+v.t:now}})}catch(e){}}
+/* таймеры чиби (раз в 30 с и др.) рисуют героя мимо render — чиним и там */
+if(typeof renderChibi==='function'){const _rch96=renderChibi;renderChibi=function(){cbFix();return _rch96.apply(this,arguments)}}
+if(typeof clUse==='function'){const _cu96=clUse;clUse=async function(){try{return await _cu96.apply(this,arguments)}finally{cbFix()}}}
+if(typeof clRefresh46==='function'){const _cr96=clRefresh46;clRefresh46=async function(){try{return await _cr96.apply(this,arguments)}finally{cbFix()}}}
+
+/* ---------- 6. ярлыки PWA: ./?a=add и ./?a=water ---------- */
+const PA_KEY='flow_pa';let paBusy=false;
+(function(){try{const url=new URL(location.href),a=url.searchParams.get('a');if(a!=='add'&&a!=='water')return;
+ try{sessionStorage.setItem(PA_KEY,a)}catch(e){window.__pa96=a}
+ url.searchParams.delete('a');history.replaceState(history.state,'',url.pathname+url.search+url.hash)}catch(e){}})();
+function paGet(){try{return sessionStorage.getItem(PA_KEY)}catch(e){return window.__pa96||null}}
+function paClear(){try{sessionStorage.removeItem(PA_KEY)}catch(e){}window.__pa96=null}
+function paRun(){const a=paGet();if(!a||paBusy||!okUser())return;const app=document.getElementById('app');if(!app||app.hidden)return;
+ paClear();paBusy=true;setTimeout(()=>{paBusy=false;try{
+  if(a==='add'){if(window.qa90Open)qa90Open();else quickAdd()}
+  else if(a==='water'){const w=+day().water||0;if(w>=8)toast('Норма воды на сегодня уже выполнена 💧');else{setWater(w+1);toast('Вода +1 💧 '+(w+1)+' из 8')}}
+ }catch(e){}},350)}
+
 /* ---------- обёртки ---------- */
 if(typeof renderWeight==='function'){const _rw96=renderWeight;renderWeight=function(){const x=_rw96.apply(this,arguments);try{weightEmpty()}catch(e){}return x}}
 if(typeof renderCarb==='function'){const _rc96=renderCarb;renderCarb=function(){const x=_rc96.apply(this,arguments);try{mealPlus()}catch(e){}return x}}
 if(typeof renderStats==='function'){const _rs96=renderStats;renderStats=function(){const x=_rs96.apply(this,arguments);try{statsEmpty()}catch(e){}return x}}
-const _r96=render;render=function(){try{heroDefault()}catch(e){}const x=_r96.apply(this,arguments);
- try{headSub()}catch(e){}try{statsEmpty()}catch(e){}try{weightEmpty()}catch(e){}try{mealPlus()}catch(e){}return x};
+const _r96=render;render=function(){cbFix();try{heroDefault()}catch(e){}const x=_r96.apply(this,arguments);
+ try{headSub()}catch(e){}try{statsEmpty()}catch(e){}try{weightEmpty()}catch(e){}try{mealPlus()}catch(e){}try{paRun()}catch(e){}return x};
+if(typeof enter==='function'){const _en96=enter;enter=function(){cbFix();const x=_en96.apply(this,arguments);try{paRun()}catch(e){}return x}}
 
 document.head.insertAdjacentHTML('beforeend','<style id="v96css">'+
  /* запасной вид заглушки, если v91 не подключён (у v91 те же правила для .v91empty) */
@@ -71,5 +97,5 @@ document.head.insertAdjacentHTML('beforeend','<style id="v96css">'+
  'html:not([data-ui=glam]):not([data-theme=slate]) nav .fab{filter:drop-shadow(0 8px 16px color-mix(in srgb,var(--lime) 42%,transparent))}'+
  '</style>');
 
-try{if(okUser())render()}catch(e){}
+cbFix();try{if(okUser())render()}catch(e){}
 })();

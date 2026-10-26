@@ -18,9 +18,9 @@ D.head.insertAdjacentHTML('beforeend','<style id="a11y93">'+[
 '[tabindex="-1"]:focus{outline:none!important}',
 '.a11y-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}',
 /* касаемые цели ≥44px */
-'.hb{width:44px!important;height:44px!important;min-width:44px}',
-'header>div:last-child{gap:4px!important}',
-'header>div:first-child{min-width:0;overflow:hidden}header>div:first-child>b,#hSub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}',
+/* .hb визуально 40px, область касания 44px (псевдоэлемент) — шапка на 320px не ломается */
+'.hb{position:relative}.hb::after{content:"";position:absolute;inset:-3px;border-radius:inherit}',
+'#app header>div:first-child{flex:1 1 auto;min-width:0}#app header>div:first-child>b{display:block;white-space:normal;overflow-wrap:anywhere}',
 '.chip2{min-height:44px;display:inline-flex!important;align-items:center;box-sizing:border-box}',
 '.gr>button{min-width:44px!important;min-height:44px!important}',
 '.meDel{min-height:44px;padding:12px 10px!important;opacity:1!important}',

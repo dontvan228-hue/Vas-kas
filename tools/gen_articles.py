@@ -20,7 +20,7 @@
 а также подстановки из базы продуктов index.html:
     [[slug]] / [[slug|текст]] — ссылка на страницу калорийности;
     {{k:slug}} — ккал на 100 г; {{k:slug:200}} — ккал в 200 г;
-    {{p:..}} {{f:..}} {{c:..}} — белки/жиры/углеводы (г), те же формы;
+    {{p:..}} {{f:..}} {{c:..}} {{fi:..}} — белки/жиры/углеводы/клетчатка (г), те же формы;
     {{sum:slug:г,slug:г}} — сумма ккал; {{cta}} — кнопка «Считать калории бесплатно».
 Раздел «## Вопросы и ответы» с подзаголовками ### попадает в разметку FAQPage.
 
@@ -102,7 +102,7 @@ def subst(text, ctx):
         k = g / 100
         if kind == "k":
             return G.fk(kc * k)
-        return G.fnum(round({"p": p, "f": fat, "c": c}[kind] * k, 1))
+        return G.fnum(round({"p": p, "f": fat, "c": c, "fi": fi}[kind] * k, 1))
 
     def rep(m):
         body = m.group(1)
@@ -118,7 +118,7 @@ def subst(text, ctx):
                     tot += f["v"][0] * float(g) / 100
             return str(int(round(tot)))
         bits = body.split(":")
-        if bits[0] in ("k", "p", "f", "c") and len(bits) in (2, 3):
+        if bits[0] in ("k", "p", "f", "c", "fi") and len(bits) in (2, 3):
             return val(bits[0], bits[1], bits[2] if len(bits) == 3 else None)
         ctx.errors.append("неизвестная подстановка {{%s}}" % body)
         return "?"

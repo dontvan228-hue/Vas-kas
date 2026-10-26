@@ -218,11 +218,11 @@ function offlinePage() {
 }
 
 // Сеть с таймаутом. Если сеть не успела, а в кэше есть — отдаём кэш, сеть продолжает и обновляет кэш в фоне.
-function networkFirst(e, req, store, names, onMiss) {
+function networkFirst(e, req, store, names, onMiss, key) {
   const net = fetch(req, { cache: 'no-cache' }).then(async res => {
     if (res && res.ok && (res.type === 'basic' || res.type === 'default' || res.type === 'cors')) {
       const c = await caches.open(store);
-      await c.put(req, (await clean(res.clone())));
+      await c.put(key || req, (await clean(res.clone())));
       if (store === PAGES) trim(PAGES, PAGES_MAX);
     }
     return res;
@@ -280,8 +280,10 @@ self.addEventListener('fetch', e => {
 
   if (r.mode === 'navigate' || (r.destination === 'document')) {
     if (isShell(u)) {
+      // Кладём под адрес без ?query, чтобы ./?a=add, ./?a=water и т.п. не плодили копий.
       e.respondWith(networkFirst(e, r, CORE, [CORE], async () =>
-        (await lookup(new Request(abs('./')), [CORE])) || (await lookup(new Request(abs('index.html')), [CORE])) || offlinePage()));
+        (await lookup(new Request(abs('./')), [CORE])) || (await lookup(new Request(abs('index.html')), [CORE])) || offlinePage(),
+        u.origin + u.pathname));
     } else {
       e.respondWith(networkFirst(e, r, PAGES, [PAGES, CORE], offlinePage));
     }

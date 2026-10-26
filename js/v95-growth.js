@@ -37,7 +37,7 @@ window.g95StreakInfo=streakInfo;
 
 /* ---------- общие стили ---------- */
 var css=''+
-'.g95card{position:relative}.g95card h2{margin-bottom:6px}.g95card p{font-size:13px;color:var(--mut);line-height:1.45}'+
+'.g95card{position:relative}html .card.g95card>.g95x,#g95m .in>.g95x{position:absolute;top:10px;right:10px;left:auto;z-index:2}.g95card h2{padding-right:36px}.g95card h2{margin-bottom:6px}.g95card p{font-size:13px;color:var(--mut);line-height:1.45}'+
 '.g95row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.g95row>button,.g95row>a{flex:1 1 120px;min-width:0}'+
 '.g95b{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--lime);color:var(--on);border:0;border-radius:14px;padding:12px 14px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none;text-align:center}'+
 '.g95b.gh{background:transparent;color:var(--lime);border:1px solid var(--line)}'+
