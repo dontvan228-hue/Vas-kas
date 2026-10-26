@@ -141,24 +141,28 @@ async function runQuiz(page, prefs, { skip = false } = {}) {
       assert(N <= M, `«${kind} ${N} из ${M}»: номер больше общего числа`);
       if (kind === 'Вопрос') prevMain = { N, M }; else prevExtra = { N, M };
     }
+    const sig = await page.evaluate(() => qi + '|' + document.getElementById('qBody').innerHTML.length + '|' + ((document.querySelector('#qBody .qt') || {}).textContent || ''));
     log.push(`${st.qi}:${st.key || (st.qi < 0 ? 'intro' : 'summary')}${st.lab ? ' [' + st.lab + ']' : ''}`);
-    const before = st.qi;
+    // клики через element.click(): анимации появления вариантов не тормозят прогон
     if (st.key && skip && st.skip && !(st.key in prefs)) {
       skipped = true;
-      await page.locator('#qBody button', { hasText: 'Пропустить' }).first().click();
+      await page.evaluate(() => [...document.querySelectorAll('#qBody button')].find(x => /Пропустить/.test(x.textContent)).click());
     } else if (st.key && st.qo > 0) {
       let idx = 0;
       if (st.key in prefs) { idx = st.vals.indexOf(prefs[st.key]); assert(idx >= 0, `в вопросе ${st.key} нет варианта ${prefs[st.key]} (есть: ${st.vals.join(',')})`); }
-      await page.locator('#qBody .qo').nth(idx).click();
+      await page.evaluate(i => document.querySelectorAll('#qBody .qo')[i].click(), idx);
     } else {
-      const btns = page.locator('#qBody .btn:not([disabled]):not(.q94skip)');
-      const c = await btns.count();
-      assert(c > 0, `в анкете нет активной кнопки на шаге ${st.qi}/${st.key}`);
-      await btns.nth(c - 1).click();
+      // шаги без вариантов (интро, оформление, выбор героя, сводка): последняя активная кнопка;
+      // кнопка может быть временно disabled (защита от случайного нажатия) — ждём, когда включится
+      const SEL = '#qBody .btn:not([disabled]):not(.q94skip)';
+      await page.waitForFunction(s => document.querySelector(s), SEL, { timeout: 4000 })
+        .catch(() => { throw new Fail(`в анкете нет активной кнопки на шаге ${st.qi}/${st.key || 'без вопроса'}`); });
+      await page.evaluate(s => { const b = document.querySelectorAll(s); b[b.length - 1].click(); }, SEL);
     }
-    // ждём смены шага или выхода из анкеты
-    await page.waitForFunction(b => document.getElementById('quiz').hidden || qi !== b, before, { timeout: 5000 })
-      .catch(() => { throw new Fail(`анкета застряла на шаге ${before} (${st.key})`); });
+    // ждём смены шага/экрана или выхода из анкеты
+    await page.waitForFunction(sig => document.getElementById('quiz').hidden ||
+      (qi + '|' + document.getElementById('qBody').innerHTML.length + '|' + ((document.querySelector('#qBody .qt') || {}).textContent || '')) !== sig, sig, { timeout: 5000 })
+      .catch(() => { throw new Fail(`анкета застряла на шаге ${st.qi} (${st.key})`); });
   }
   assert(await screen(page) === 'onb', `после анкеты ожидалась форма плана, открыт экран «${await screen(page)}»`);
   if (skip) log.skipped = skipped;
@@ -214,10 +218,12 @@ scenario('Регистрация: authMode(reg) + doAuth()', async () => {
   assert(await screen(page) === 'quiz', 'после регистрации ожидалась анкета, а открыт «' + await screen(page) + '»');
   // повторная регистрация той же почты — ошибка, а не перезапись
   await page.evaluate(() => logout());
+  await page.waitForFunction(() => !document.getElementById('auth').hidden);
   await page.evaluate(() => authMode('reg'));
-  await page.fill('#aMail', email); await page.fill('#aPass', PASS);
+  await page.fill('#aMail', email); await page.fill('#aPass', 'other-pass-1');
   await page.evaluate(() => doAuth());
-  await page.waitForFunction(() => document.querySelector('#aErr').textContent.trim());
+  assert(await screen(page) === 'auth', 'повторная регистрация занятой почты с другим паролем пустила в аккаунт');
+  assert((await page.textContent('#aErr')).trim(), 'нет сообщения об ошибке при регистрации занятой почты');
   // короткий пароль
   await page.evaluate(() => authMode('reg'));
   await page.fill('#aMail', mail('short')); await page.fill('#aPass', '123');

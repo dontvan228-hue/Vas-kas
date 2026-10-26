@@ -97,3 +97,40 @@
   if(gs&&gs.value==='lose'&&+$q('#oT').value>+$q('#oW').value){const e=$q('#oErr');if(e)e.textContent='Для снижения веса желаемый вес должен быть меньше текущего. Если хотите просто держать вес, выберите «Удержать вес».';return}}catch(e){}return _sp94.apply(this,arguments)};
  try{const o=$q('#onb');if(o&&!o.hidden)onShow()}catch(e){}
 })();
+
+/* ===== v94b: карточки-дозаполнения пропущенных вопросов анкеты (U().quiz.later) ===== */
+(function(){
+ if(typeof QZ==='undefined')return;
+ const $q=s=>document.querySelector(s);
+ /* спрашиваем только то, что на что-то влияет; мотивация и число приёмов пищи не используются */
+ const ASK=['rem','act','hard'];
+ const DAY=864e5;
+ const tday=()=>{try{return today()}catch(e){return new Date().toISOString().slice(0,10)}};
+ const kcal=()=>{try{return Math.round(plan().b)}catch(e){return 0}};
+ function pick(u){const q=u&&u.quiz;if(!q||!Array.isArray(q.later)||!u.p)return null;
+  if(q.lastAsk===tday())return null;
+  const sn=q.snooze||{},now=Date.now();
+  q.later=q.later.filter(k=>ASK.includes(k));
+  const k=q.later.find(k=>!(sn[k]>now));
+  if(!k)return null;const z=QZ.find(x=>x[0]===k);return z?{k,z}:null}
+ function apply(u,k,v){const q=u.quiz;q[k]=v;
+  if(k==='rem'){const n=NT();n.on=v!=='off';n.meals=v==='mv'||v==='meals';n.water=v!=='off';n.weigh=v==='wv'||v==='mv';n.eve=v==='mv';
+   try{if(n.on&&'Notification' in window&&Notification.permission==='default')Notification.requestPermission().then(()=>{try{renderNt()}catch(e){}})}catch(e){}
+   return v==='off'?'Напоминания выключены':'Напоминания настроены. Изменить можно в «Профиле»'}
+  if(k==='act'){const a=+v;if(a>0&&u.p){u.p.act=a;try{const s=$q('#oAct');if(s)s.value=String(v)}catch(e){}}const b=kcal();return b?'Норма обновлена: '+b+' ккал':'Активность сохранена'}
+  if(k==='hard'){try{return (typeof HT!=='undefined'&&HT[v])||'Спасибо, учтём'}catch(e){return 'Спасибо, учтём'}}
+  return 'Сохранено'}
+ window.q94Ans=function(k,i){try{const u=U(),q=u.quiz,z=QZ.find(x=>x[0]===k);if(!z||!z[2][i])return;
+  const msg=apply(u,k,z[2][i][2]);q.later=(q.later||[]).filter(x=>x!==k);if(q.snooze)delete q.snooze[k];q.lastAsk=tday();
+  save();try{hap()}catch(e){}render();toast(msg)}catch(e){}};
+ window.q94Snooze=function(k){try{const q=U().quiz;(q.snooze||(q.snooze={}))[k]=Date.now()+2*DAY;q.lastAsk=tday();save();render()}catch(e){}};
+ try{if(typeof TD_ORDER!=='undefined'&&Array.isArray(TD_ORDER)&&!TD_ORDER.includes('q94Later')){const i=TD_ORDER.indexOf('ringCard');TD_ORDER.splice(i>-1?i+1:0,0,'q94Later')}}catch(e){}
+ function card(){try{const t=$q('#t-today');let c=$q('#q94Later');const u=U();const it=u&&!(typeof isGuest==='function'&&isGuest()&&$q('#g99Save'))?pick(u):null;
+  if(!it||!t){if(c)c.remove();return}
+  const {k,z}=it,man=u.p&&u.p.sex==='m';
+  let title=z[1];if(k==='act')title='Сколько вы двигаетесь? От этого зависит норма калорий';
+  const html=`<h2 style="margin:0 0 4px">Уточним план</h2><p class="m" style="margin-bottom:10px">${esc(title)}</p><div class="chips">${z[2].map((o,i)=>`<button type="button" class="chip2" style="font-size:14px;padding:10px 14px;min-height:44px" onclick="q94Ans('${k}',${i})">${o[0]} ${esc(o[1])}</button>`).join('')}</div><button type="button" class="btn ghost" style="margin-top:10px" onclick="q94Snooze('${k}')">Не сейчас</button>`;
+  if(!c){c=document.createElement('div');c.className='card';c.id='q94Later';const r=$q('#ringCard');if(r&&r.parentNode===t)r.after(c);else t.prepend(c)}
+  if(c.dataset.k!==k){c.dataset.k=k;c.innerHTML=html}}catch(e){}}
+ try{const _r=render;render=function(){const x=_r.apply(this,arguments);card();return x}}catch(e){}
+})();
