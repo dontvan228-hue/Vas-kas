@@ -1212,7 +1212,7 @@ let zxRot=null;const _stop21=stopScan;stopScan=function(){if(zxRot){clearInterva
 </script>
 
 <script>
-if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js').then(r=>{r.update&&r.update()}).catch(()=>{})}catch(e){}})}
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update&&r.update()}).catch(()=>{})}catch(e){}})}
 </script>
 <script>
 /* v23: после подтверждения почты Supabase возвращает на сайт со входом в адресе. Входим автоматически. */

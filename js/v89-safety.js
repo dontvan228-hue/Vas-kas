@@ -113,12 +113,19 @@ try{const fix=(arr,name,vals)=>arr.forEach(x=>{if(x[0]===name)vals.forEach((v,i)
 }catch(e){}
 
 /* 8. Углеводы: одна норма на «Макро» и в «БЖУ за сегодня» */
-const _mn89n=mnorm;mnorm=function(){const r=_mn89n.apply(this,arguments);try{if(LIM()){const b=plan().b,C=MG().net;r.C=C;r.F=Math.max(r.F,Math.round((b-4*r.P-4*C)/9));r.net=1}}catch(e){}return r};
+/* C в mnorm = чистые углеводы (как в NG и на «Макро»), Ct = все углеводы, Fi = норма клетчатки */
+const FIBN=()=>{try{return U().p.sex==='m'?30:25}catch(e){return 25}};
+const _mn89n=mnorm;mnorm=function(){const r=_mn89n.apply(this,arguments);try{const b=plan().b;r.Fi=FIBN();
+ if(LIM()){const C=MG().net;r.C=C;r.Ct=C+r.Fi;r.F=Math.max(r.F,Math.round((b-4*r.P-4*C)/9));r.net=1}
+ else{r.Ct=r.C;r.C=Math.max(0,r.C-r.Fi)}}catch(e){}return r};
 renderBzu=function(){const e=$('#bzu');if(!e||!U()||!U().p)return;const m=macros(day()),N=mnorm(),lim=!!N.net,miss=day().food.filter(f=>f.p==null&&f.c==null).length;
  const row=(l,v,n,col)=>`<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><span>${l}</span><b>${n1(v)} / ${n} г</b></div><div style="height:8px;border-radius:5px;background:var(--trk);overflow:hidden;margin-top:4px"><div style="height:100%;width:${Math.min(100,n?v/n*100:0)}%;background:${col};border-radius:5px"></div></div></div>`;
- e.innerHTML=row('Белки',m.p,N.P,'var(--lime)')+row('Жиры',m.f,N.F,'#e8c76a')+(lim?row('Углеводы чистые (лимит)',Math.max(0,m.c-m.fi),N.C,'#e59a86'):row('Углеводы',m.c,N.C,'#e59a86'))
+ e.innerHTML=row('Белки',m.p,N.P,'var(--lime)')+row('Жиры',m.f,N.F,'#e8c76a')+(lim?row('Углеводы чистые (лимит)',Math.max(0,m.c-m.fi),N.C,'#e59a86'):row('Углеводы все (с клетчаткой)',m.c,N.Ct,'#e59a86')+row('из них чистые',Math.max(0,m.c-m.fi),N.C,'#e5b386'))
   +(miss?`<p class="m" style="font-size:11px">${miss} запис${miss==1?'ь':'и'} без БЖУ (добавлены только по ккал).</p>`:'')
-  +`<p class="m" style="font-size:11px">${lim?`Лимит ${N.C} г чистых углеводов (без клетчатки), основная энергия из белка и жиров.`:'Норма: белки около 30% калорий, жиры 28%, остальное углеводы.'}</p>`};
+  +`<p class="m" style="font-size:11px">${lim?`Лимит ${N.C} г чистых углеводов (без клетчатки), основная энергия из белка и жиров.`:`Норма: белки около 30% калорий, жиры 28%, остальное углеводы. Чистые = все углеводы минус клетчатка (норма ${N.Fi} г); на «Макро» показаны чистые.`}</p>`};
+/* старые названия переименованных продуктов при ручном вводе */
+const ALIAS89={'куриная грудка':'Куриная грудка запечённая','тунец консервированный':'Тунец консервированный без жидкости'};
+try{const _af89=addFood;addFood=function(){try{const i=$('#fN'),k=i&&i.value.trim().toLowerCase();if(ALIAS89[k])i.value=ALIAS89[k]}catch(e){}return _af89.apply(this,arguments)}}catch(e){}
 /* итоги анкеты: реальная цифра вместо «до 100 г» */
 const _qs89b=qSummary;qSummary=function(){_qs89b.apply(this,arguments);try{$('#qBody').querySelectorAll('.item').forEach(e=>{if(e.textContent.includes('Углеводы')){const b=e.querySelector('b');if(b)b.textContent=qa.diet==='lc'?'до 30 г чистых':'без жёсткого лимита, ориентир по вашей норме'}})}catch(e){}};
 /* беременность или кормление + «лоу-карб» в анкете: лимит 30 г только после подтверждения */
