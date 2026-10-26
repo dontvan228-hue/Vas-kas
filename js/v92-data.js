@@ -198,6 +198,27 @@ try{const _cu=clUse;clUse=async function(kind){if(kind!=='pull')return _cu.apply
    BL.set(v,snap(v));if(CL)CL.rts=null}}catch(e){}
  return r}}catch(e){}
 
+/* ---------- облачная сессия привязана к локальному пользователю (CL.owner) ---------- */
+let AUTHM=null;/* почта, для которой сейчас идёт вход в облако */
+const low=x=>String(x||'').toLowerCase();
+const clOwn=()=>{try{if(!CL||!CL.user||!me)return false;if(!CL.owner&&AUTHM)CL.owner=AUTHM;return !!CL.owner&&CL.owner===low(me)}catch(e){return false}};
+window.__v92own=clOwn;
+/* старая сессия без владельца: привязываем, только если владелец однозначен */
+try{if(CL&&CL.user&&!CL.owner){const ses=low(db&&db.session),em=low(CL.user.email),real=Object.keys((db&&db.users)||{}).filter(k=>k.indexOf('guest:')!==0);
+ if(em&&db.users[em])CL.owner=em;else if(ses&&real.length===1&&real[0]===ses)CL.owner=ses;
+ if(CL.owner)clSave()}}catch(e){}
+const NOT='Облако подключено к другому аккаунту на этом телефоне. Войдите в облако заново';
+try{const _pl=clPull;clPull=async function(){if(!AUTHM&&!clOwn())throw new Error(NOT);return _pl.apply(this,arguments)}}catch(e){}
+try{const _p=clPush;clPush=async function(){if(typeof isTest==='function'&&isTest())return;if(!clOwn())throw new Error(NOT);return _p.apply(this,arguments)}}catch(e){}
+try{const _r=clRefresh46;clRefresh46=async function(){if(!clOwn())return;return _r.apply(this,arguments)}}catch(e){}
+try{const _u=clUse;clUse=async function(){if(!clOwn()){clMsg=NOT;try{renderCloud()}catch(e){}return}return _u.apply(this,arguments)}}catch(e){}
+const withAuth=(name,mailOf)=>{try{const f=window[name];if(typeof f!=='function')return;window[name]=async function(){const m=low(mailOf.apply(this,arguments));const prev=AUTHM;AUTHM=m;
+ try{const r=await f.apply(this,arguments);try{if(CL&&CL.user&&!CL.owner){CL.owner=m;clSave()}}catch(e){}return r}finally{AUTHM=prev}}}catch(e){}};
+withAuth('cloudTry',mail=>mail);withAuth('cloudSignup',mail=>mail);withAuth('clAuth',()=>me);
+/* выход: облачную сессию отключаем, войти снова можно той же почтой и паролем */
+try{const _lo=logout;logout=function(){try{CL=null;localStorage.removeItem('flow_cloud');clMergedUid=''}catch(e){}return _lo.apply(this,arguments)}}catch(e){}
+try{const _rc=renderCloud;renderCloud=function(){try{if(CL&&CL.user&&me&&!clOwn()&&!AUTHM){const e=$('#cloudBox');if(e){e.innerHTML='<p class="m">'+NOT+'.</p><button class="btn ghost" onclick="clOut()">Отключить облако на этом телефоне</button>';return}}}catch(e){}return _rc.apply(this,arguments)}}catch(e){}
+
 /* ---------- 4. heroWords ---------- */
 try{const _hw=heroWords;let hl=0,ht=0;
  heroWords=function(){try{const u=U();if(!u||!u.p)return;const k=chKey(),male=!!(CHARS[k]&&CHARS[k].male);if(!male&&!isMan())return}catch(e){}

@@ -117,7 +117,7 @@ async function register(page, email) {
    skip: нажимать «Пропустить», когда кнопка есть. Возвращает журнал шагов. */
 async function runQuiz(page, prefs, { skip = false } = {}) {
   await page.waitForFunction(() => !document.getElementById('quiz').hidden);
-  const log = [], seen = new Set();
+  const log = page.qlog = [], seen = new Set();
   let prevMain = null, prevExtra = null, skipped = false;
   for (let step = 0; step < 60; step++) {
     const st = await page.evaluate(() => {
@@ -172,6 +172,7 @@ async function runQuiz(page, prefs, { skip = false } = {}) {
 /* ---------------- форма плана ---------------- */
 async function fillPlan(page, vals) {
   await waitVisible(page, '#onb');
+  if (VERBOSE) console.log('    форма до заполнения:', JSON.stringify(await page.evaluate(() => Object.fromEntries(['#oSex', '#oAge', '#oH', '#oW', '#oT', '#oAct', '#oPace', '#oGoalSel'].map(s => { const e = document.querySelector(s); return [s, e ? e.value + (e.closest('[hidden]') ? '(скрыто)' : '') : null]; })))));
   for (const [sel, v] of Object.entries(vals)) {
     const ok = await page.evaluate(([s, v]) => { const e = document.querySelector(s); if (!e) return 'нет';
       const r = e.getBoundingClientRect(), vis = !e.closest('[hidden]') && r.width > 0;
@@ -190,7 +191,8 @@ async function fillPlan(page, vals) {
 async function onboard(page, prefs, planVals, opt) {
   await open(page);
   await register(page, mail(opt && opt.tag || ''));
-  const log = await runQuiz(page, prefs, opt);
+  const log = await runQuiz(page, prefs, opt).catch(e => { if (VERBOSE && page.qlog) console.log('    ', page.qlog.join(' → ')); throw e; });
+  if (VERBOSE) console.log('    ', log.join(' → '));
   await fillPlan(page, planVals);
   return log;
 }

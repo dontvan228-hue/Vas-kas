@@ -426,7 +426,9 @@ button.cta{width:100%;border:0;cursor:pointer;font:inherit;font-weight:700;font-
 .res .line:last-child{border:0}
 .warn{border-color:var(--warn)}
 .letters{display:flex;flex-wrap:wrap;gap:4px}
-@media (max-width:420px){.big{grid-template-columns:repeat(2,minmax(0,1fr))}.top nav a.hide-s{display:none}th,td{padding:8px 3px;font-size:14px}}
+.logo{white-space:nowrap}.top nav{white-space:nowrap}
+@media (max-width:360px){.top nav a:first-child{display:none}}
+@media (max-width:420px){.big{grid-template-columns:repeat(2,minmax(0,1fr))}.top nav a.hide-s{display:none}.logo{font-size:13px;gap:8px;letter-spacing:.2px}.top nav a{font-size:13px;margin-left:10px}th,td{padding:8px 3px;font-size:14px}}
 """
 
 
