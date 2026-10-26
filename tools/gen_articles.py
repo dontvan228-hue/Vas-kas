@@ -116,7 +116,7 @@ def subst(text, ctx):
                 f = ctx.food(slug)
                 if f:
                     tot += f["v"][0] * float(g) / 100
-            return str(int(round(tot)))
+            return str(int(round(tot / 10) * 10))
         bits = body.split(":")
         if bits[0] in ("k", "p", "f", "c", "fi") and len(bits) in (2, 3):
             return val(bits[0], bits[1], bits[2] if len(bits) == 3 else None)
@@ -208,9 +208,9 @@ def md_to_html(md, cta_html):
     return "\n".join(out), [(q, a) for q, a in faq if a]
 
 
-def words(md):
-    t = re.sub(r"\{\{[^}]+\}\}|\[\[[^\]]+\]\]|\([^)]*\.html[^)]*\)|[#>|*\-]", " ", md)
-    return len(re.findall(r"[А-Яа-яЁёA-Za-z0-9]+", t))
+def words(text):
+    """Число слов в отрисованном тексте статьи (без кнопки)."""
+    return len(re.findall(r"[А-Яа-яЁёA-Za-z0-9]+(?:[-–][А-Яа-яЁёA-Za-z0-9]+)*", html.unescape(text)))
 
 
 def date_ru(iso):
@@ -229,7 +229,7 @@ def article_page(meta, md, ctx, all_meta):
     if md2.count("\x00CTA\x00") != 1:
         ctx.errors.append(f"{slug}: {{{{cta}}}} должен встречаться ровно один раз")
     body_html, faq = md_to_html(md2, cta)
-    n = words(md)
+    n = words(re.sub(r"<[^>]+>", " ", body_html.replace(cta, "")))
     minutes = max(2, round(n / 180))
     rel = [all_meta[r] for r in meta["related"] if r in all_meta]
     for r in meta["related"]:

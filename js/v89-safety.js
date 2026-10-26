@@ -114,7 +114,7 @@ try{const fix=(arr,name,vals)=>arr.forEach(x=>{if(x[0]===name)vals.forEach((v,i)
 
 /* 8. Углеводы: одна норма на «Макро» и в «БЖУ за сегодня» */
 /* C в mnorm = чистые углеводы (как в NG и на «Макро»), Ct = все углеводы, Fi = норма клетчатки */
-const FIBN=()=>{try{return U().p.sex==='m'?30:25}catch(e){return 25}};
+const FIBN=()=>{try{return Math.round(plan().b/1000*14)}catch(e){return 25}};/* как цель клетчатки на «Макро»: 14 г на 1000 ккал */
 const _mn89n=mnorm;mnorm=function(){const r=_mn89n.apply(this,arguments);try{const b=plan().b;r.Fi=FIBN();
  if(LIM()){const C=MG().net;r.C=C;r.Ct=C+r.Fi;r.F=Math.max(r.F,Math.round((b-4*r.P-4*C)/9));r.net=1}
  else{r.Ct=r.C;r.C=Math.max(0,r.C-r.Fi)}}catch(e){}return r};

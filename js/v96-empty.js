@@ -62,6 +62,8 @@ function cbFix(){try{const u=U();if(!u)return;if(u.cb!=null&&(typeof u.cb!=='obj
  ['sat','wat'].forEach(k=>{const v=c[k];if(!v||typeof v!=='object'||!isFinite(v.v)||!isFinite(v.t))c[k]={v:isFinite(v&&v.v)?+v.v:60,t:isFinite(v&&v.t)?+v.t:now}})}catch(e){}}
 /* таймеры чиби (раз в 30 с и др.) рисуют героя мимо render — чиним и там */
 if(typeof renderChibi==='function'){const _rch96=renderChibi;renderChibi=function(){cbFix();return _rch96.apply(this,arguments)}}
+/* cbMood зовут и renderChibi, и покадровый herLoop — дешёвая проверка перед ним */
+if(typeof cbMood==='function'){const _cm96=cbMood;cbMood=function(){try{const c=U()&&U().cb;if(c&&(!c.sat||!c.wat||typeof c.sat!=='object'||typeof c.wat!=='object'))cbFix()}catch(e){}return _cm96.apply(this,arguments)}}
 if(typeof clUse==='function'){const _cu96=clUse;clUse=async function(){try{return await _cu96.apply(this,arguments)}finally{cbFix()}}}
 if(typeof clRefresh46==='function'){const _cr96=clRefresh46;clRefresh46=async function(){try{return await _cr96.apply(this,arguments)}finally{cbFix()}}}
 

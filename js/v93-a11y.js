@@ -35,6 +35,8 @@ D.head.insertAdjacentHTML('beforeend','<style id="a11y93">'+[
 '.bd:not(.on){opacity:1!important;color:var(--mut)!important}.bd:not(.on)>span{opacity:.45}',
 /* контраст: светлые темы (определяются по --bg) */
 'html.a11y-light .meDel{color:#a8322a!important}',
+/* активная вкладка нижней панели: подпись на тонированной подложке */
+'html.a11y-light nav button.on em{color:color-mix(in srgb,var(--lime) 72%,#000)!important}',
 'html.a11y-light .bd:not(.on){color:var(--txt)!important}.a11y-light .bd:not(.on)>span{opacity:.4}',
 /* темы: минимальные сдвиги --mut и акцентов (сохраняют оттенок, только темнее/плотнее) */
 T('cream','@{--lime:#5c684b;--acc:92,104,75;--mut:rgba(58,50,38,.8)}'),
